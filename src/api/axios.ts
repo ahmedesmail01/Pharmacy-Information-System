@@ -1,7 +1,10 @@
 import axios from "axios";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://50.6.228.16:4000";
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://50.6.228.16:4000",
+  baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -23,7 +26,7 @@ api.interceptors.response.use(
       if (refreshToken && token) {
         try {
           const { data } = await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL}/api/Auth/refresh`,
+            `${API_BASE_URL}/api/Auth/refresh`,
             { token, refreshToken },
           );
           if (data.success) {
