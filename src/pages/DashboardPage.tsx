@@ -47,10 +47,10 @@ export default function DashboardPage() {
 
         const [branchesRes, productsRes, usersRes, salesRes, lowStockRes] =
           await Promise.all([
-            // branchService.getAll(),
-            // productService.getAll(),
+            branchService.getAll(),
+            productService.getAll(),
             systemUserService.getAll(),
-            // salesService.getAll({ startDate, endDate }),
+            salesService.getAll({ startDate, endDate }),
             productService.query({
               request: {
                 filters: [
