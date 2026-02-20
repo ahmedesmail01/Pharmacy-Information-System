@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 
 const API_BASE_URL = import.meta.env.PROD
-  ? "/api" // Netlify proxy
+  ? "" // same origin (relative paths starting with /api)
   : import.meta.env.VITE_API_BASE_URL || "http://50.6.228.16:4000";
 
 const api = axios.create({
