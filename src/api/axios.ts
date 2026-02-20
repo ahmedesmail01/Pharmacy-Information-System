@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://50.6.228.16:4000";
+const API_BASE_URL = import.meta.env.PROD
+  ? "" // same origin (https://your-site.com)
+  : import.meta.env.VITE_API_BASE_URL || "http://50.6.228.16:4000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -26,10 +27,10 @@ api.interceptors.response.use(
 
       if (refreshToken && token && user) {
         try {
-          const { data } = await axios.post(
-            `${API_BASE_URL}/api/Auth/refresh`,
-            { token, refreshToken },
-          );
+          const { data } = await api.post(`${API_BASE_URL}/api/Auth/refresh`, {
+            token,
+            refreshToken,
+          });
           if (data.success) {
             setAuth(data.data.token, data.data.refreshToken, user);
             error.config.headers.Authorization = `Bearer ${data.data.token}`;
@@ -43,7 +44,7 @@ api.interceptors.response.use(
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  },
+  }
 );
 
 export default api;
