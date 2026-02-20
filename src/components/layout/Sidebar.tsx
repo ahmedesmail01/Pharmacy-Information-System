@@ -56,7 +56,7 @@ export default function Sidebar() {
         </h2>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
         {menuItems.map((item) => (
           <div key={item.label}>
             {item.children ? (
