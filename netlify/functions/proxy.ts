@@ -1,26 +1,37 @@
 import type { Handler } from "@netlify/functions";
 
 export const handler: Handler = async (event) => {
+  // Handle preflight
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods":
+          "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      },
+      body: "",
+    };
+  }
+
   try {
-    const targetBase = "http://50.6.228.16:4000"; // الباك HTTP
+    const targetBase = "http://50.6.228.16:4000";
     const path = event.queryStringParameters?.path || "";
     const url = `${targetBase}/${path}`.replace(/([^:]\/)\/+/g, "$1");
 
-    const method = event.httpMethod || "GET";
-
-    // Body
-    const body = method !== "GET" && method !== "HEAD" ? event.body : undefined;
-
     const res = await fetch(url, {
-      method,
+      method: event.httpMethod,
       headers: {
         "content-type": event.headers["content-type"] || "application/json",
-        // لو الباك محتاج Authorization من الفرونت مرّره:
         ...(event.headers.authorization
           ? { authorization: event.headers.authorization }
           : {}),
       },
-      body,
+      body:
+        event.httpMethod !== "GET" && event.httpMethod !== "HEAD"
+          ? event.body
+          : undefined,
     });
 
     const text = await res.text();
@@ -28,9 +39,8 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: res.status,
       headers: {
-        "content-type": res.headers.get("content-type") || "application/json",
-        // CORS للفرونت
-        "access-control-allow-origin": "*",
+        "Content-Type": res.headers.get("content-type") || "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
       body: text,
     };
