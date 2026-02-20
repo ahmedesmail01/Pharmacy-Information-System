@@ -71,7 +71,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+              <div className="absolute inset-y-0 top-5 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                 <User className="h-4 w-4" />
               </div>
               <Input
@@ -85,7 +85,7 @@ export default function LoginPage() {
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+              <div className="absolute inset-y-0 top-5 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                 <Lock className="h-4 w-4" />
               </div>
               <Input
