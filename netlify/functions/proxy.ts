@@ -22,8 +22,8 @@ export const handler: Handler = async (event: HandlerEvent) => {
   const remainingParams = new URLSearchParams(
     Object.fromEntries(
       Object.entries(event.queryStringParameters ?? {}).filter(
-        ([k]) => k !== "path",
-      ),
+        ([k, v]) => k !== "path" && v !== undefined,
+      ) as [string, string][],
     ),
   ).toString();
   const targetUrl =
