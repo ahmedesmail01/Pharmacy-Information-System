@@ -1,4 +1,5 @@
 import { useEffect, ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import Button from "./Button";
 
@@ -42,8 +43,8 @@ export default function Modal({
     full: "max-w-full m-4",
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div
         className={`bg-white rounded-2xl shadow-xl w-full flex flex-col max-h-[90vh] ${sizeClasses[size]}`}
         onClick={(e) => e.stopPropagation()}
@@ -56,6 +57,7 @@ export default function Modal({
         </div>
         <div className="flex-1 overflow-y-auto p-6">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
