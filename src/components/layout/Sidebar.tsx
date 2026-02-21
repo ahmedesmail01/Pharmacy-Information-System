@@ -7,11 +7,13 @@ import {
   Database,
   Users,
   ShieldCheck,
-  Search,
   ChevronDown,
   ChevronRight,
   UserCircle,
   Settings,
+  ChevronLeft,
+  ChevronRight as ChevronRightIcon,
+  Menu,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -35,7 +37,17 @@ const menuItems = [
   { label: "Lookups", icon: Settings, path: "/lookups" },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  isCollapsed: boolean;
+  setIsCollapsed: (value: boolean) => void;
+  isMobileOpen: boolean;
+}
+
+export default function Sidebar({
+  isCollapsed,
+  setIsCollapsed,
+  isMobileOpen,
+}: SidebarProps) {
   const location = useLocation();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
@@ -45,42 +57,69 @@ export default function Sidebar() {
   };
 
   const toggleSubmenu = (label: string) => {
-    setOpenSubmenu(openSubmenu === label ? null : label);
+    if (isCollapsed) {
+      setIsCollapsed(false);
+      setOpenSubmenu(label);
+    } else {
+      setOpenSubmenu(openSubmenu === label ? null : label);
+    }
   };
 
   return (
-    <aside className="w-64 bg-gray-900 text-white h-screen fixed left-0 top-0 z-40 flex flex-col">
-      <div className="p-6">
-        <h2 className="text-xl font-bold tracking-tight text-blue-400">
-          Pharmacy IS
-        </h2>
+    <aside
+      className={`bg-gray-900 text-white h-screen fixed left-0 top-0 z-40 flex flex-col transition-all duration-300 ${
+        isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      } ${isCollapsed ? "w-20" : "w-64"}`}
+    >
+      <div className="p-6 flex items-center justify-between overflow-hidden">
+        {!isCollapsed && (
+          <h2 className="text-xl font-bold tracking-tight text-blue-400 truncate">
+            Pharmacy IS
+          </h2>
+        )}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-800 text-gray-400 transition-colors ml-auto"
+        >
+          {isCollapsed ? (
+            <ChevronRightIcon className="h-5 w-5" />
+          ) : (
+            <ChevronLeft className="h-5 w-5" />
+          )}
+        </button>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto no-scrollbar overflow-x-hidden">
         {menuItems.map((item) => (
           <div key={item.label}>
             {item.children ? (
               <>
                 <button
                   onClick={() => toggleSubmenu(item.label)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors ${
+                  className={`w-full flex items-center justify-between px-3 py-3 rounded-xl transition-colors ${
                     isActive(item.path)
                       ? "bg-blue-600 text-white"
                       : "hover:bg-gray-800 text-gray-400"
                   }`}
+                  title={isCollapsed ? item.label : ""}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
+                    <item.icon className="h-5 w-5 min-w-[20px]" />
+                    {!isCollapsed && (
+                      <span className="font-medium whitespace-nowrap">
+                        {item.label}
+                      </span>
+                    )}
                   </div>
-                  {openSubmenu === item.label ? (
-                    <ChevronDown className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
+                  {!isCollapsed &&
+                    (openSubmenu === item.label ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    ))}
                 </button>
-                {openSubmenu === item.label && (
-                  <div className="ml-12 mt-1 space-y-1">
+                {openSubmenu === item.label && !isCollapsed && (
+                  <div className="ml-10 mt-1 space-y-1 transition-all">
                     {item.children.map((child) => (
                       <Link
                         key={child.path}
@@ -100,25 +139,37 @@ export default function Sidebar() {
             ) : (
               <Link
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors ${
                   isActive(item.path)
                     ? "bg-blue-600 text-white"
                     : "hover:bg-gray-800 text-gray-400"
                 }`}
+                title={isCollapsed ? item.label : ""}
               >
-                <item.icon className="h-5 w-5" />
-                <span className="font-medium">{item.label}</span>
+                <item.icon className="h-5 w-5 min-w-[20px]" />
+                {!isCollapsed && (
+                  <span className="font-medium whitespace-nowrap">
+                    {item.label}
+                  </span>
+                )}
               </Link>
             )}
           </div>
         ))}
       </nav>
 
-      <div className="p-6 border-t border-gray-800">
-        <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2 px-4">
-          Version
-        </div>
-        <div className="px-4 text-sm text-gray-400 font-medium">v1.0.0</div>
+      <div className="p-6 border-t border-gray-800 flex flex-col items-center">
+        {!isCollapsed && (
+          <div className="w-full">
+            <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2 px-1">
+              Version
+            </div>
+            <div className="px-1 text-sm text-gray-400 font-medium">v1.0.0</div>
+          </div>
+        )}
+        {isCollapsed && (
+          <div className="text-[10px] text-gray-600 font-bold">V1.0</div>
+        )}
       </div>
     </aside>
   );

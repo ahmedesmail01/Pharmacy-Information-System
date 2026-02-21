@@ -184,7 +184,7 @@ export default function BranchesPage() {
         addLabel="Add Branch"
       />
 
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         <SearchBar
           onSearch={setSearchTerm}
           placeholder="Filter by branch name..."

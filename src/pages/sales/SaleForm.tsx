@@ -249,7 +249,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto overflow-x-auto">
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-300 gap-2">
                 <ShoppingCart className="h-12 w-12 opacity-20" />
@@ -258,67 +258,75 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
                 </p>
               </div>
             ) : (
-              <table className="w-full">
-                <thead className="sticky top-0 bg-white border-b border-gray-50">
-                  <tr className="text-left text-[10px] text-gray-400 uppercase tracking-widest">
-                    <th className="px-6 py-3 font-bold">Product</th>
-                    <th className="px-6 py-3 font-bold text-center">Qty</th>
-                    <th className="px-6 py-3 font-bold text-right">Price</th>
-                    <th className="px-6 py-3 font-bold text-right">Subtotal</th>
-                    <th className="px-6 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {cart.map((item) => (
-                    <tr
-                      key={item.product.oid}
-                      className="group hover:bg-gray-50/50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <p className="font-bold text-gray-900 text-sm">
-                          {item.product.drugName}
-                        </p>
-                        <p className="text-[10px] text-gray-400">
-                          Unit: ${item.unitPrice.toFixed(2)}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => updateQuantity(item.product.oid, -1)}
-                            className="p-1 hover:bg-white rounded border border-gray-200"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <span className="w-8 text-center font-bold text-sm">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.product.oid, 1)}
-                            className="p-1 hover:bg-white rounded border border-gray-200"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-right font-medium text-gray-600 text-sm">
-                        ${item.unitPrice.toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 text-right font-bold text-gray-900 text-sm">
-                        ${(item.quantity * item.unitPrice).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => removeFromCart(item.product.oid)}
-                          className="text-gray-300 hover:text-red-500 transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </td>
+              <div className="min-w-[600px] lg:min-w-0">
+                <table className="w-full">
+                  <thead className="sticky top-0 bg-white border-b border-gray-50">
+                    <tr className="text-left text-[10px] text-gray-400 uppercase tracking-widest">
+                      <th className="px-6 py-3 font-bold">Product</th>
+                      <th className="px-6 py-3 font-bold text-center">Qty</th>
+                      <th className="px-6 py-3 font-bold text-right">Price</th>
+                      <th className="px-6 py-3 font-bold text-right">
+                        Subtotal
+                      </th>
+                      <th className="px-6 py-3"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {cart.map((item) => (
+                      <tr
+                        key={item.product.oid}
+                        className="group hover:bg-gray-50/50 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <p className="font-bold text-gray-900 text-sm">
+                            {item.product.drugName}
+                          </p>
+                          <p className="text-[10px] text-gray-400">
+                            Unit: ${item.unitPrice.toFixed(2)}
+                          </p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() =>
+                                updateQuantity(item.product.oid, -1)
+                              }
+                              className="p-1 hover:bg-white rounded border border-gray-200"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="w-8 text-center font-bold text-sm">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() =>
+                                updateQuantity(item.product.oid, 1)
+                              }
+                              className="p-1 hover:bg-white rounded border border-gray-200"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium text-gray-600 text-sm">
+                          ${item.unitPrice.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 text-right font-bold text-gray-900 text-sm">
+                          ${(item.quantity * item.unitPrice).toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={() => removeFromCart(item.product.oid)}
+                            className="text-gray-300 hover:text-red-500 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>
