@@ -1,19 +1,30 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 
-const API_BASE_URL = import.meta.env.PROD
-  ? "" // same origin (relative paths starting with /api)
-  : import.meta.env.VITE_API_BASE_URL || "http://50.6.228.16:4000";
+const IS_PROD = import.meta.env.PROD;
+const DEV_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://50.6.228.16:4000";
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  // In dev, hit the backend directly. In prod, we'll rewrite URLs below.
+  baseURL: IS_PROD ? "/" : DEV_BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Request interceptor: attach JWT
+// Request interceptor: attach JWT + rewrite URL through Netlify proxy in prod
 api.interceptors.request.use((config) => {
   const { token } = useAuthStore.getState();
   if (token) config.headers.Authorization = `Bearer ${token}`;
+
+  if (IS_PROD && config.url) {
+    // Strip leading slash to get the path, e.g. "api/Auth/login"
+    const apiPath = config.url.replace(/^\//, "");
+    config.url = `/.netlify/functions/proxy`;
+    config.params = { path: apiPath, ...config.params };
+    // Remove the baseURL so axios doesn't prepend it again
+    config.baseURL = "";
+  }
+
   return config;
 });
 
@@ -27,7 +38,7 @@ api.interceptors.response.use(
 
       if (refreshToken && token && user) {
         try {
-          const { data } = await api.post(`${API_BASE_URL}/api/Auth/refresh`, {
+          const { data } = await api.post(`/api/Auth/refresh`, {
             token,
             refreshToken,
           });
