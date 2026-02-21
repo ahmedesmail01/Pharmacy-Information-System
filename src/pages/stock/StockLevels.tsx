@@ -124,7 +124,7 @@ export default function StockLevels() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-end">
+      <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-6 sm:items-end">
         <div className="flex-1 space-y-2">
           <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
             Search Products
@@ -134,7 +134,7 @@ export default function StockLevels() {
             placeholder="Search by product name or GTIN..."
           />
         </div>
-        <div className="w-full md:w-64 space-y-2">
+        <div className="w-full sm:w-64 space-y-2">
           <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
             Branch Location
           </label>

@@ -209,8 +209,8 @@ export default function ProductsPage() {
         addLabel="Add Product"
       />
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 items-end">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
           <div className="flex-1">
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">
               Search Products
@@ -220,7 +220,7 @@ export default function ProductsPage() {
               placeholder="Search by drug name or GTIN..."
             />
           </div>
-          <div className="w-full md:w-64">
+          <div className="w-full sm:w-64">
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">
               Category Filter
             </label>

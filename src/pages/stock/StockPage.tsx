@@ -37,7 +37,7 @@ export default function StockPage() {
         </div>
       </PageHeader>
 
-      <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-2xl w-fit">
+      <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-2xl w-fit max-w-full overflow-x-auto no-scrollbar">
         <button
           onClick={() => setActiveTab("levels")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${

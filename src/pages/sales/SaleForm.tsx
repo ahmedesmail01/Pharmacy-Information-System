@@ -159,7 +159,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 min-h-[70vh]">
-      <div className="xl:col-span-2 space-y-6">
+      <div className="xl:col-span-2 space-y-6 min-w-0">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Select
             label="Source Branch"
