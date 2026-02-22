@@ -71,7 +71,13 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
         const cRes = await stakeholderService.getAll({
           stakeholderTypeCode: "CUSTOMER",
         });
-        setCustomers(cRes.data.data || []);
+        const rawCustomers = cRes.data.data || [];
+        setCustomers(
+          rawCustomers.map((c: any) => ({
+            ...c,
+            fullName: c.fullName || c.name || "",
+          })),
+        );
       } catch (err) {
         console.error("Failed to fetch customers", err);
       }
