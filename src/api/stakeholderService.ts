@@ -15,17 +15,23 @@ export const stakeholderService = {
       req,
     ),
 
-  getAll: (params?: { stakeholderTypeId?: string }) =>
+  getAll: (params?: { stakeholderTypeCode?: string }) =>
     api.get<ApiResponse<StakeholderDto[]>>("/api/Stakeholder", { params }),
 
   getById: (id: string) =>
     api.get<ApiResponse<StakeholderDto>>(`/api/Stakeholder/${id}`),
 
   create: (dto: CreateStakeholderDto) =>
-    api.post<ApiResponse<StakeholderDto>>("/api/Stakeholder", dto),
+    api.post<ApiResponse<StakeholderDto>>("/api/Stakeholder", {
+      ...dto,
+      name: dto.fullName,
+    }),
 
   update: (id: string, dto: UpdateStakeholderDto) =>
-    api.put<ApiResponse<StakeholderDto>>(`/api/Stakeholder/${id}`, dto),
+    api.put<ApiResponse<StakeholderDto>>(`/api/Stakeholder/${id}`, {
+      ...dto,
+      name: dto.fullName,
+    }),
 
   delete: (id: string) => api.delete<ApiResponse>(`/api/Stakeholder/${id}`),
 };

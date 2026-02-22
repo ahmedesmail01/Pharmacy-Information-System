@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "@/store/authStore";
 import AppLayout from "@/components/layout/AppLayout";
@@ -21,37 +23,42 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+const queryClient = new QueryClient();
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <Toaster position="top-right" />
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<DashboardPage />} />
-          <Route path="branches" element={<BranchesPage />} />
-          <Route path="products" element={<ProductsPage />} />
-          <Route path="roles" element={<RolesPage />} />
-          <Route path="sales" element={<SalesPage />} />
-          <Route path="sales/:id" element={<SaleDetailPage />} />
-          <Route path="stakeholders" element={<StakeholdersPage />} />
-          <Route path="stock" element={<StockPage />} />
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Toaster position="top-right" />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
           <Route
-            path="stock/transactions"
-            element={<StockTransactionsPage />}
-          />
-          <Route path="users" element={<UsersPage />} />
-          <Route path="lookups" element={<LookupsPage />} />
-          <Route path="lookups/:lookupCode" element={<LookupDetailPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="branches" element={<BranchesPage />} />
+            <Route path="products" element={<ProductsPage />} />
+            <Route path="roles" element={<RolesPage />} />
+            <Route path="sales" element={<SalesPage />} />
+            <Route path="sales/:id" element={<SaleDetailPage />} />
+            <Route path="stakeholders" element={<StakeholdersPage />} />
+            <Route path="stock" element={<StockPage />} />
+            <Route
+              path="stock/transactions"
+              element={<StockTransactionsPage />}
+            />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="lookups" element={<LookupsPage />} />
+            <Route path="lookups/:lookupCode" element={<LookupDetailPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }

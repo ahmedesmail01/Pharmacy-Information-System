@@ -50,19 +50,38 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Fetch Products
       try {
-        const [pRes, bRes, cRes, lRes] = await Promise.all([
-          productService.getAll(),
-          branchService.getAll(),
-          stakeholderService.getAll({ stakeholderTypeId: "CUSTOMER" }),
-          lookupService.getByCode("PAYMENT_METHOD"),
-        ]);
+        const pRes = await productService.getAll();
         setProducts(pRes.data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch products", err);
+      }
+
+      // Fetch Branches
+      try {
+        const bRes = await branchService.getAll();
         setBranches(bRes.data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch branches", err);
+      }
+
+      // Fetch Customers
+      try {
+        const cRes = await stakeholderService.getAll({
+          stakeholderTypeCode: "CUSTOMER",
+        });
         setCustomers(cRes.data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch customers", err);
+      }
+
+      // Fetch Payment Methods
+      try {
+        const lRes = await lookupService.getByCode("PAYMENT_METHOD");
         setPaymentMethods(lRes.data.data?.lookupDetails || []);
       } catch (err) {
-        console.error("Failed to fetch POS data", err);
+        console.error("Failed to fetch payment methods", err);
       }
     };
     fetchData();

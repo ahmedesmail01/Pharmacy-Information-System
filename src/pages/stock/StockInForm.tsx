@@ -56,7 +56,7 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
         const [bRes, pRes, sRes] = await Promise.all([
           branchService.getAll(),
           productService.getAll(),
-          stakeholderService.getAll({ stakeholderTypeId: "VENDOR" }),
+          stakeholderService.getAll({ stakeholderTypeCode: "VENDOR" }),
         ]);
         setBranches(bRes.data.data || []);
         setProducts(pRes.data.data || []);
@@ -114,7 +114,7 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
       <Select
         {...register("supplierId")}
         label="Supplier (Vendor)"
-        options={suppliers.map((s) => ({ value: s.oid, label: s.fullName }))}
+        options={suppliers.map((s) => ({ value: s.oid, label: s.name }))}
         error={errors.supplierId?.message}
         disabled={isLoading}
       />

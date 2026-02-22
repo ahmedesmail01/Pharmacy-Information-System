@@ -36,7 +36,10 @@ export const stockService = {
 
   // ── Stock In ──────────────────────────────────────────────────────────────
   stockIn: (dto: CreateStockInDto) =>
-    api.post<ApiResponse<StockTransactionDto>>("/api/Stock/in", dto),
+    api.post<ApiResponse<StockTransactionDto>>("/api/Stock/in", {
+      ...dto,
+      toBranchId: dto.branchId,
+    }),
 
   // ── Stock Transfer ────────────────────────────────────────────────────────
   transfer: (dto: CreateStockTransferDto) =>
