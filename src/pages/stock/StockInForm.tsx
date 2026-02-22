@@ -60,7 +60,13 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
         ]);
         setBranches(bRes.data.data || []);
         setProducts(pRes.data.data || []);
-        setSuppliers(sRes.data.data || []);
+        const rawSuppliers = sRes.data.data || [];
+        setSuppliers(
+          rawSuppliers.map((s: any) => ({
+            ...s,
+            fullName: s.fullName || s.name || "",
+          })),
+        );
       } catch (err) {
         console.error("Failed to fetch stock in data", err);
       }
@@ -114,7 +120,7 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
       <Select
         {...register("supplierId")}
         label="Supplier (Vendor)"
-        options={suppliers.map((s) => ({ value: s.oid, label: s.name }))}
+        options={suppliers.map((s) => ({ value: s.oid, label: s.fullName }))}
         error={errors.supplierId?.message}
         disabled={isLoading}
       />
