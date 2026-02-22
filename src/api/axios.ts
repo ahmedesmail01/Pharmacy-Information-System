@@ -32,7 +32,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
-    if (error.response?.status === 401) {
+    if (
+      error.response?.status === 401 &&
+      error.response?.data?.message !== "Invalid username or password."
+    ) {
+      console.log("error", error);
       const { token, refreshToken, setAuth, clearAuth, user } =
         useAuthStore.getState();
 
