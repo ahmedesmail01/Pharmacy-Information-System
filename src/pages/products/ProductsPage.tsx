@@ -170,21 +170,21 @@ export default function ProductsPage() {
       ),
     },
     {
-      header: "Product Type",
-      accessorKey: "productTypeName",
+      header: "Package Type",
+      accessorKey: "packageType",
       cell: (info: any) => (
         <Badge className="bg-blue-50 text-blue-700">
-          <Beaker className="h-3 w-3 mr-1" />
+          {/* <Beaker className="h-3 w-3 mr-1" /> */}
           {info.getValue() || "Other"}
         </Badge>
       ),
     },
-    {
-      header: "Manufacturer",
-      accessorKey: "manufacturer",
-      cell: (info: any) =>
-        info.getValue() || <span className="text-gray-400">---</span>,
-    },
+    // {
+    //   header: "Manufacturer",
+    //   accessorKey: "manufacturer",
+    //   cell: (info: any) =>
+    //     info.getValue() || <span className="text-gray-400">---</span>,
+    // },
     {
       header: "Price",
       accessorKey: "price",
@@ -195,10 +195,19 @@ export default function ProductsPage() {
       ),
     },
     {
-      header: "Status",
-      accessorKey: "status",
+      header: "Marketing Status",
+      accessorKey: "marketingStatus",
       cell: (info: any) => (
-        <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
+        <Badge variant={info.getValue() === "1" ? "success" : "danger"}>
+          {info.getValue() === 1 ? "Active" : "Inactive"}
+        </Badge>
+      ),
+    },
+    {
+      header: "legal Status",
+      accessorKey: "legalStatus",
+      cell: (info: any) => (
+        <Badge variant={info.getValue() === "1" ? "success" : "danger"}>
           {info.getValue() === 1 ? "Active" : "Inactive"}
         </Badge>
       ),
