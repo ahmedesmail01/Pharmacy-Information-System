@@ -89,7 +89,10 @@ export default function ProductsPage() {
     setIsActionLoading(true);
     try {
       if (selectedProduct) {
-        await productService.update(selectedProduct.oid, formData);
+        await productService.update(selectedProduct.oid, {
+          ...formData,
+          oid: selectedProduct.oid,
+        });
         toast.success("Product updated successfully");
       } else {
         await productService.create(formData);
