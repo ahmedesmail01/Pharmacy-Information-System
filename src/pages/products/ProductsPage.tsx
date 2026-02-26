@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Edit2,
   Trash2,
@@ -81,9 +81,9 @@ export default function ProductsPage() {
     fetch("", filters);
   }, [fetch, searchTerm, productTypeId]);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData, pageNumber]);
+  // useEffect(() => {
+  //   loadData();
+  // }, [loadData, pageNumber]);
 
   const handleCreateOrUpdate = async (formData: any) => {
     setIsActionLoading(true);
@@ -119,19 +119,26 @@ export default function ProductsPage() {
     }
   };
 
-  // ✅ when filters change: reset page to 1 (only once)
-  useEffect(() => {
-    if (pageNumber !== 1) {
-      setPageNumber(1);
-      return; // ⛔ don't fetch yet (avoid fetching old page)
-    }
-    loadData(); // ✅ already on page 1, just fetch
-  }, [searchTerm, productTypeId]); // intentionally NOT depending on pageNumber/loadData
+  // ✅ track previous filters
+  const prevFiltersRef = useRef({ searchTerm: "", productTypeId: "" });
 
-  // ✅ when page changes (pagination clicks): fetch
   useEffect(() => {
+    const prev = prevFiltersRef.current;
+    const filtersChanged =
+      prev.searchTerm !== searchTerm || prev.productTypeId !== productTypeId;
+
+    if (filtersChanged) {
+      prevFiltersRef.current = { searchTerm, productTypeId };
+
+      // reset to 1 once, and wait for pageNumber effect re-run
+      if (pageNumber !== 1) {
+        setPageNumber(1);
+        return;
+      }
+    }
+
     loadData();
-  }, [pageNumber, loadData]);
+  }, [searchTerm, productTypeId, pageNumber, setPageNumber, loadData]);
 
   // ✅ memoized handlers (prevents SearchBar effects from re-firing)
   const handleSearch = useCallback((value: string) => {
