@@ -27,7 +27,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       label,
       error,
       options,
-      placeholder = "Select...",
+      // placeholder = "Select...",
       disabled,
       required,
       searchPlaceholder = "Search...",
@@ -260,7 +260,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
               selectedOption ? "text-gray-900 truncate" : "text-gray-400"
             }
           >
-            {selectedOption ? selectedOption.label : (placeholder as string)}
+            {selectedOption ? selectedOption.label : ("select" as string)}
           </span>
 
           <span className="flex items-center gap-1 shrink-0">
