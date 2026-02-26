@@ -12,11 +12,11 @@ export default function Pagination({
   totalPages,
   onPageChange,
 }: PaginationProps) {
-  if (totalPages <= 1) return null;
+  // if (totalPages <= 1) return null;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   const visiblePages = pages.filter(
-    (p) => p === 1 || p === totalPages || Math.abs(p - pageNumber) <= 1,
+    (p) => p === 1 || p === totalPages || Math.abs(p - pageNumber) <= 1
   );
 
   const renderedPages: (number | string)[] = [];

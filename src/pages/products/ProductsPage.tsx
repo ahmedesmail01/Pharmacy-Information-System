@@ -119,6 +119,32 @@ export default function ProductsPage() {
     }
   };
 
+  // ✅ when filters change: reset page to 1 (only once)
+  useEffect(() => {
+    if (pageNumber !== 1) {
+      setPageNumber(1);
+      return; // ⛔ don't fetch yet (avoid fetching old page)
+    }
+    loadData(); // ✅ already on page 1, just fetch
+  }, [searchTerm, productTypeId]); // intentionally NOT depending on pageNumber/loadData
+
+  // ✅ when page changes (pagination clicks): fetch
+  useEffect(() => {
+    loadData();
+  }, [pageNumber, loadData]);
+
+  // ✅ memoized handlers (prevents SearchBar effects from re-firing)
+  const handleSearch = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
+
+  const handleTypeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setProductTypeId(e.target.value);
+    },
+    []
+  );
+
   const columns = [
     {
       header: "GTIN / Drug Name",
@@ -227,7 +253,7 @@ export default function ProductsPage() {
               Search Products
             </label>
             <SearchBar
-              onSearch={setSearchTerm}
+              onSearch={handleSearch}
               placeholder="Search by drug name or GTIN..."
             />
           </div>
@@ -237,7 +263,7 @@ export default function ProductsPage() {
             </label>
             <Select
               value={productTypeId}
-              onChange={(e) => setProductTypeId(e.target.value)}
+              onChange={handleTypeChange}
               options={productTypes.map((pt) => ({
                 value: pt.oid,
                 label: pt.valueNameEn || pt.valueNameAr || "",
