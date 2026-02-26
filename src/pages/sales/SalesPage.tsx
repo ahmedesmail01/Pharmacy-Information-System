@@ -170,7 +170,7 @@ export default function SalesPage() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <Card className="lg:col-span-1 p-5 border-blue-50">
+        {/* <Card className="lg:col-span-1 p-5 border-blue-50">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
             Quick Stats
           </h3>
@@ -193,9 +193,9 @@ export default function SalesPage() {
               </p>
             </div>
           </div>
-        </Card>
+        </Card> */}
 
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-4 space-y-4">
           <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
             <SearchBar
               onSearch={setSearchTerm}
