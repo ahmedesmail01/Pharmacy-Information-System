@@ -115,7 +115,7 @@ export default function LookupDetailPage() {
     return <div className="text-center py-12">Lookup category not found</div>;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="max-w-full mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="flex items-center justify-between">
         <Link to="/lookups">
           <Button
