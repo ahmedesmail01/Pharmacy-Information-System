@@ -33,7 +33,7 @@ export default function ProductsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDto | null>(
-    null,
+    null
   );
   const [isActionLoading, setIsActionLoading] = useState(false);
 
@@ -133,6 +133,17 @@ export default function ProductsPage() {
       ),
     },
     {
+      header: "Generic Name",
+      accessorKey: "genericName",
+      cell: (info: any) => (
+        <div className="flex flex-col">
+          <span className="font-bold text-wrap max-w-60 text-gray-600">
+            {info.getValue()}
+          </span>
+        </div>
+      ),
+    },
+    {
       header: "Product Type",
       accessorKey: "productTypeName",
       cell: (info: any) => (
@@ -178,7 +189,7 @@ export default function ProductsPage() {
               setSelectedProduct(info.row.original);
               setIsFormOpen(true);
             }}
-            className="text-blue-600 h-8 w-8 p-0 hover:bg-blue-50"
+            className="text-blue-600  p-0 hover:bg-blue-50"
           >
             <Edit2 className="h-4 w-4" />
           </Button>
@@ -189,7 +200,7 @@ export default function ProductsPage() {
               setSelectedProduct(info.row.original);
               setIsDeleteOpen(true);
             }}
-            className="text-red-600 h-8 w-8 p-0 hover:bg-red-50"
+            className="text-red-600 p-0 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
