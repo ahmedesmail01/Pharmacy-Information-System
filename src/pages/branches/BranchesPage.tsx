@@ -125,18 +125,18 @@ export default function BranchesPage() {
     //     </Badge>
     //   ),
     // },
-    {
-      header: "Stock",
-      accessorKey: "stockCount",
-      cell: (info: any) => (
-        <Badge
-          variant="default"
-          className="bg-green-50 text-green-700 border border-green-100"
-        >
-          {info.getValue()} Items
-        </Badge>
-      ),
-    },
+    // {
+    //   header: "Stock",
+    //   accessorKey: "stockCount",
+    //   cell: (info: any) => (
+    //     <Badge
+    //       variant="default"
+    //       className="bg-green-50 text-green-700 border border-green-100"
+    //     >
+    //       {info.getValue()} Items
+    //     </Badge>
+    //   ),
+    // },
     // {
     //   header: "Status",
     //   accessorKey: "status",

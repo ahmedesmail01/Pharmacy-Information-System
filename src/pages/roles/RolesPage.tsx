@@ -155,7 +155,7 @@ export default function RolesPage() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-full mx-auto space-y-6">
       <PageHeader
         title="Access Control Roles"
         onAddClick={() => {
