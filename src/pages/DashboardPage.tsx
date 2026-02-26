@@ -45,45 +45,45 @@ export default function DashboardPage() {
         const startDate = format(startOfDay(today), "yyyy-MM-dd'T'HH:mm:ss");
         const endDate = format(endOfDay(today), "yyyy-MM-dd'T'HH:mm:ss");
 
-        const [branchesRes, productsRes, usersRes, salesRes, lowStockRes] =
-          await Promise.all([
-            branchService.getAll(),
-            productService.getAll(),
-            systemUserService.getAll(),
-            salesService.getAll({ startDate, endDate }),
-            productService.query({
-              request: {
-                filters: [
-                  // This is a bit tricky since we need to compare availableQuantity with minStockLevel
-                  // The API might not support cross-field comparison directly in filters.
-                  // For now, we'll fetch products and filter client-side or assume a "low stock" flag if it existed.
-                  // Strictly speaking, SOP says "use Stock query endpoint with filter"
-                  // Let's stick to the SOP instruction as much as possible.
-                ],
-                pagination: { pageNumber: 1, pageSize: 5 },
-                sort: [{ sortBy: "drugName", sortDirection: "asc" }],
-              },
-            }),
-          ]);
+        // const [branchesRes, productsRes, usersRes, salesRes, lowStockRes] =
+        //   await Promise.all([
+        //     branchService.getAll(),
+        //     productService.getAll(),
+        //     systemUserService.getAll(),
+        //     salesService.getAll({ startDate, endDate }),
+        //     productService.query({
+        //       request: {
+        //         filters: [
+        //           // This is a bit tricky since we need to compare availableQuantity with minStockLevel
+        //           // The API might not support cross-field comparison directly in filters.
+        //           // For now, we'll fetch products and filter client-side or assume a "low stock" flag if it existed.
+        //           // Strictly speaking, SOP says "use Stock query endpoint with filter"
+        //           // Let's stick to the SOP instruction as much as possible.
+        //         ],
+        //         pagination: { pageNumber: 1, pageSize: 5 },
+        //         sort: [{ sortBy: "drugName", sortDirection: "asc" }],
+        //       },
+        //     }),
+        //   ]);
 
-        const todaySales = salesRes.data.data || [];
-        const revenue = todaySales.reduce(
-          (acc, sale) => acc + (sale.totalAmount || 0),
-          0,
-        );
+        // const todaySales = salesRes.data.data || [];
+        // const revenue = todaySales.reduce(
+        //   (acc, sale) => acc + (sale.totalAmount || 0),
+        //   0,
+        // );
 
-        setStats({
-          branches: branchesRes.data.data?.length || 0,
-          products: productsRes.data.data?.length || 0,
-          users: usersRes.data.data?.length || 0,
-          todaySalesCount: todaySales.length,
-          todayRevenue: revenue,
-        });
+        // setStats({
+        //   branches: branchesRes.data.data?.length || 0,
+        //   products: productsRes.data.data?.length || 0,
+        //   users: usersRes.data.data?.length || 0,
+        //   todaySalesCount: todaySales.length,
+        //   todayRevenue: revenue,
+        // });
 
-        setRecentSales(todaySales.slice(0, 5));
+        // setRecentSales(todaySales.slice(0, 5));
 
         // Mocking low stock for now if the query system doesn't directly support this logic
-        setLowStockProducts(lowStockRes.data.data?.data.slice(0, 5) || []);
+        // setLowStockProducts(lowStockRes.data.data?.data.slice(0, 5) || []);
       } catch (err) {
         handleApiError(err, "Failed to load dashboard data");
       } finally {
@@ -168,25 +168,20 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Branches"
-          value={stats.branches}
+          value={500}
           icon={MapPin}
           color="blue"
         />
         <StatCard
           title="Total Products"
-          value={stats.products}
+          value={500}
           icon={Package}
           color="green"
         />
-        <StatCard
-          title="Total Users"
-          value={stats.users}
-          icon={Users}
-          color="purple"
-        />
+        <StatCard title="Total Users" value={500} icon={Users} color="purple" />
         <StatCard
           title="Today's Revenue"
-          value={`$${stats.todayRevenue.toFixed(2)}`}
+          value={`$${500}`}
           icon={TrendingUp}
           trend={{ value: 12, isUp: true }}
           color="yellow"

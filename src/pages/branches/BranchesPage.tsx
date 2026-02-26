@@ -50,7 +50,10 @@ export default function BranchesPage() {
     setIsActionLoading(true);
     try {
       if (selectedBranch) {
-        await branchService.update(selectedBranch.oid, formData);
+        await branchService.update(selectedBranch.oid, {
+          ...formData,
+          oid: selectedBranch.oid,
+        });
         toast.success("Branch updated successfully");
       } else {
         await branchService.create(formData);
@@ -104,22 +107,24 @@ export default function BranchesPage() {
     {
       header: "Location",
       accessorFn: (row: BranchDto) =>
-        `${row.city || ""}${row.city && row.district ? ", " : ""}${row.district || ""}`,
+        `${row.city || ""}${row.city && row.district ? ", " : ""}${
+          row.district || ""
+        }`,
       cell: (info: any) =>
         info.getValue() || <span className="text-gray-400">---</span>,
     },
-    {
-      header: "Users",
-      accessorKey: "userCount",
-      cell: (info: any) => (
-        <Badge
-          variant="default"
-          className="bg-purple-50 text-purple-700 border border-purple-100"
-        >
-          {info.getValue()} Users
-        </Badge>
-      ),
-    },
+    // {
+    //   header: "Users",
+    //   accessorKey: "userCount",
+    //   cell: (info: any) => (
+    //     <Badge
+    //       variant="default"
+    //       className="bg-purple-50 text-purple-700 border border-purple-100"
+    //     >
+    //       {info.getValue()} Users
+    //     </Badge>
+    //   ),
+    // },
     {
       header: "Stock",
       accessorKey: "stockCount",
@@ -132,15 +137,15 @@ export default function BranchesPage() {
         </Badge>
       ),
     },
-    {
-      header: "Status",
-      accessorKey: "status",
-      cell: (info: any) => (
-        <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Inactive"}
-        </Badge>
-      ),
-    },
+    // {
+    //   header: "Status",
+    //   accessorKey: "status",
+    //   cell: (info: any) => (
+    //     <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
+    //       {info.getValue() === 1 ? "Active" : "Inactive"}
+    //     </Badge>
+    //   ),
+    // },
     {
       header: "Actions",
       id: "actions",
