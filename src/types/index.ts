@@ -451,7 +451,7 @@ export interface CreateStockTransferDto {
 
 export interface AppLookupDetailDto {
   oid: string;
-  lookupMasterID: string;
+  masterID: string;
   lookupDetailCode: string;
   valueNameAr: string | null;
   valueNameEn: string | null;

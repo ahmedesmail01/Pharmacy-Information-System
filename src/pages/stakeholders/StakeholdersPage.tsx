@@ -66,14 +66,14 @@ export default function StakeholdersPage() {
     const filters = [];
     if (searchTerm) {
       filters.push({
-        propertyName: "fullName",
+        propertyName: "name",
         value: searchTerm,
         operation: FilterOperation.Contains,
       });
     }
     if (stakeholderTypeCode) {
       filters.push({
-        propertyName: "stakeholderTypeCode",
+        propertyName: "stakeholderTypeId",
         value: stakeholderTypeCode,
         operation: FilterOperation.Equals,
       });
@@ -207,7 +207,7 @@ export default function StakeholdersPage() {
             value={stakeholderTypeCode}
             onChange={(e) => setStakeholderTypeCode(e.target.value)}
             options={types.map((t) => ({
-              value: t.lookupDetailCode || "",
+              value: t.oid || "",
               label: t.valueNameEn || "",
             }))}
             className="h-[42px]"
