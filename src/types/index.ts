@@ -316,11 +316,18 @@ export interface UpdateProductDto extends CreateProductDto {
 export interface StakeholderDto {
   oid: string;
   name: string;
+  gln?: string;
   stakeholderTypeCode: string;
+  stakeholderTypeId?: string;
   stakeholderTypeName?: string;
+  city?: string;
+  district?: string;
+  address?: string;
+  isActive?: boolean;
+  contactPerson?: string;
   email?: string;
   phoneNumber?: string;
-  address?: string;
+  phone?: string;
   taxNumber?: string;
   crNumber?: string;
   status: number | null;

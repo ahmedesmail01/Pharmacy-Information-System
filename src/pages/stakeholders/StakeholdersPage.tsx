@@ -36,6 +36,7 @@ export default function StakeholdersPage() {
   const [selectedStakeholder, setSelectedStakeholder] =
     useState<StakeholderDto | null>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   const {
     data,
@@ -103,6 +104,19 @@ export default function StakeholdersPage() {
     }
   };
 
+  const handleEdit = async (id: string) => {
+    setIsDetailLoading(true);
+    try {
+      const res = await stakeholderService.getById(id);
+      setSelectedStakeholder(res.data.data);
+      setIsFormOpen(true);
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setIsDetailLoading(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!selectedStakeholder) return;
     setIsActionLoading(true);
@@ -154,11 +168,12 @@ export default function StakeholdersPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              setSelectedStakeholder(info.row.original);
-              setIsFormOpen(true);
-            }}
-            className="text-blue-600  p-0 hover:bg-blue-50"
+            onClick={() => handleEdit(info.row.original.oid)}
+            className="text-blue-600 p-0 hover:bg-blue-50"
+            isLoading={
+              isDetailLoading &&
+              selectedStakeholder?.oid === info.row.original.oid
+            }
           >
             <Edit2 className="h-4 w-4" />
           </Button>

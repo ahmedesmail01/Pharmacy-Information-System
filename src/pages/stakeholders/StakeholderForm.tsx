@@ -68,7 +68,7 @@ export default function StakeholderForm({
         fullName: initialData.name || "",
         stakeholderTypeCode: initialData.stakeholderTypeCode || "",
         email: initialData.email || "",
-        phoneNumber: initialData.phoneNumber || "",
+        phoneNumber: initialData.phoneNumber || initialData.phone || "",
         address: initialData.address || "",
         taxNumber: initialData.taxNumber || "",
         crNumber: initialData.crNumber || "",
