@@ -98,6 +98,7 @@ export const LookupProvider: React.FC<{ children: React.ReactNode }> = ({
         "INVOICE_STATUS",
         "DOSAGE_FORM",
         "VAT_TYPE",
+        "STAKEHOLDER_TYPE",
       ]);
     }
   }, [cache, refreshLookups]);

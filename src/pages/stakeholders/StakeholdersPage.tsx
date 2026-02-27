@@ -24,9 +24,13 @@ import { lookupService } from "@/api/lookupService";
 import { useQueryTable } from "@/hooks/useQuery";
 import { handleApiError } from "@/utils/handleApiError";
 import { StakeholderDto, AppLookupDetailDto, FilterOperation } from "@/types";
+import { useLookup } from "@/context/LookupContext";
 
 export default function StakeholdersPage() {
-  const { t } = useTranslation("stakeholders");
+  const { t, i18n } = useTranslation("stakeholders");
+  const { getLookupDetails } = useLookup();
+  const isAr = i18n.language === "ar";
+  const stakeholderTypes = getLookupDetails("STAKEHOLDER_TYPE");
   const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [stakeholderTypeCode, setStakeholderTypeCode] = useState("");
@@ -37,6 +41,8 @@ export default function StakeholdersPage() {
     useState<StakeholderDto | null>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
+
+  console.log(getLookupDetails("STAKEHOLDER_TYPE"));
 
   const {
     data,
@@ -151,6 +157,20 @@ export default function StakeholdersPage() {
               #{info.row.original.oid.slice(0, 8)}
             </span>
           </div>
+        </div>
+      ),
+    },
+
+    {
+      header: t("stakeholderTypeId"),
+      accessorKey: "stakeholderTypeId",
+      cell: (info: any) => (
+        <div className="flex items-center gap-3">
+          {isAr
+            ? stakeholderTypes.find((x) => x.oid === info.getValue())
+                ?.valueNameAr
+            : stakeholderTypes.find((x) => x.oid === info.getValue())
+                ?.valueNameEn || "-"}
         </div>
       ),
     },

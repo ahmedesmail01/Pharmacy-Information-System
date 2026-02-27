@@ -70,8 +70,8 @@ export default function StakeholderForm({
         email: initialData.email || "",
         phoneNumber: initialData.phoneNumber || initialData.phone || "",
         address: initialData.address || "",
-        taxNumber: initialData.taxNumber || "",
-        crNumber: initialData.crNumber || "",
+        // taxNumber: initialData.taxNumber || "",
+        // crNumber: initialData.crNumber || "",
         status: initialData.status ?? 1,
       });
     }
@@ -122,7 +122,7 @@ export default function StakeholderForm({
         disabled={isLoading}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
           {...register("taxNumber")}
           label={t("taxNumber")}
@@ -137,7 +137,7 @@ export default function StakeholderForm({
           error={errors.crNumber?.message}
           disabled={isLoading}
         />
-      </div>
+      </div> */}
 
       <Select
         {...register("status")}
