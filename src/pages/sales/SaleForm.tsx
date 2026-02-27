@@ -51,60 +51,143 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  const [isDataLoading, setIsDataLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Initial Fetch: Branches, Stakeholders, Payment Methods
   useEffect(() => {
-    const fetchData = async () => {
-      // Fetch Products
+    const fetchInitialData = async () => {
+      setIsDataLoading(true);
       try {
-        const pRes = await productService.getAll();
-        setProducts(pRes.data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch products", err);
-      }
-
-      // Fetch Branches
-      try {
-        const bRes = await branchService.getAll();
-        setBranches(bRes.data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch branches", err);
-      }
-
-      // Fetch Customers
-      try {
-        const cRes = await stakeholderService.getAll({
-          stakeholderTypeCode: "CUSTOMER",
+        // Fetch Branches (Paginated)
+        const bRes = await branchService.query({
+          request: {
+            filters: [],
+            sort: [],
+            pagination: { pageNumber: 1, pageSize: 50 },
+          },
         });
-        const rawCustomers = cRes.data.data || [];
-        setCustomers(
-          rawCustomers.map((c: any) => ({
-            ...c,
-            fullName: c.fullName || c.name || "",
-          })),
-        );
-      } catch (err) {
-        console.error("Failed to fetch customers", err);
-      }
+        setBranches(bRes.data.data?.data || []);
 
-      // Fetch Payment Methods
-      try {
+        // Fetch Customers (Paginated)
+        const cRes = await stakeholderService.query({
+          request: {
+            filters: [
+              {
+                propertyName: "stakeholderTypeCode",
+                value: "CUSTOMER",
+                operation: 0, // Equal
+              },
+            ],
+            sort: [],
+            pagination: { pageNumber: 1, pageSize: 50 },
+          },
+        });
+        const rawCustomers = cRes.data.data?.data || [];
+        setCustomers(rawCustomers);
+
+        // Fetch Payment Methods (Lookups - usually small, but still via service)
         const lRes = await lookupService.getByCode("PAYMENT_METHOD");
         setPaymentMethods(lRes.data.data?.lookupDetails || []);
       } catch (err) {
-        console.error("Failed to fetch payment methods", err);
+        console.error("Failed to fetch initial data", err);
+      } finally {
+        setIsDataLoading(false);
       }
     };
-    fetchData();
+    fetchInitialData();
   }, []);
 
-  const filteredProducts = useMemo(() => {
-    return products
-      .filter(
-        (p) =>
-          p.drugName?.toLowerCase().includes(search.toLowerCase()) ||
-          p.gtin?.includes(search),
-      )
-      .slice(0, 8);
-  }, [products, search]);
+  // Debounced Product Search
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (!search.trim()) {
+        setProducts([]);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const pRes = await productService.query({
+          request: {
+            filters: [
+              {
+                propertyName: "drugName",
+                value: search,
+                operation: 6, // Contains
+              },
+            ],
+            sort: [],
+            pagination: { pageNumber: 1, pageSize: 10 },
+          },
+        });
+        setProducts(pRes.data.data?.data || []);
+      } catch (err) {
+        console.error("Failed to search products", err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const filteredProducts = products;
+
+  // Debounced Branch Search
+  const handleBranchSearch = useMemo(() => {
+    let timer: any;
+    return (val: string) => {
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        try {
+          const res = await branchService.query({
+            request: {
+              filters: val.trim()
+                ? [{ propertyName: "branchName", value: val, operation: 6 }]
+                : [],
+              sort: [],
+              pagination: { pageNumber: 1, pageSize: 50 },
+            },
+          });
+          setBranches(res.data.data?.data || []);
+        } catch (err) {
+          console.error("Branch search failed", err);
+        }
+      }, 400);
+    };
+  }, []);
+
+  // Debounced Customer Search
+  const handleCustomerSearch = useMemo(() => {
+    let timer: any;
+    return (val: string) => {
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        try {
+          const res = await stakeholderService.query({
+            request: {
+              filters: [
+                {
+                  propertyName: "stakeholderTypeCode",
+                  value: "CUSTOMER",
+                  operation: 0,
+                },
+                ...(val.trim()
+                  ? [{ propertyName: "fullName", value: val, operation: 6 }]
+                  : []),
+              ] as any,
+              sort: [],
+              pagination: { pageNumber: 1, pageSize: 50 },
+            },
+          });
+          setCustomers(res.data.data?.data || []);
+        } catch (err) {
+          console.error("Customer search failed", err);
+        }
+      }, 400);
+    };
+  }, []);
 
   const addToCart = (product: ProductDto) => {
     setCart((prev) => {
@@ -193,6 +276,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             label={t("source_branch")}
             value={selectedBranchId}
             onChange={(e) => setSelectedBranchId(e.target.value)}
+            onSearchChange={handleBranchSearch}
             options={branches.map((b) => ({
               value: b.oid,
               label: b.branchName ?? "",
@@ -202,9 +286,10 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             label={t("customer_optional")}
             value={selectedCustomerId}
             onChange={(e) => setSelectedCustomerId(e.target.value)}
+            onSearchChange={handleCustomerSearch}
             options={customers.map((c) => ({
               value: c.oid,
-              label: c.fullName ?? "",
+              label: c.name ?? "",
             }))}
           />
         </div>
@@ -222,7 +307,12 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
 
           {search && (
             <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
-              {filteredProducts.length > 0 ? (
+              {isSearching ? (
+                <div className="p-8 text-center text-gray-400">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                  {t("searching")}...
+                </div>
+              ) : filteredProducts.length > 0 ? (
                 <div className="divide-y divide-gray-100">
                   {filteredProducts.map((p) => (
                     <button

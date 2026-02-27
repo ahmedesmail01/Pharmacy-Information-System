@@ -19,6 +19,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   error?: string;
   options: Option[];
   searchPlaceholder?: string;
+  onSearchChange?: (search: string) => void;
 }
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
@@ -38,6 +39,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       onBlur,
       value: valueProp,
       defaultValue,
+      onSearchChange,
       ...rest
     },
     ref,
@@ -301,8 +303,10 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                   type="text"
                   value={search}
                   onChange={(e) => {
-                    setSearch(e.target.value);
+                    const val = e.target.value;
+                    setSearch(val);
                     setHighlightedIndex(-1);
+                    if (onSearchChange) onSearchChange(val);
                   }}
                   placeholder={searchPlaceholder}
                   className="flex-1 text-sm bg-transparent outline-none text-gray-700 placeholder:text-gray-400 min-w-0"

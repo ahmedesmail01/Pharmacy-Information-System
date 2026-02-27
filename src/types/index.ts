@@ -315,7 +315,7 @@ export interface UpdateProductDto extends CreateProductDto {
 
 export interface StakeholderDto {
   oid: string;
-  fullName: string;
+  name: string;
   stakeholderTypeCode: string;
   stakeholderTypeName?: string;
   email?: string;
