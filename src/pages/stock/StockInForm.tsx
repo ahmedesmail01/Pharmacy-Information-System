@@ -124,7 +124,7 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
       <Select
         {...register("supplierId")}
         label={t("supplier")}
-        options={suppliers.map((s) => ({ value: s.oid, label: s.fullName }))}
+        options={suppliers.map((s) => ({ value: s.oid, label: s.name }))}
         error={errors.supplierId?.message}
         disabled={isLoading}
       />

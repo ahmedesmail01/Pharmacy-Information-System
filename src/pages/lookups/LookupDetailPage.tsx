@@ -60,7 +60,7 @@ export default function LookupDetailPage() {
 
     const formData = new FormData(e.currentTarget);
     const data = {
-      lookupMasterID: master.oid,
+      masterID: master.oid,
       valueCode: formData.get("detailCode") as string,
       valueNameAr: formData.get("nameAr") as string,
       valueNameEn: formData.get("nameEn") as string,

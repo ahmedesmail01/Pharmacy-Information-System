@@ -65,7 +65,7 @@ export default function StakeholderForm({
   useEffect(() => {
     if (initialData) {
       reset({
-        fullName: initialData.fullName || "",
+        fullName: initialData.name || "",
         stakeholderTypeCode: initialData.stakeholderTypeCode || "",
         email: initialData.email || "",
         phoneNumber: initialData.phoneNumber || "",

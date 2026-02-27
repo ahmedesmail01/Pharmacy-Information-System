@@ -501,7 +501,7 @@ export interface UpdateAppLookupMasterDto {
 // }
 
 export interface CreateAppLookupDetailDto {
-  lookupMasterID: string;
+  masterID: string;
   valueCode: string;
   valueNameAr: string;
   valueNameEn: string;
