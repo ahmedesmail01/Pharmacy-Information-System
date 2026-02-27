@@ -455,6 +455,8 @@ export interface AppLookupDetailDto {
   lookupDetailCode: string;
   valueNameAr: string | null;
   valueNameEn: string | null;
+  sortOrder?: number;
+  isDefault?: boolean;
   status: number;
   isActive?: boolean;
 }
@@ -490,12 +492,21 @@ export interface UpdateAppLookupMasterDto {
   isSystem: boolean;
 }
 
+// export interface CreateAppLookupDetailDto {
+//   masterId: string;
+//   lookupDetailCode: string;
+//   valueNameAr: string;
+//   valueNameEn: string;
+//   status: number;
+// }
+
 export interface CreateAppLookupDetailDto {
-  masterId: string;
-  lookupDetailCode: string;
+  lookupMasterID: string;
+  valueCode: string;
   valueNameAr: string;
   valueNameEn: string;
-  status: number;
+  sortOrder: number;
+  isDefault: boolean;
 }
 
 export interface UpdateAppLookupDetailDto {

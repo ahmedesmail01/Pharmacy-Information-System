@@ -60,11 +60,12 @@ export default function LookupDetailPage() {
 
     const formData = new FormData(e.currentTarget);
     const data = {
-      masterId: master.oid,
-      lookupDetailCode: formData.get("detailCode") as string,
-      valueNameEn: formData.get("nameEn") as string,
+      lookupMasterID: master.oid,
+      valueCode: formData.get("detailCode") as string,
       valueNameAr: formData.get("nameAr") as string,
-      status: 1,
+      valueNameEn: formData.get("nameEn") as string,
+      sortOrder: Number(formData.get("sortOrder")) || 0,
+      isDefault: formData.get("isDefault") === "on",
     };
 
     setIsActionLoading(true);
@@ -92,8 +93,8 @@ export default function LookupDetailPage() {
       valueCode: formData.get("detailCode") as string,
       valueNameEn: formData.get("nameEn") as string,
       valueNameAr: formData.get("nameAr") as string,
-      sortOrder: undefined,
-      isDefault: false,
+      sortOrder: Number(formData.get("sortOrder")) || 0,
+      isDefault: formData.get("isDefault") === "on",
       isActive: (formData.get("isActive") as string) === "1",
     };
 
@@ -369,6 +370,29 @@ export default function LookupDetailPage() {
               label={t("valueAr")}
               placeholder="e.g. دواء بوصفة"
             />
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                name="sortOrder"
+                label={t("sortOrder")}
+                placeholder="e.g. 1"
+                type="number"
+                min="0"
+              />
+              <div className="flex items-center gap-2 pt-8">
+                <input
+                  type="checkbox"
+                  name="isDefault"
+                  id="create-isDefault"
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="create-isDefault"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  {t("isDefault")}
+                </label>
+              </div>
+            </div>
           </div>
           <div className="flex justify-end pt-4">
             <Button
@@ -407,6 +431,30 @@ export default function LookupDetailPage() {
               label={t("valueAr")}
               defaultValue={editDetail?.valueNameAr || ""}
             />
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                name="sortOrder"
+                label={t("sortOrder")}
+                defaultValue={editDetail?.sortOrder?.toString() || "0"}
+                type="number"
+                min="0"
+              />
+              <div className="flex items-center gap-2 pt-8">
+                <input
+                  type="checkbox"
+                  name="isDefault"
+                  id="edit-isDefault"
+                  defaultChecked={editDetail?.isDefault}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="edit-isDefault"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  {t("isDefault")}
+                </label>
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {tc("status")}
