@@ -76,7 +76,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
               {
                 propertyName: "stakeholderTypeCode",
                 value: "CUSTOMER",
-                operation: 0, // Equal
+                operation: 2, // contains
               },
             ],
             sort: [],
@@ -114,7 +114,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
               {
                 propertyName: "drugName",
                 value: search,
-                operation: 6, // Contains
+                operation: 2, // Contains
               },
             ],
             sort: [],
@@ -171,7 +171,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
                 {
                   propertyName: "stakeholderTypeCode",
                   value: "CUSTOMER",
-                  operation: 0,
+                  operation: 2,
                 },
                 ...(val.trim()
                   ? [{ propertyName: "fullName", value: val, operation: 6 }]
