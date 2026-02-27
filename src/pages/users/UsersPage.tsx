@@ -6,6 +6,8 @@ import {
   Mail,
   Shield,
   MapPin,
+  Clock,
+  AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import PageHeader from "@/components/shared/PageHeader";
@@ -140,6 +142,39 @@ export default function UsersPage() {
           {info.getValue() || "---"}
         </div>
       ),
+    },
+    {
+      header: "Last Login",
+      accessorKey: "lastLogin",
+      cell: (info: any) => {
+        const val = info.getValue();
+        if (!val) return <span className="text-gray-400">—</span>;
+        return (
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <Clock className="h-3 w-3" />
+            {new Date(val).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </div>
+        );
+      },
+    },
+    {
+      header: "Failed Logins",
+      accessorKey: "failedLoginCount",
+      cell: (info: any) => {
+        const count = info.getValue() ?? 0;
+        if (count === 0) return <span className="text-gray-400">0</span>;
+        return (
+          <div className="flex items-center gap-1.5 text-orange-600 text-sm font-medium">
+            <AlertTriangle className="h-3 w-3" />
+            {count}
+          </div>
+        );
+      },
     },
     {
       header: "Status",

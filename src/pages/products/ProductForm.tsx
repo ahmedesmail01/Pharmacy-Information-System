@@ -13,6 +13,8 @@ import { positiveNumberInputProps } from "@/utils/positiveNumberInputProps";
 const productSchema = z.object({
   drugName: z.string().min(1, "Drug name is required").max(200),
   gtin: z.string().optional(),
+  barcode: z.string().optional(),
+  drugNameAr: z.string().optional(),
   genericName: z.string().optional(),
   productTypeId: z.string().optional(),
   strengthValue: z.string().optional(),
@@ -32,6 +34,10 @@ const productSchema = z.object({
   drugStatus: z.string().optional(),
   marketingStatus: z.string().optional(),
   legalStatus: z.string().optional(),
+  vatTypeId: z.string().optional(),
+  packageTypeId: z.string().optional(),
+  dosageFormId: z.string().optional(),
+  productGroupId: z.string().optional(),
   status: z.coerce.number().default(1),
 });
 
@@ -52,6 +58,12 @@ export default function ProductForm({
     "basic" | "strength" | "regulatory" | "stock"
   >("basic");
   const [productTypes, setProductTypes] = useState<AppLookupDetailDto[]>([]);
+  const [vatTypes, setVatTypes] = useState<AppLookupDetailDto[]>([]);
+  const [packageTypeLookups, setPackageTypeLookups] = useState<
+    AppLookupDetailDto[]
+  >([]);
+  const [dosageForms, setDosageForms] = useState<AppLookupDetailDto[]>([]);
+  const [productGroups, setProductGroups] = useState<AppLookupDetailDto[]>([]);
 
   const {
     register,
@@ -72,8 +84,19 @@ export default function ProductForm({
   useEffect(() => {
     const fetchLookups = async () => {
       try {
-        const res = await lookupService.getByCode("PRODUCT_TYPE");
-        setProductTypes(res.data.data?.lookupDetails || []);
+        const [ptRes, vatRes, pkgRes, doseRes, grpRes] = await Promise.all([
+          lookupService.getByCode("PRODUCT_TYPE"),
+          lookupService.getByCode("VAT_TYPE").catch(() => null),
+          lookupService.getByCode("PACKAGE_TYPE").catch(() => null),
+          lookupService.getByCode("DOSAGE_FORM").catch(() => null),
+          lookupService.getByCode("PRODUCT_GROUP").catch(() => null),
+        ]);
+        setProductTypes(ptRes.data.data?.lookupDetails || []);
+        if (vatRes) setVatTypes(vatRes.data.data?.lookupDetails || []);
+        if (pkgRes)
+          setPackageTypeLookups(pkgRes.data.data?.lookupDetails || []);
+        if (doseRes) setDosageForms(doseRes.data.data?.lookupDetails || []);
+        if (grpRes) setProductGroups(grpRes.data.data?.lookupDetails || []);
       } catch (err) {
         console.error("Failed to fetch product types", err);
       }
@@ -89,6 +112,8 @@ export default function ProductForm({
     reset({
       drugName: initialData.drugName ?? "",
       gtin: n(initialData.gtin),
+      barcode: n(initialData.barcode),
+      drugNameAr: n(initialData.drugNameAr),
       genericName: n(initialData.genericName),
       productTypeId: initialData.productTypeId
         ? String(initialData.productTypeId)
@@ -117,6 +142,19 @@ export default function ProductForm({
       drugStatus: n(initialData.drugStatus),
       marketingStatus: n(initialData.marketingStatus),
       legalStatus: n(initialData.legalStatus),
+
+      vatTypeId: initialData.vatTypeId
+        ? String(initialData.vatTypeId)
+        : undefined,
+      packageTypeId: initialData.packageTypeId
+        ? String(initialData.packageTypeId)
+        : undefined,
+      dosageFormId: initialData.dosageFormId
+        ? String(initialData.dosageFormId)
+        : undefined,
+      productGroupId: initialData.productGroupId
+        ? String(initialData.productGroupId)
+        : undefined,
 
       status: initialData.status ?? 1,
     });
@@ -170,9 +208,21 @@ export default function ProductForm({
               disabled={isLoading}
             />
             <Input
+              {...register("barcode")}
+              label="Barcode"
+              placeholder="Standard barcode"
+              disabled={isLoading}
+            />
+            <Input
               {...register("genericName")}
               label="Generic Name"
               placeholder="e.g. Paracetamol"
+              disabled={isLoading}
+            />
+            <Input
+              {...register("drugNameAr")}
+              label="Drug Name (Arabic)"
+              placeholder="اسم الدواء بالعربية"
               disabled={isLoading}
             />
             <Select
@@ -270,6 +320,42 @@ export default function ProductForm({
             <Input
               {...register("countryOfOrigin")}
               label="Country of Origin"
+              disabled={isLoading}
+            />
+            <Select
+              {...register("vatTypeId")}
+              label="VAT Type"
+              options={vatTypes.map((v) => ({
+                value: String(v.oid),
+                label: v.valueNameEn || v.valueNameAr || "",
+              }))}
+              disabled={isLoading}
+            />
+            <Select
+              {...register("packageTypeId")}
+              label="Package Type (Lookup)"
+              options={packageTypeLookups.map((p) => ({
+                value: String(p.oid),
+                label: p.valueNameEn || p.valueNameAr || "",
+              }))}
+              disabled={isLoading}
+            />
+            <Select
+              {...register("dosageFormId")}
+              label="Dosage Form"
+              options={dosageForms.map((d) => ({
+                value: String(d.oid),
+                label: d.valueNameEn || d.valueNameAr || "",
+              }))}
+              disabled={isLoading}
+            />
+            <Select
+              {...register("productGroupId")}
+              label="Product Group"
+              options={productGroups.map((g) => ({
+                value: String(g.oid),
+                label: g.valueNameEn || g.valueNameAr || "",
+              }))}
               disabled={isLoading}
             />
             <div className="flex flex-col gap-4 mt-6">

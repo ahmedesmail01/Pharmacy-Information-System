@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
   Menu,
+  Plug,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -35,6 +37,15 @@ const menuItems = [
   { label: "System Users", icon: Users, path: "/users" },
   { label: "Roles", icon: ShieldCheck, path: "/roles" },
   { label: "Lookups", icon: Settings, path: "/lookups" },
+  {
+    label: "Integrations",
+    icon: Plug,
+    path: "/integrations",
+    children: [
+      { label: "Providers", path: "/integrations/providers" },
+      { label: "Branch Settings", path: "/integrations/settings" },
+    ],
+  },
 ];
 
 interface SidebarProps {

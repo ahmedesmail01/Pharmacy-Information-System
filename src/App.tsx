@@ -17,6 +17,8 @@ import StockTransactionsPage from "@/pages/stock/StockTransactionsPage";
 import UsersPage from "@/pages/users/UsersPage";
 import LookupsPage from "@/pages/lookups/LookupsPage";
 import LookupDetailPage from "@/pages/lookups/LookupDetailPage";
+import IntegrationProvidersPage from "@/pages/integrations/IntegrationProvidersPage";
+import BranchIntegrationsPage from "@/pages/integrations/BranchIntegrationsPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -55,6 +57,14 @@ export default function App() {
             <Route path="users" element={<UsersPage />} />
             <Route path="lookups" element={<LookupsPage />} />
             <Route path="lookups/:lookupCode" element={<LookupDetailPage />} />
+            <Route
+              path="integrations/providers"
+              element={<IntegrationProvidersPage />}
+            />
+            <Route
+              path="integrations/settings"
+              element={<BranchIntegrationsPage />}
+            />
           </Route>
         </Routes>
       </BrowserRouter>

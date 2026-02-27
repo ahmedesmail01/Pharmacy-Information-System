@@ -11,6 +11,20 @@ export interface ApiResponse<T = null> {
   traceId: string | null;
 }
 
+// ─── BooleanApiResponse ───────────────────────────────────────────────────────
+// Used as the return type for DELETE on IntegrationProvider and BranchIntegrationSetting
+
+export interface BooleanApiResponse {
+  success: boolean;
+  message: string | null;
+  data: boolean;
+  errors: Record<string, string[]> | null;
+  innerException: string | null;
+  statusCode: number;
+  timestamp: string;
+  traceId: string | null;
+}
+
 export interface PagedResult<T> {
   data: T[];
   totalRecords: number;
@@ -117,8 +131,14 @@ export interface SystemUserDto {
   roleName?: string;
   branchId?: string;
   branchName?: string;
+  genderLookupId?: string | null;
+  genderName?: string | null;
   status: number;
   isActive?: boolean;
+  lastLogin?: string | null;
+  failedLoginCount?: number;
+  lockoutEnd?: string | null;
+  passwordExpiry?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -168,10 +188,19 @@ export interface BranchDto {
   city: string | null;
   district: string | null;
   address: string | null;
+  crn: string | null;
+  vatNumber: string | null;
+  identifyLookupId: string | null;
+  identifyLookupName: string | null;
+  identifyValue: string | null;
+  streetName: string | null;
+  buildingNumber: string | null;
+  citySubdivisionName: string | null;
+  cityName: string | null;
+  postalZone: string | null;
+  registrationName: string | null;
   status: number | null;
   createdAt?: string;
-  userCount: number;
-  stockCount: number;
 }
 
 export interface CreateBranchDto {
@@ -181,6 +210,16 @@ export interface CreateBranchDto {
   city?: string;
   district?: string;
   address?: string;
+  crn?: string;
+  vatNumber?: string;
+  identifyLookupId?: string;
+  identifyValue?: string;
+  streetName?: string;
+  buildingNumber?: string;
+  citySubdivisionName?: string;
+  cityName?: string;
+  postalZone?: string;
+  registrationName?: string;
   status?: number;
 }
 
@@ -193,10 +232,13 @@ export interface UpdateBranchDto extends CreateBranchDto {
 export interface ProductDto {
   oid: string;
   gtin: string | null;
+  barcode: string | null;
   drugName: string;
+  drugNameAr: string | null;
   genericName: string | null;
   productTypeId: string | null;
   productTypeName: string | null;
+  productTypeNameAr: string | null;
   strengthValue: string | null;
   strengthUnit: string | null;
   fullStrength: string | null;
@@ -217,13 +259,28 @@ export interface ProductDto {
   countryOfOrigin: string | null;
   minStockLevel: number | null;
   maxStockLevel: number | null;
+  vatTypeId: string | null;
+  vatTypeName: string | null;
+  vatTypeNameAr: string | null;
+  packageTypeId: string | null;
+  packageTypeName: string | null;
+  packageTypeNameAr: string | null;
+  dosageFormId: string | null;
+  dosageFormName: string | null;
+  dosageFormNameAr: string | null;
+  productGroupId: string | null;
+  productGroupName: string | null;
+  productGroupNameAr: string | null;
   status: number | null;
   createdAt?: string;
+  updatedAt?: string | null;
 }
 
 export interface CreateProductDto {
   gtin?: string;
+  barcode?: string;
   drugName: string;
+  drugNameAr?: string;
   genericName?: string;
   productTypeId?: string;
   strengthValue?: string;
@@ -243,6 +300,10 @@ export interface CreateProductDto {
   countryOfOrigin?: string;
   minStockLevel?: number;
   maxStockLevel?: number;
+  vatTypeId?: string;
+  packageTypeId?: string;
+  dosageFormId?: string;
+  productGroupId?: string;
   status?: number;
 }
 
@@ -395,6 +456,7 @@ export interface AppLookupDetailDto {
   valueNameAr: string | null;
   valueNameEn: string | null;
   status: number;
+  isActive?: boolean;
 }
 
 export interface AppLookupMasterDto {
@@ -403,6 +465,8 @@ export interface AppLookupMasterDto {
   lookupNameAr: string | null;
   lookupNameEn: string | null;
   lookupName?: string; // For query results
+  description?: string | null;
+  isSystem?: boolean;
   status: number;
   detailCount?: number;
   lookupDetails: AppLookupDetailDto[] | null;
@@ -412,7 +476,18 @@ export interface CreateAppLookupMasterDto {
   lookupCode: string;
   lookupNameAr: string;
   lookupNameEn: string;
+  description?: string;
+  isSystem?: boolean;
   status: number;
+}
+
+export interface UpdateAppLookupMasterDto {
+  oid: string;
+  lookupCode: string;
+  lookupNameAr: string;
+  lookupNameEn: string;
+  description?: string;
+  isSystem: boolean;
 }
 
 export interface CreateAppLookupDetailDto {
@@ -420,5 +495,74 @@ export interface CreateAppLookupDetailDto {
   lookupDetailCode: string;
   valueNameAr: string;
   valueNameEn: string;
+  status: number;
+}
+
+export interface UpdateAppLookupDetailDto {
+  oid: string;
+  lookupMasterID: string;
+  valueCode: string;
+  valueNameAr: string;
+  valueNameEn: string;
+  sortOrder?: number;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
+// ─── IntegrationProvider ─────────────────────────────────────────────────────
+
+export interface IntegrationProviderDto {
+  oid: string;
+  name: string | null;
+  description: string | null;
+  status: number;
+  statusName: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface CreateIntegrationProviderDto {
+  name?: string;
+  description?: string;
+  status: number;
+}
+
+export interface UpdateIntegrationProviderDto {
+  oid: string;
+  name?: string;
+  description?: string;
+  status: number;
+}
+
+// ─── BranchIntegrationSetting ────────────────────────────────────────────────
+
+export interface BranchIntegrationSettingDto {
+  oid: string;
+  integrationProviderId: string;
+  integrationProviderName: string | null;
+  branchId: string;
+  branchName: string | null;
+  integrationKey: string | null;
+  integrationValue: string | null;
+  status: number;
+  statusName: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface CreateBranchIntegrationSettingDto {
+  integrationProviderId: string;
+  branchId: string;
+  integrationKey?: string;
+  integrationValue?: string;
+  status: number;
+}
+
+export interface UpdateBranchIntegrationSettingDto {
+  oid: string;
+  integrationProviderId: string;
+  branchId: string;
+  integrationKey?: string;
+  integrationValue?: string;
   status: number;
 }
