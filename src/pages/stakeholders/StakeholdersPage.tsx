@@ -156,6 +156,29 @@ export default function StakeholdersPage() {
     },
 
     {
+      header: t("address"),
+      accessorKey: "address",
+      cell: (info: any) => (
+        <div className="flex items-center gap-3">{info.getValue() || "-"}</div>
+      ),
+    },
+
+    {
+      header: t("city"),
+      accessorKey: "city",
+      cell: (info: any) => (
+        <div className="flex items-center gap-3">{info.getValue() || "-"}</div>
+      ),
+    },
+    {
+      header: t("district"),
+      accessorKey: "district",
+      cell: (info: any) => (
+        <div className="flex items-center gap-3">{info.getValue() || "-"}</div>
+      ),
+    },
+
+    {
       header: tc("status"),
       accessorKey: "status",
       cell: (info: any) => (
