@@ -8,6 +8,7 @@ import Select from "@/components/ui/Select";
 import { useTranslation } from "react-i18next";
 import { StakeholderDto, AppLookupDetailDto } from "@/types";
 import { lookupService } from "@/api/lookupService";
+import { useLookup } from "@/context/LookupContext";
 
 interface StakeholderFormProps {
   initialData?: StakeholderDto | null;
@@ -22,10 +23,12 @@ export default function StakeholderForm({
 }: StakeholderFormProps) {
   const { t } = useTranslation("stakeholders");
   const tc = useTranslation("common").t;
+  const { getLookupDetails } = useLookup();
+  const stakeholderTypes = getLookupDetails("STAKEHOLDER_TYPE");
 
   const stakeholderSchema = z.object({
     fullName: z.string().min(1, t("fullNameRequired")).max(200),
-    stakeholderTypeCode: z.string().min(1, t("typeRequired")),
+    stakeholderTypeId: z.string().min(1, t("typeRequired")),
     email: z.string().email().optional().or(z.literal("")),
     phoneNumber: z.string().optional(),
     address: z.string().optional(),
@@ -36,7 +39,7 @@ export default function StakeholderForm({
 
   type StakeholderFormValues = z.infer<typeof stakeholderSchema>;
 
-  const [types, setTypes] = useState<AppLookupDetailDto[]>([]);
+  // const [types, setTypes] = useState<AppLookupDetailDto[]>([]);
 
   const {
     register,
@@ -50,23 +53,23 @@ export default function StakeholderForm({
     },
   });
 
-  useEffect(() => {
-    const fetchTypes = async () => {
-      try {
-        const res = await lookupService.getByCode("STAKEHOLDER_TYPE");
-        setTypes(res.data.data?.lookupDetails || []);
-      } catch (err) {
-        console.error("Failed to fetch stakeholder types", err);
-      }
-    };
-    fetchTypes();
-  }, []);
+  // useEffect(() => {
+  //   const fetchTypes = async () => {
+  //     try {
+  //       const res = await lookupService.getByCode("STAKEHOLDER_TYPE");
+  //       setTypes(res.data.data?.lookupDetails || []);
+  //     } catch (err) {
+  //       console.error("Failed to fetch stakeholder types", err);
+  //     }
+  //   };
+  //   fetchTypes();
+  // }, []);
 
   useEffect(() => {
     if (initialData) {
       reset({
         fullName: initialData.name || "",
-        stakeholderTypeCode: initialData.stakeholderTypeCode || "",
+        stakeholderTypeId: initialData.stakeholderTypeId || "",
         email: initialData.email || "",
         phoneNumber: initialData.phoneNumber || initialData.phone || "",
         address: initialData.address || "",
@@ -88,13 +91,13 @@ export default function StakeholderForm({
           disabled={isLoading}
         />
         <Select
-          {...register("stakeholderTypeCode")}
+          {...register("stakeholderTypeId")}
           label={t("type") + "*"}
-          options={types.map((t) => ({
-            value: t.lookupDetailCode,
+          options={stakeholderTypes.map((t) => ({
+            value: t.oid,
             label: t.valueNameEn ?? "",
           }))}
-          error={errors.stakeholderTypeCode?.message}
+          error={errors.stakeholderTypeId?.message}
           disabled={isLoading}
         />
         <Input
