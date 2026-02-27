@@ -99,6 +99,7 @@ export default function StakeholderForm({
           }))}
           error={errors.stakeholderTypeId?.message}
           disabled={isLoading}
+          value={initialData?.stakeholderTypeId}
         />
         <Input
           {...register("email")}
