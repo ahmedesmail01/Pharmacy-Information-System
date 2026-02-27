@@ -121,7 +121,7 @@ export default function StakeholdersPage() {
   const columns = [
     {
       header: t("name"),
-      accessorKey: "fullName",
+      accessorKey: "name",
       cell: (info: any) => (
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 uppercase font-black">
@@ -136,60 +136,7 @@ export default function StakeholdersPage() {
         </div>
       ),
     },
-    {
-      header: t("type"),
-      accessorKey: "stakeholderTypeName",
-      cell: (info: any) => (
-        <Badge
-          className={
-            info.getValue() === "Vendor"
-              ? "bg-orange-50 text-orange-700"
-              : "bg-blue-50 text-blue-700"
-          }
-        >
-          <Briefcase className="h-3 w-3 mr-1" />
-          {info.getValue()}
-        </Badge>
-      ),
-    },
-    {
-      header: t("contactInfo"),
-      id: "contact",
-      cell: (info: any) => (
-        <div className="flex flex-col gap-1">
-          {info.row.original.email && (
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <Mail className="h-3 w-3" />
-              {info.row.original.email}
-            </div>
-          )}
-          {info.row.original.phoneNumber && (
-            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-              <Phone className="h-3 w-3" />
-              {info.row.original.phoneNumber}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: "Tax / CR",
-      id: "taxInfo",
-      cell: (info: any) => (
-        <div className="flex flex-col">
-          {info.row.original.taxNumber && (
-            <span className="text-[10px] text-gray-400 font-bold">
-              VAT: {info.row.original.taxNumber}
-            </span>
-          )}
-          {info.row.original.crNumber && (
-            <span className="text-[10px] text-gray-400 font-bold">
-              CR: {info.row.original.crNumber}
-            </span>
-          )}
-        </div>
-      ),
-    },
+
     {
       header: tc("status"),
       accessorKey: "status",
@@ -211,7 +158,7 @@ export default function StakeholdersPage() {
               setSelectedStakeholder(info.row.original);
               setIsFormOpen(true);
             }}
-            className="text-blue-600 h-8 w-8 p-0 hover:bg-blue-50"
+            className="text-blue-600  p-0 hover:bg-blue-50"
           >
             <Edit2 className="h-4 w-4" />
           </Button>
@@ -222,7 +169,7 @@ export default function StakeholdersPage() {
               setSelectedStakeholder(info.row.original);
               setIsDeleteOpen(true);
             }}
-            className="text-red-600 h-8 w-8 p-0 hover:bg-red-50"
+            className="text-red-600  p-0 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
