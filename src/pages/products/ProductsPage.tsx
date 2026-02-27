@@ -28,7 +28,8 @@ import { handleApiError } from "@/utils/handleApiError";
 import { ProductDto, AppLookupDetailDto, FilterOperation } from "@/types";
 
 export default function ProductsPage() {
-  const { t } = useTranslation("products");
+  const { t, i18n } = useTranslation("products");
+  const isAr = i18n.language === "ar";
   const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [productTypeId, setProductTypeId] = useState("");
@@ -164,7 +165,11 @@ export default function ProductsPage() {
       accessorKey: "drugName",
       cell: (info: any) => (
         <div className="flex flex-col">
-          <span className="font-bold text-gray-900">{info.getValue()}</span>
+          <span className="font-bold text-gray-900">
+            {isAr
+              ? info.row.original.drugNameAr || info.getValue()
+              : info.getValue()}
+          </span>
           <span className="text-xs text-gray-400 font-medium tracking-tight">
             {t("gtin")}: {info.row.original.gtin || "N/A"}
           </span>
@@ -183,12 +188,13 @@ export default function ProductsPage() {
       ),
     },
     {
-      header: t("packageType"),
-      accessorKey: "packageType",
+      header: t("packageTypeName"),
+      accessorKey: "packageTypeName",
       cell: (info: any) => (
         <Badge className="bg-blue-50 text-blue-700">
           {/* <Beaker className="h-3 w-3 mr-1" /> */}
-          {info.getValue() || "Other"}
+          {(isAr ? info.row.original.packageTypeNameAr : info.getValue()) ||
+            "Other"}
         </Badge>
       ),
     },
