@@ -25,50 +25,57 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+import { LookupProvider } from "@/context/LookupContext";
+
 const queryClient = new QueryClient();
 
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Toaster position="top-right" />
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<DashboardPage />} />
-            <Route path="branches" element={<BranchesPage />} />
-            <Route path="products" element={<ProductsPage />} />
-            <Route path="roles" element={<RolesPage />} />
-            <Route path="sales" element={<SalesPage />} />
-            <Route path="sales/:id" element={<SaleDetailPage />} />
-            <Route path="stakeholders" element={<StakeholdersPage />} />
-            <Route path="stock" element={<StockPage />} />
+      <LookupProvider>
+        <BrowserRouter>
+          <Toaster position="top-right" />
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
             <Route
-              path="stock/transactions"
-              element={<StockTransactionsPage />}
-            />
-            <Route path="users" element={<UsersPage />} />
-            <Route path="lookups" element={<LookupsPage />} />
-            <Route path="lookups/:lookupCode" element={<LookupDetailPage />} />
-            <Route
-              path="integrations/providers"
-              element={<IntegrationProvidersPage />}
-            />
-            <Route
-              path="integrations/settings"
-              element={<BranchIntegrationsPage />}
-            />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-      <ReactQueryDevtools initialIsOpen={false} />
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<DashboardPage />} />
+              <Route path="branches" element={<BranchesPage />} />
+              <Route path="products" element={<ProductsPage />} />
+              <Route path="roles" element={<RolesPage />} />
+              <Route path="sales" element={<SalesPage />} />
+              <Route path="sales/:id" element={<SaleDetailPage />} />
+              <Route path="stakeholders" element={<StakeholdersPage />} />
+              <Route path="stock" element={<StockPage />} />
+              <Route
+                path="stock/transactions"
+                element={<StockTransactionsPage />}
+              />
+              <Route path="users" element={<UsersPage />} />
+              <Route path="lookups" element={<LookupsPage />} />
+              <Route
+                path="lookups/:lookupCode"
+                element={<LookupDetailPage />}
+              />
+              <Route
+                path="integrations/providers"
+                element={<IntegrationProvidersPage />}
+              />
+              <Route
+                path="integrations/settings"
+                element={<BranchIntegrationsPage />}
+              />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </LookupProvider>
     </QueryClientProvider>
   );
 }

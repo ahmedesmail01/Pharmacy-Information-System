@@ -12,12 +12,14 @@ import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { lookupService } from "@/api/lookupService";
+import { useLookup } from "@/context/LookupContext";
 import { useQueryTable } from "@/hooks/useQuery";
 import { handleApiError } from "@/utils/handleApiError";
 import { AppLookupMasterDto, FilterOperation } from "@/types";
 
 export default function LookupsPage() {
   const { t } = useTranslation("lookups");
+  const { refreshLookups, isLoading: isLookupLoading } = useLookup();
   const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -145,7 +147,18 @@ export default function LookupsPage() {
         title={t("title")}
         onAddClick={() => setIsFormOpen(true)}
         addLabel={t("addCategory")}
-      />
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => refreshLookups()}
+          isLoading={isLookupLoading}
+          className="gap-2 border-dashed border-blue-200 text-blue-600 hover:bg-blue-50"
+        >
+          <Database className="h-4 w-4" />
+          {t("refreshCache") || "Refresh Cache"}
+        </Button>
+      </PageHeader>
 
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         <SearchBar

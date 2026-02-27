@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { useLookup } from "@/context/LookupContext";
 import { Link } from "react-router-dom";
 import PageHeader from "@/components/shared/PageHeader";
 import SearchBar from "@/components/shared/SearchBar";
@@ -24,7 +25,9 @@ import { SalesInvoiceDto, FilterOperation } from "@/types";
 import SaleForm from "./SaleForm";
 
 export default function SalesPage() {
-  const { t } = useTranslation("sales");
+  const { t, i18n } = useTranslation("sales");
+  const isAr = i18n.language === "ar";
+  const { getLookupValue } = useLookup();
   const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -121,7 +124,13 @@ export default function SalesPage() {
         <div className="flex items-center gap-1.5">
           <CreditCard className="h-3.5 w-3.5 text-gray-400" />
           <span className="text-xs font-medium text-gray-600">
-            {info.getValue() || t("cash")}
+            {getLookupValue(
+              "PAYMENT_METHOD",
+              info.row.original.paymentMethodId,
+              i18n.language,
+            ) ||
+              info.getValue() ||
+              t("cash")}
           </span>
         </div>
       ),
@@ -129,11 +138,20 @@ export default function SalesPage() {
     {
       header: tc("status"),
       accessorKey: "invoiceStatusName",
-      cell: (info: any) => (
-        <Badge variant={info.getValue() === "Paid" ? "success" : "warning"}>
-          {info.getValue() || t("pending")}
-        </Badge>
-      ),
+      cell: (info: any) => {
+        const val = getLookupValue(
+          "INVOICE_STATUS",
+          info.row.original.invoiceStatusId,
+          i18n.language,
+        );
+        return (
+          <Badge
+            variant={val === "Paid" || val === "مدفوع" ? "success" : "warning"}
+          >
+            {val || info.getValue() || t("pending")}
+          </Badge>
+        );
+      },
     },
     {
       header: tc("actions"),
@@ -144,7 +162,7 @@ export default function SalesPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="text-blue-600 h-8 w-8 p-0 hover:bg-blue-50"
+              className="text-blue-600  p-0 hover:bg-blue-50"
             >
               <Eye className="h-4 w-4" />
             </Button>
@@ -155,7 +173,7 @@ export default function SalesPage() {
             onClick={() => {
               /* Print Logic */
             }}
-            className="text-gray-600 h-8 w-8 p-0 hover:bg-gray-100"
+            className="text-gray-600  p-0 hover:bg-gray-100"
           >
             <Printer className="h-4 w-4" />
           </Button>

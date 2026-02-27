@@ -32,8 +32,8 @@ export default function ProductsPage() {
   const isAr = i18n.language === "ar";
   const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
-  const [productTypeId, setProductTypeId] = useState("");
-  const [productTypes, setProductTypes] = useState<AppLookupDetailDto[]>([]);
+  const [dosageFormId, setDosageFormId] = useState("");
+  const [dosageForms, setDosageForms] = useState<AppLookupDetailDto[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDto | null>(
@@ -57,8 +57,8 @@ export default function ProductsPage() {
   useEffect(() => {
     const fetchLookups = async () => {
       try {
-        const res = await lookupService.getByCode("PRODUCT_TYPE");
-        setProductTypes(res.data.data?.lookupDetails || []);
+        const res = await lookupService.getByCode("Dosage_Form");
+        setDosageForms(res.data.data?.lookupDetails || []);
       } catch (err) {
         console.error("Failed to fetch product types", err);
       }
@@ -75,15 +75,15 @@ export default function ProductsPage() {
         operation: FilterOperation.Contains,
       });
     }
-    if (productTypeId) {
+    if (dosageFormId) {
       filters.push({
-        propertyName: "productTypeId",
-        value: productTypeId,
+        propertyName: "dosageFormId",
+        value: dosageFormId,
         operation: FilterOperation.Equals,
       });
     }
     fetch("", filters);
-  }, [fetch, searchTerm, productTypeId]);
+  }, [fetch, searchTerm, dosageFormId]);
 
   // useEffect(() => {
   //   loadData();
@@ -127,15 +127,15 @@ export default function ProductsPage() {
   };
 
   // ✅ track previous filters
-  const prevFiltersRef = useRef({ searchTerm: "", productTypeId: "" });
+  const prevFiltersRef = useRef({ searchTerm: "", dosageFormId: "" });
 
   useEffect(() => {
     const prev = prevFiltersRef.current;
     const filtersChanged =
-      prev.searchTerm !== searchTerm || prev.productTypeId !== productTypeId;
+      prev.searchTerm !== searchTerm || prev.dosageFormId !== dosageFormId;
 
     if (filtersChanged) {
-      prevFiltersRef.current = { searchTerm, productTypeId };
+      prevFiltersRef.current = { searchTerm, dosageFormId };
 
       // reset to 1 once, and wait for pageNumber effect re-run
       if (pageNumber !== 1) {
@@ -145,7 +145,7 @@ export default function ProductsPage() {
     }
 
     loadData();
-  }, [searchTerm, productTypeId, pageNumber, setPageNumber, loadData]);
+  }, [searchTerm, dosageFormId, pageNumber, setPageNumber, loadData]);
 
   // ✅ memoized handlers (prevents SearchBar effects from re-firing)
   const handleSearch = useCallback((value: string) => {
@@ -154,7 +154,7 @@ export default function ProductsPage() {
 
   const handleTypeChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setProductTypeId(e.target.value);
+      setDosageFormId(e.target.value);
     },
     [],
   );
@@ -287,12 +287,12 @@ export default function ProductsPage() {
           </div>
           <div className="w-full sm:w-64">
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">
-              {t("productGroup")}
+              {t("dosageForm")}
             </label>
             <Select
-              value={productTypeId}
+              value={dosageFormId}
               onChange={handleTypeChange}
-              options={productTypes.map((pt) => ({
+              options={dosageForms.map((pt) => ({
                 value: pt.oid,
                 label: pt.valueNameEn || pt.valueNameAr || "",
               }))}
