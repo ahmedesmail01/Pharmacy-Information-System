@@ -90,6 +90,10 @@ export default function StakeholdersPage() {
     setIsActionLoading(true);
     try {
       if (selectedStakeholder) {
+        await stakeholderService.update(selectedStakeholder.oid, {
+          ...formData,
+          oid: selectedStakeholder.oid,
+        });
         toast.success(t("stakeholderUpdated"));
       } else {
         await stakeholderService.create(formData);
