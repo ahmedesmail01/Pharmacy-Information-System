@@ -9,6 +9,7 @@ import Select from "@/components/ui/Select";
 import { stockService } from "@/api/stockService";
 import { branchService } from "@/api/branchService";
 import { productService } from "@/api/productService";
+import { useTranslation } from "react-i18next";
 import { stakeholderService } from "@/api/stakeholderService";
 import { handleApiError } from "@/utils/handleApiError";
 import {
@@ -18,20 +19,23 @@ import {
   CreateStockInDto,
 } from "@/types";
 
-const stockInSchema = z.object({
-  branchId: z.string().min(1, "Branch is required"),
-  productId: z.string().min(1, "Product is required"),
-  supplierId: z.string().optional(),
-  quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
-  unitCost: z.coerce.number().min(0, "Unit cost is required"),
-  batchNumber: z.string().optional(),
-  expiryDate: z.string().optional(),
-  referenceNumber: z.string().optional(),
-});
-
-type StockInFormValues = z.infer<typeof stockInSchema>;
-
 export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
+  const { t } = useTranslation("stock");
+  const tc = useTranslation("common").t;
+
+  const stockInSchema = z.object({
+    branchId: z.string().min(1, t("branch_required")),
+    productId: z.string().min(1, t("product_required")),
+    supplierId: z.string().optional(),
+    quantity: z.coerce.number().min(1, t("quantity_min")),
+    unitCost: z.coerce.number().min(0, t("unit_cost_required")),
+    batchNumber: z.string().optional(),
+    expiryDate: z.string().optional(),
+    referenceNumber: z.string().optional(),
+  });
+
+  type StockInFormValues = z.infer<typeof stockInSchema>;
+
   const [branches, setBranches] = useState<BranchDto[]>([]);
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [suppliers, setSuppliers] = useState<StakeholderDto[]>([]);
@@ -85,7 +89,7 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
         unitCost: formData.unitCost,
       };
       await stockService.stockIn(dto);
-      toast.success("Stock received successfully");
+      toast.success(t("stock_in_success"));
       reset();
       onSuccess();
     } catch (err) {
@@ -102,7 +106,7 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
     >
       <Select
         {...register("branchId")}
-        label="Destination Branch*"
+        label={t("destination_branch") + "*"}
         options={branches.map((b) => ({
           value: b.oid,
           label: b.branchName ?? "",
@@ -112,14 +116,14 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
       />
       <Select
         {...register("productId")}
-        label="Product*"
+        label={t("product") + "*"}
         options={products.map((p) => ({ value: p.oid, label: p.drugName }))}
         error={errors.productId?.message}
         disabled={isLoading}
       />
       <Select
         {...register("supplierId")}
-        label="Supplier (Vendor)"
+        label={t("supplier")}
         options={suppliers.map((s) => ({ value: s.oid, label: s.fullName }))}
         error={errors.supplierId?.message}
         disabled={isLoading}
@@ -127,14 +131,14 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
       <div className="grid grid-cols-2 gap-4">
         <Input
           {...register("quantity")}
-          label="Quantity Received*"
+          label={t("quantity_received") + "*"}
           type="number"
           error={errors.quantity?.message}
           disabled={isLoading}
         />
         <Input
           {...register("unitCost")}
-          label="Unit Cost*"
+          label={t("unit_cost") + "*"}
           type="number"
           step="0.01"
           error={errors.unitCost?.message}
@@ -143,21 +147,21 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       <Input
         {...register("batchNumber")}
-        label="Batch / Lot Number"
+        label={t("batch_number")}
         placeholder="e.g. BATCH-2024-X"
         error={errors.batchNumber?.message}
         disabled={isLoading}
       />
       <Input
         {...register("expiryDate")}
-        label="Expiry Date"
+        label={t("expiry_date")}
         type="date"
         error={errors.expiryDate?.message}
         disabled={isLoading}
       />
       <Input
         {...register("referenceNumber")}
-        label="Reference / Invoice #"
+        label={t("reference_number")}
         placeholder="PO-12345"
         error={errors.referenceNumber?.message}
         disabled={isLoading}
@@ -168,7 +172,7 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
           isLoading={isLoading}
           className="w-full md:w-auto px-12 h-12 shadow-lg shadow-green-100 bg-green-600 hover:bg-green-700"
         >
-          Confirm Receipt
+          {t("confirm_receipt")}
         </Button>
       </div>
     </form>

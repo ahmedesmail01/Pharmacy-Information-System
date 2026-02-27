@@ -1,0 +1,18 @@
+{
+  "title": "Stakeholder Management",
+  "addStakeholder": "Add New",
+  "editStakeholder": "Edit",
+  "deleteStakeholder": "Delete",
+  "deleteConfirm": "Are you sure you want to delete this record?",
+  "deleted": "Deleted successfully",
+  "created": "Created successfully",
+  "updated": "Updated successfully",
+  "searchPlaceholder": "Search by name...",
+  "stakeholderName": "Name",
+  "stakeholderType": "Type",
+  "phone": "Phone",
+  "email": "Email",
+  "address": "Address",
+  "createStakeholder": "Create",
+  "updateStakeholder": "Update"
+}

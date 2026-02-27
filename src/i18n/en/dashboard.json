@@ -1,0 +1,19 @@
+{
+  "title": "Dashboard Overview",
+  "totalBranches": "Total Branches",
+  "totalProducts": "Total Products",
+  "totalUsers": "Total Users",
+  "todayRevenue": "Today's Revenue",
+  "recentSales": "Recent Sales",
+  "lowStockAlerts": "Low Stock Alerts",
+  "viewAllSales": "View all sales",
+  "manageInventory": "Manage Inventory",
+  "loadingDashboard": "Loading dashboard insights...",
+  "invoiceNo": "Invoice #",
+  "customer": "Customer",
+  "walkInCustomer": "Walk-in Customer",
+  "amount": "Amount",
+  "product": "Product",
+  "currentStock": "Current Stock",
+  "minLevel": "Min Level"
+}

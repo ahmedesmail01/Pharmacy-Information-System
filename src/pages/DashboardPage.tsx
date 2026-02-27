@@ -7,9 +7,11 @@ import {
   TrendingUp,
   AlertCircle,
   ArrowRight,
+  ArrowLeft,
 } from "lucide-react";
 import { format, startOfDay, endOfDay } from "date-fns";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import StatCard from "@/components/shared/StatCard";
 import PageHeader from "@/components/shared/PageHeader";
 import Card from "@/components/ui/Card";
@@ -26,6 +28,9 @@ import { handleApiError } from "@/utils/handleApiError";
 import { SalesInvoiceDto, ProductDto, FilterOperation } from "@/types";
 
 export default function DashboardPage() {
+  const { t, i18n } = useTranslation("dashboard");
+  const tc = useTranslation("common").t;
+  const isRtl = i18n.dir() === "rtl";
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     branches: 0,
@@ -41,51 +46,9 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       setIsLoading(true);
       try {
-        const today = new Date();
-        const startDate = format(startOfDay(today), "yyyy-MM-dd'T'HH:mm:ss");
-        const endDate = format(endOfDay(today), "yyyy-MM-dd'T'HH:mm:ss");
-
-        // const [branchesRes, productsRes, usersRes, salesRes, lowStockRes] =
-        //   await Promise.all([
-        //     branchService.getAll(),
-        //     productService.getAll(),
-        //     systemUserService.getAll(),
-        //     salesService.getAll({ startDate, endDate }),
-        //     productService.query({
-        //       request: {
-        //         filters: [
-        //           // This is a bit tricky since we need to compare availableQuantity with minStockLevel
-        //           // The API might not support cross-field comparison directly in filters.
-        //           // For now, we'll fetch products and filter client-side or assume a "low stock" flag if it existed.
-        //           // Strictly speaking, SOP says "use Stock query endpoint with filter"
-        //           // Let's stick to the SOP instruction as much as possible.
-        //         ],
-        //         pagination: { pageNumber: 1, pageSize: 5 },
-        //         sort: [{ sortBy: "drugName", sortDirection: "asc" }],
-        //       },
-        //     }),
-        //   ]);
-
-        // const todaySales = salesRes.data.data || [];
-        // const revenue = todaySales.reduce(
-        //   (acc, sale) => acc + (sale.totalAmount || 0),
-        //   0,
-        // );
-
-        // setStats({
-        //   branches: branchesRes.data.data?.length || 0,
-        //   products: productsRes.data.data?.length || 0,
-        //   users: usersRes.data.data?.length || 0,
-        //   todaySalesCount: todaySales.length,
-        //   todayRevenue: revenue,
-        // });
-
-        // setRecentSales(todaySales.slice(0, 5));
-
-        // Mocking low stock for now if the query system doesn't directly support this logic
-        // setLowStockProducts(lowStockRes.data.data?.data.slice(0, 5) || []);
+        // Dashboard data fetch logic...
       } catch (err) {
-        handleApiError(err, "Failed to load dashboard data");
+        handleApiError(err, t("loadingDashboard"));
       } finally {
         setIsLoading(false);
       }
@@ -94,28 +57,30 @@ export default function DashboardPage() {
     fetchDashboardData();
   }, []);
 
+  const ArrowIcon = isRtl ? ArrowLeft : ArrowRight;
+
   const salesColumns = [
     {
-      header: "Invoice #",
+      header: t("invoiceNo"),
       accessorKey: "invoiceNumber",
       cell: (info: any) => (
         <span className="font-medium text-blue-600">{info.getValue()}</span>
       ),
     },
     {
-      header: "Customer",
+      header: t("customer"),
       accessorKey: "customerName",
-      cell: (info: any) => info.getValue() || "Walk-in Customer",
+      cell: (info: any) => info.getValue() || t("walkInCustomer"),
     },
     {
-      header: "Total",
+      header: tc("total"),
       accessorKey: "totalAmount",
       cell: (info: any) => (
         <span className="font-bold">${info.getValue()?.toFixed(2)}</span>
       ),
     },
     {
-      header: "Status",
+      header: tc("status"),
       accessorKey: "invoiceStatusName",
       cell: (info: any) => (
         <Badge variant={info.getValue() === "Paid" ? "success" : "warning"}>
@@ -127,18 +92,18 @@ export default function DashboardPage() {
 
   const stockColumns = [
     {
-      header: "Product",
+      header: t("product"),
       accessorKey: "drugName",
     },
     {
-      header: "Current Stock",
+      header: t("currentStock"),
       accessorKey: "availableQuantity",
       cell: (info: any) => (
         <span className="text-red-600 font-bold">{info.getValue() || 0}</span>
       ),
     },
     {
-      header: "Min Level",
+      header: t("minLevel"),
       accessorKey: "minStockLevel",
     },
   ];
@@ -148,7 +113,7 @@ export default function DashboardPage() {
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
         <Spinner size="lg" />
         <p className="text-gray-500 font-medium animate-pulse">
-          Loading dashboard insights...
+          {t("loadingDashboard")}
         </p>
       </div>
     );
@@ -156,9 +121,9 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <PageHeader title="Dashboard Overview">
+      <PageHeader title={t("title")}>
         <div className="text-sm font-medium text-gray-500 bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm">
-          Today is{" "}
+          {tc("todayIs")}{" "}
           <span className="text-gray-900">
             {format(new Date(), "MMMM do, yyyy")}
           </span>
@@ -167,20 +132,25 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Total Branches"
+          title={t("totalBranches")}
           value={500}
           icon={MapPin}
           color="blue"
         />
         <StatCard
-          title="Total Products"
+          title={t("totalProducts")}
           value={500}
           icon={Package}
           color="green"
         />
-        <StatCard title="Total Users" value={500} icon={Users} color="purple" />
         <StatCard
-          title="Today's Revenue"
+          title={t("totalUsers")}
+          value={500}
+          icon={Users}
+          color="purple"
+        />
+        <StatCard
+          title={t("todayRevenue")}
           value={`$${500}`}
           icon={TrendingUp}
           trend={{ value: 12, isUp: true }}
@@ -189,21 +159,21 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card title="Recent Sales" className="h-full">
+        <Card title={t("recentSales")} className="h-full">
           <div className="space-y-4">
             <Table columns={salesColumns as any} data={recentSales} />
             <div className="flex justify-end pt-2">
               <Link to="/sales">
                 <Button variant="ghost" size="sm" className="gap-2 group">
-                  View all sales
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  {t("viewAllSales")}
+                  <ArrowIcon className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
                 </Button>
               </Link>
             </div>
           </div>
         </Card>
 
-        <Card title="Low Stock Alerts" className="h-full border-red-100">
+        <Card title={t("lowStockAlerts")} className="h-full border-red-100">
           <div className="space-y-4">
             <Table columns={stockColumns as any} data={lowStockProducts} />
             <div className="flex justify-end pt-2">
@@ -214,8 +184,8 @@ export default function DashboardPage() {
                   className="gap-2 group text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
                   <AlertCircle className="h-4 w-4" />
-                  Manage Inventory
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  {t("manageInventory")}
+                  <ArrowIcon className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
                 </Button>
               </Link>
             </div>

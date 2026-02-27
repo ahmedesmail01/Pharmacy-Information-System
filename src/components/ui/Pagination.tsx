@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Button from "./Button";
 
 interface PaginationProps {
@@ -12,11 +13,12 @@ export default function Pagination({
   totalPages,
   onPageChange,
 }: PaginationProps) {
+  const { t } = useTranslation("common");
   // if (totalPages <= 1) return null;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   const visiblePages = pages.filter(
-    (p) => p === 1 || p === totalPages || Math.abs(p - pageNumber) <= 1
+    (p) => p === 1 || p === totalPages || Math.abs(p - pageNumber) <= 1,
   );
 
   const renderedPages: (number | string)[] = [];
@@ -39,7 +41,7 @@ export default function Pagination({
           disabled={pageNumber <= 1}
           onClick={() => onPageChange(pageNumber - 1)}
         >
-          Previous
+          {t("previous")}
         </Button>
         <Button
           variant="secondary"
@@ -47,14 +49,14 @@ export default function Pagination({
           disabled={pageNumber >= totalPages}
           onClick={() => onPageChange(pageNumber + 1)}
         >
-          Next
+          {t("next")}
         </Button>
       </div>
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700">
-            Page <span className="font-medium">{pageNumber}</span> of{" "}
-            <span className="font-medium">{totalPages}</span>
+            {t("page")} <span className="font-medium">{pageNumber}</span>{" "}
+            {t("of")} <span className="font-medium">{totalPages}</span>
           </p>
         </div>
         <div>
@@ -67,7 +69,7 @@ export default function Pagination({
               disabled={pageNumber <= 1}
               className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
             </button>
             {renderedPages.map((page, idx) => (
               <button
@@ -88,7 +90,7 @@ export default function Pagination({
               disabled={pageNumber >= totalPages}
               className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-5 w-5 rtl:rotate-180" />
             </button>
           </nav>
         </div>

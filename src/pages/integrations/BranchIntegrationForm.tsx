@@ -6,17 +6,19 @@ import { Eye, EyeOff } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { useTranslation } from "react-i18next";
 import { BranchIntegrationSettingDto, IntegrationProviderDto } from "@/types";
 
-const settingSchema = z.object({
-  integrationProviderId: z.string().min(1, "Provider is required"),
-  branchId: z.string().min(1, "Branch is required"),
-  integrationKey: z.string().optional(),
-  integrationValue: z.string().optional(),
-  status: z.coerce.number().default(1),
-});
+type SettingFormValues = z.infer<ReturnType<typeof getSettingSchema>>;
 
-type SettingFormValues = z.infer<typeof settingSchema>;
+const getSettingSchema = (t: any) =>
+  z.object({
+    integrationProviderId: z.string().min(1, t("providerRequired")),
+    branchId: z.string().min(1, t("branchRequired")),
+    integrationKey: z.string().optional(),
+    integrationValue: z.string().optional(),
+    status: z.coerce.number().default(1),
+  });
 
 interface BranchIntegrationFormProps {
   isOpen: boolean;
@@ -36,6 +38,8 @@ export default function BranchIntegrationForm({
   onSubmit,
   isLoading = false,
 }: BranchIntegrationFormProps) {
+  const { t } = useTranslation("integrations");
+  const tc = useTranslation("common").t;
   const [showValue, setShowValue] = useState(false);
 
   const {
@@ -44,7 +48,7 @@ export default function BranchIntegrationForm({
     reset,
     formState: { errors },
   } = useForm<SettingFormValues>({
-    resolver: zodResolver(settingSchema),
+    resolver: zodResolver(getSettingSchema(t)),
     defaultValues: {
       branchId: selectedBranchId,
       status: 1,
@@ -78,7 +82,7 @@ export default function BranchIntegrationForm({
 
       <Select
         {...register("integrationProviderId")}
-        label="Integration Provider*"
+        label={t("integrationProvider") + "*"}
         options={providers.map((p) => ({
           value: p.oid,
           label: p.name || "Unnamed Provider",
@@ -89,21 +93,21 @@ export default function BranchIntegrationForm({
 
       <Input
         {...register("integrationKey")}
-        label="Integration Key"
-        placeholder="e.g. API_KEY, CLIENT_ID, ENDPOINT_URL"
+        label={t("integrationKey")}
+        placeholder={t("integrationKeyPlaceholder")}
         error={errors.integrationKey?.message}
         disabled={isLoading}
       />
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Integration Value
+          {t("integrationValue")}
         </label>
         <div className="relative">
           <input
             {...register("integrationValue")}
             type={showValue ? "text" : "password"}
-            placeholder="Enter secret value"
+            placeholder={t("integrationValuePlaceholder")}
             disabled={isLoading}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:opacity-50 disabled:cursor-not-allowed"
           />
@@ -123,10 +127,10 @@ export default function BranchIntegrationForm({
 
       <Select
         {...register("status")}
-        label="Status"
+        label={tc("status")}
         options={[
-          { value: 1, label: "Active" },
-          { value: 0, label: "Inactive" },
+          { value: 1, label: tc("active") },
+          { value: 0, label: tc("inactive") },
         ]}
         error={errors.status?.message}
         disabled={isLoading}
@@ -138,7 +142,7 @@ export default function BranchIntegrationForm({
           isLoading={isLoading}
           className="w-full md:w-auto px-10"
         >
-          {editItem ? "Update Setting" : "Create Setting"}
+          {editItem ? t("updateSetting") : t("createSetting")}
         </Button>
       </div>
     </form>

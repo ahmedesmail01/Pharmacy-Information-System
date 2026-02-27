@@ -5,11 +5,14 @@ import Table from "@/components/ui/Table";
 import Pagination from "@/components/ui/Pagination";
 import SearchBar from "@/components/shared/SearchBar";
 import Badge from "@/components/ui/Badge";
+import { useTranslation } from "react-i18next";
 import { stockService } from "@/api/stockService";
 import { useQueryTable } from "@/hooks/useQuery";
 import { StockTransactionDto, FilterOperation } from "@/types";
 
 export default function StockTransactions() {
+  const { t } = useTranslation("stock");
+  const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
@@ -43,7 +46,7 @@ export default function StockTransactions() {
 
   const columns = [
     {
-      header: "Date",
+      header: tc("date"),
       accessorKey: "transactionDate",
       cell: (info: any) => (
         <span className="text-xs font-bold text-gray-500 font-mono">
@@ -54,7 +57,7 @@ export default function StockTransactions() {
       ),
     },
     {
-      header: "Type",
+      header: tc("type"),
       accessorKey: "transactionTypeName",
       cell: (info: any) => {
         const type = info.getValue() || "";
@@ -81,21 +84,21 @@ export default function StockTransactions() {
       },
     },
     {
-      header: "Product",
+      header: t("product"),
       accessorKey: "productName",
       cell: (info: any) => (
         <p className="font-bold text-gray-900 text-sm">{info.getValue()}</p>
       ),
     },
     {
-      header: "Qty",
+      header: t("qty"),
       accessorKey: "quantity",
       cell: (info: any) => (
         <span className="font-black text-gray-900">{info.getValue()}</span>
       ),
     },
     {
-      header: "Batch #",
+      header: t("batch_number"),
       accessorKey: "batchNumber",
       cell: (info: any) => (
         <span className="font-mono text-[10px] font-bold text-gray-400">
@@ -104,15 +107,15 @@ export default function StockTransactions() {
       ),
     },
     {
-      header: "From / To",
+      header: t("from_to"),
       id: "branches",
       cell: (info: any) => (
         <div className="flex flex-col text-[10px] font-bold uppercase tracking-tight">
           <span className="text-gray-400">
-            FROM: {info.row.original.fromBranchName || "---"}
+            {t("from")}: {info.row.original.fromBranchName || "---"}
           </span>
           <span className="text-blue-500">
-            TO: {info.row.original.toBranchName || "---"}
+            {t("to")}: {info.row.original.toBranchName || "---"}
           </span>
         </div>
       ),
@@ -124,10 +127,11 @@ export default function StockTransactions() {
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
         <SearchBar
           onSearch={setSearchTerm}
-          placeholder="Filter by product or batch..."
+          placeholder={t("filter_placeholder")}
         />
         <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-          Found <span className="text-gray-900">{totalRecords}</span> entries
+          {t("found")} <span className="text-gray-900">{totalRecords}</span>{" "}
+          {t("entries")}
         </div>
       </div>
 

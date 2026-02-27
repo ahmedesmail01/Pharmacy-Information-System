@@ -5,19 +5,12 @@ import { useEffect } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { useTranslation } from "react-i18next";
 import { RoleDto } from "@/types";
-
-const roleSchema = z.object({
-  roleName: z.string().min(1, "Role name is required").max(50),
-  roleNameAr: z.string().optional(),
-  status: z.coerce.number().default(1),
-});
-
-type RoleFormValues = z.infer<typeof roleSchema>;
 
 interface RoleFormProps {
   initialData?: RoleDto | null;
-  onSubmit: (data: RoleFormValues) => void;
+  onSubmit: (data: any) => void;
   isLoading?: boolean;
 }
 
@@ -26,6 +19,17 @@ export default function RoleForm({
   onSubmit,
   isLoading = false,
 }: RoleFormProps) {
+  const { t } = useTranslation("roles");
+  const tc = useTranslation("common").t;
+
+  const roleSchema = z.object({
+    roleName: z.string().min(1, t("roleNameRequired")).max(50),
+    roleNameAr: z.string().optional(),
+    status: z.coerce.number().default(1),
+  });
+
+  type RoleFormValues = z.infer<typeof roleSchema>;
+
   const {
     register,
     handleSubmit,
@@ -53,24 +57,24 @@ export default function RoleForm({
       <div className="space-y-4">
         <Input
           {...register("roleName")}
-          label="Role Name (English)*"
+          label={t("roleName") + " (English)*"}
           placeholder="e.g. Administrator"
           error={errors.roleName?.message}
           disabled={isLoading}
         />
         <Input
           {...register("roleNameAr")}
-          label="Role Name (Arabic)"
+          label={t("roleName") + " (Arabic)"}
           placeholder="e.g. مدير النظام"
           error={errors.roleNameAr?.message}
           disabled={isLoading}
         />
         <Select
           {...register("status")}
-          label="Status"
+          label={tc("status")}
           options={[
-            { value: 1, label: "Active" },
-            { value: 0, label: "Inactive" },
+            { value: 1, label: tc("active") },
+            { value: 0, label: tc("inactive") },
           ]}
           disabled={isLoading}
         />
@@ -82,7 +86,7 @@ export default function RoleForm({
           isLoading={isLoading}
           className="w-full md:w-auto px-10"
         >
-          {initialData ? "Update Role" : "Create Role"}
+          {initialData ? t("updateRole") : t("createRole")}
         </Button>
       </div>
     </form>

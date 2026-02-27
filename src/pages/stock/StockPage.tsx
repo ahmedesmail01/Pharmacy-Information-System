@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Package, History, Plus, Shuffle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/shared/PageHeader";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -9,6 +10,7 @@ import StockInForm from "./StockInForm";
 import StockTransferForm from "./StockTransferForm";
 
 export default function StockPage() {
+  const { t } = useTranslation("stock");
   const [activeTab, setActiveTab] = useState<"levels" | "transactions">(
     "levels",
   );
@@ -17,7 +19,7 @@ export default function StockPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Inventory & Stock Management">
+      <PageHeader title={t("title")}>
         <div className="flex items-center gap-3">
           <Button
             variant="secondary"
@@ -25,14 +27,14 @@ export default function StockPage() {
             className="gap-2 border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100"
           >
             <Shuffle className="h-4 w-4" />
-            Transfer Stock
+            {t("transfer_stock")}
           </Button>
           <Button
             onClick={() => setIsStockInOpen(true)}
             className="gap-2 shadow-lg shadow-green-100 bg-green-600 hover:bg-green-700"
           >
             <Plus className="h-4 w-4" />
-            Stock In / Receive
+            {t("stock_in")}
           </Button>
         </div>
       </PageHeader>
@@ -47,7 +49,7 @@ export default function StockPage() {
           }`}
         >
           <Package className="h-4 w-4" />
-          Stock Levels
+          {t("stock_levels")}
         </button>
         <button
           onClick={() => setActiveTab("transactions")}
@@ -58,7 +60,7 @@ export default function StockPage() {
           }`}
         >
           <History className="h-4 w-4" />
-          Transaction History
+          {t("transaction_history")}
         </button>
       </div>
 
@@ -69,7 +71,7 @@ export default function StockPage() {
       <Modal
         isOpen={isStockInOpen}
         onClose={() => setIsStockInOpen(false)}
-        title="Receive New Stock (Stock In)"
+        title={t("stock_in_title")}
         size="lg"
       >
         <StockInForm onSuccess={() => setIsStockInOpen(false)} />
@@ -78,7 +80,7 @@ export default function StockPage() {
       <Modal
         isOpen={isTransferOpen}
         onClose={() => setIsTransferOpen(false)}
-        title="Inventory Transfer (Branch to Branch)"
+        title={t("transfer_title")}
         size="lg"
       >
         <StockTransferForm onSuccess={() => setIsTransferOpen(false)} />

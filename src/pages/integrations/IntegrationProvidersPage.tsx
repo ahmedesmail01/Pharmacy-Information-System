@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Edit2, Trash2, Plug } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/shared/PageHeader";
 import Table from "@/components/ui/Table";
 import Badge from "@/components/ui/Badge";
@@ -14,6 +15,8 @@ import { handleApiError } from "@/utils/handleApiError";
 import { IntegrationProviderDto } from "@/types";
 
 export default function IntegrationProvidersPage() {
+  const { t } = useTranslation("integrations");
+  const tc = useTranslation("common").t;
   const [providers, setProviders] = useState<IntegrationProviderDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,10 +61,10 @@ export default function IntegrationProvidersPage() {
           ...formData,
           oid: selectedProvider.oid,
         });
-        toast.success("Provider updated successfully");
+        toast.success(t("providerUpdated"));
       } else {
         await integrationProviderService.create(formData);
-        toast.success("Provider created successfully");
+        toast.success(t("providerCreated"));
       }
       setIsModalOpen(false);
       setSelectedProvider(null);
@@ -79,7 +82,7 @@ export default function IntegrationProvidersPage() {
     try {
       const res = await integrationProviderService.delete(deleteTarget);
       if (res.data.data === true) {
-        toast.success("Provider deleted");
+        toast.success(t("providerDeleted"));
         loadProviders();
       } else {
         toast.error(res.data.message || "Delete failed");
@@ -103,7 +106,7 @@ export default function IntegrationProvidersPage() {
 
   const columns = [
     {
-      header: "Name",
+      header: tc("name"),
       accessorKey: "name",
       cell: (info: any) => (
         <div className="flex items-center gap-2">
@@ -119,7 +122,7 @@ export default function IntegrationProvidersPage() {
       ),
     },
     {
-      header: "Description",
+      header: tc("description"),
       accessorKey: "description",
       cell: (info: any) => {
         const val = info.getValue();
@@ -132,16 +135,16 @@ export default function IntegrationProvidersPage() {
       },
     },
     {
-      header: "Status",
+      header: tc("status"),
       accessorKey: "status",
       cell: (info: any) => (
         <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Inactive"}
+          {info.getValue() === 1 ? tc("active") : tc("inactive")}
         </Badge>
       ),
     },
     {
-      header: "Created",
+      header: tc("createdAt"),
       accessorKey: "createdAt",
       cell: (info: any) => (
         <span className="text-sm text-gray-500">
@@ -150,7 +153,7 @@ export default function IntegrationProvidersPage() {
       ),
     },
     {
-      header: "Updated",
+      header: tc("updatedAt"),
       accessorKey: "updatedAt",
       cell: (info: any) => (
         <span className="text-sm text-gray-500">
@@ -159,7 +162,7 @@ export default function IntegrationProvidersPage() {
       ),
     },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <div className="flex items-center gap-1">
@@ -188,7 +191,7 @@ export default function IntegrationProvidersPage() {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
         <Spinner size="lg" />
-        <p className="text-gray-500 font-medium">Loading providers...</p>
+        <p className="text-gray-500 font-medium">{t("loadingProviders")}</p>
       </div>
     );
   }
@@ -196,12 +199,12 @@ export default function IntegrationProvidersPage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <PageHeader
-        title="Integration Providers"
+        title={t("providersTitle")}
         onAddClick={() => {
           setSelectedProvider(null);
           setIsModalOpen(true);
         }}
-        addLabel="Add Provider"
+        addLabel={t("addProvider")}
       />
 
       <Table columns={columns} data={providers} isLoading={isLoading} />
@@ -225,8 +228,8 @@ export default function IntegrationProvidersPage() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Provider"
-        message="Are you sure you want to delete this integration provider? This action cannot be undone."
+        title={t("deleteProvider")}
+        message={t("deleteProviderConfirm")}
         isLoading={isActionLoading}
       />
     </div>

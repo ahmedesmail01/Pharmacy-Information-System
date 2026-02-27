@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Settings, Eye, Database } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/shared/PageHeader";
 import SearchBar from "@/components/shared/SearchBar";
 import Table from "@/components/ui/Table";
@@ -16,6 +17,8 @@ import { handleApiError } from "@/utils/handleApiError";
 import { AppLookupMasterDto, FilterOperation } from "@/types";
 
 export default function LookupsPage() {
+  const { t } = useTranslation("lookups");
+  const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
@@ -63,7 +66,7 @@ export default function LookupsPage() {
     setIsActionLoading(true);
     try {
       await lookupService.createMaster(data);
-      toast.success("Lookup category created");
+      toast.success(t("categoryCreated"));
       setIsFormOpen(false);
       loadData();
     } catch (err) {
@@ -75,7 +78,7 @@ export default function LookupsPage() {
 
   const columns = [
     {
-      header: "Category Code",
+      header: t("lookupCode"),
       accessorKey: "lookupCode",
       cell: (info: any) => (
         <span className="font-mono font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded border border-gray-100 uppercase tracking-tighter">
@@ -84,7 +87,7 @@ export default function LookupsPage() {
       ),
     },
     {
-      header: "Lookup Name",
+      header: tc("name"),
       accessorKey: "lookupNameEn",
       cell: (info: any) => (
         <div className="flex items-center gap-3">
@@ -101,7 +104,7 @@ export default function LookupsPage() {
       ),
     },
     {
-      header: "Variants",
+      header: t("detailCount"),
       accessorKey: "detailCount",
       cell: (info: any) => (
         <Badge className="bg-gray-50 text-gray-500 border border-gray-100">
@@ -110,16 +113,16 @@ export default function LookupsPage() {
       ),
     },
     {
-      header: "Status",
+      header: tc("status"),
       accessorKey: "status",
       cell: (info: any) => (
         <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Locked"}
+          {info.getValue() === 1 ? tc("active") : tc("inactive")}
         </Badge>
       ),
     },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <Link to={`/lookups/${info.row.original.lookupCode}`}>
@@ -129,7 +132,7 @@ export default function LookupsPage() {
             className="text-blue-600 gap-2 hover:bg-blue-50"
           >
             <Eye className="h-4 w-4" />
-            Manage Details
+            {t("viewDetails")}
           </Button>
         </Link>
       ),
@@ -139,19 +142,20 @@ export default function LookupsPage() {
   return (
     <div className="max-w-full mx-auto space-y-6">
       <PageHeader
-        title="System Lookups & Enums"
+        title={t("title")}
         onAddClick={() => setIsFormOpen(true)}
-        addLabel="Create Category"
+        addLabel={t("addCategory")}
       />
 
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         <SearchBar
           onSearch={setSearchTerm}
-          placeholder="Filter lookup categories..."
+          placeholder={t("searchPlaceholder")}
         />
         <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest px-4">
           <Database className="h-3 w-3" />
-          Catalog Entries: <span className="text-gray-900">{totalRecords}</span>
+          {t("detailCount")}:{" "}
+          <span className="text-gray-900">{totalRecords}</span>
         </div>
       </div>
 
@@ -167,25 +171,25 @@ export default function LookupsPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title="Create New Lookup Category"
+        title={t("createCategory")}
       >
         <form onSubmit={handleCreateMaster} className="space-y-6">
           <div className="space-y-4">
             <Input
               name="lookupCode"
-              label="Category Code (Uppercase)*"
+              label={t("lookupCode") + "*"}
               placeholder="e.g. PRODUCT_CATEGORY"
               required
             />
             <Input
               name="lookupNameEn"
-              label="Name (English)*"
+              label={t("lookupNameEn") + "*"}
               placeholder="e.g. Product Category"
               required
             />
             <Input
               name="lookupNameAr"
-              label="Name (Arabic)"
+              label={t("lookupNameAr")}
               placeholder="e.g. فئة المنتج"
               required
             />
@@ -196,7 +200,7 @@ export default function LookupsPage() {
               isLoading={isActionLoading}
               className="w-full shadow-lg shadow-blue-100"
             >
-              Register Category
+              {t("createCategory")}
             </Button>
           </div>
         </form>

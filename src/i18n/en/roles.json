@@ -1,0 +1,16 @@
+{
+  "title": "Role Management",
+  "addRole": "Add Role",
+  "editRole": "Edit Role",
+  "deleteRole": "Delete Role",
+  "deleteConfirm": "Are you sure you want to delete this role?",
+  "roleDeleted": "Role deleted successfully",
+  "roleCreated": "Role created successfully",
+  "roleUpdated": "Role updated successfully",
+  "searchPlaceholder": "Search by name...",
+  "roleName": "Role Name",
+  "roleNameRequired": "Role name is required",
+  "permissions": "Permissions",
+  "createRole": "Create Role",
+  "updateRole": "Update Role"
+}

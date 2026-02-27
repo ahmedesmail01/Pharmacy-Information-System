@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Modal from "./Modal";
 import Button from "./Button";
 
@@ -20,11 +21,13 @@ export default function ConfirmDialog({
   onConfirm,
   title,
   message,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   variant = "danger",
   isLoading = false,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
       <div className="flex flex-col items-center text-center">
@@ -41,7 +44,7 @@ export default function ConfirmDialog({
             onClick={onClose}
             disabled={isLoading}
           >
-            {cancelLabel}
+            {cancelLabel || t("common:cancel")}
           </Button>
           <Button
             variant={variant}
@@ -49,7 +52,7 @@ export default function ConfirmDialog({
             onClick={onConfirm}
             isLoading={isLoading}
           >
-            {confirmLabel}
+            {confirmLabel || t("common:confirm")}
           </Button>
         </div>
       </div>

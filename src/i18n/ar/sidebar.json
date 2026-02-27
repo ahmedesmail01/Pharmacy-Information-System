@@ -1,0 +1,15 @@
+{
+  "dashboard": "لوحة التحكم",
+  "branches": "الفروع",
+  "products": "المنتجات",
+  "sales": "المبيعات",
+  "stock": "المخزون",
+  "systemUsers": "المستخدمين",
+  "roles": "الأدوار",
+  "lookups": "القوائم المرجعية",
+  "integrations": "التكاملات",
+  "providers": "مزودي الخدمات",
+  "branchSettings": "إعدادات الفروع",
+  "stakeholders": "stakeholders",
+  "pharmacyIS": "Pharmacy IS"
+}

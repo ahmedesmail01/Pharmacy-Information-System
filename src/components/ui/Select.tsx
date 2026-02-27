@@ -7,6 +7,7 @@ import {
   KeyboardEvent,
 } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Option {
   value: string | number;
@@ -39,14 +40,15 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       defaultValue,
       ...rest
     },
-    ref
+    ref,
   ) => {
+    const { t } = useTranslation("common");
     // ─── Internal UI state ──────────────────────────────────────────────────
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const [internalValue, setInternalValue] = useState<string | number>(
-      (valueProp ?? defaultValue ?? "") as string | number
+      (valueProp ?? defaultValue ?? "") as string | number,
     );
 
     // Sync when RHF resets or patches the value externally
@@ -78,11 +80,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 
     // ─── Derived ────────────────────────────────────────────────────────────
     const selectedOption = options.find(
-      (o) => String(o.value) === String(internalValue)
+      (o) => String(o.value) === String(internalValue),
     );
     const filtered = search.trim()
       ? options.filter((o) =>
-          o.label.toLowerCase().includes(search.toLowerCase())
+          o.label.toLowerCase().includes(search.toLowerCase()),
         )
       : options;
 
@@ -101,7 +103,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       if (!el) return;
       const nativeSetter = Object.getOwnPropertyDescriptor(
         HTMLSelectElement.prototype,
-        "value"
+        "value",
       )?.set;
       nativeSetter?.call(el, String(newValue));
       el.dispatchEvent(new Event("change", { bubbles: true }));
@@ -134,7 +136,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             setSearch("");
             // Tell RHF the field was touched/blurred
             hiddenSelectRef.current?.dispatchEvent(
-              new Event("blur", { bubbles: true })
+              new Event("blur", { bubbles: true }),
             );
           }
         }
@@ -260,7 +262,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
               selectedOption ? "text-gray-900 truncate" : "text-gray-400"
             }
           >
-            {selectedOption ? selectedOption.label : ("select" as string)}
+            {selectedOption ? selectedOption.label : t("select")}
           </span>
 
           <span className="flex items-center gap-1 shrink-0">
@@ -329,7 +331,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             >
               {filtered.length === 0 ? (
                 <li className="px-3 py-6 text-sm text-gray-400 text-center">
-                  No results found
+                  {t("no_results_found")}
                 </li>
               ) : (
                 filtered.map((opt, i) => {
@@ -348,8 +350,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
                         isSelected
                           ? "bg-blue-600 text-white font-medium"
                           : isHighlighted
-                          ? "bg-blue-50 text-gray-900"
-                          : "text-gray-700 hover:bg-gray-50",
+                            ? "bg-blue-50 text-gray-900"
+                            : "text-gray-700 hover:bg-gray-50",
                       ].join(" ")}
                     >
                       {search.trim() ? (
@@ -369,7 +371,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 
             {filtered.length > 0 && (
               <div className="px-3 py-1.5 border-t border-gray-100 bg-gray-50 text-xs text-gray-400">
-                {filtered.length} of {options.length} options
+                {filtered.length} {t("of")} {options.length} {t("options")}
               </div>
             )}
           </div>
@@ -378,7 +380,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 function HighlightMatch({

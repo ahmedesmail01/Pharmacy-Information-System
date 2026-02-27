@@ -11,29 +11,33 @@ import { stockService } from "@/api/stockService";
 import { branchService } from "@/api/branchService";
 import { productService } from "@/api/productService";
 import { handleApiError } from "@/utils/handleApiError";
+import { useTranslation } from "react-i18next";
 import { BranchDto, ProductDto, CreateStockTransferDto } from "@/types";
-
-const transferSchema = z
-  .object({
-    fromBranchId: z.string().min(1, "Source branch is required"),
-    toBranchId: z.string().min(1, "Destination branch is required"),
-    productId: z.string().min(1, "Product is required"),
-    quantity: z.coerce.number().min(0.01, "Quantity must be at least 0.01"),
-    batchNumber: z.string().optional(),
-    referenceNumber: z.string().optional(),
-  })
-  .refine((data) => data.fromBranchId !== data.toBranchId, {
-    message: "Source and destination branches cannot be the same",
-    path: ["toBranchId"],
-  });
-
-type TransferFormValues = z.infer<typeof transferSchema>;
 
 export default function StockTransferForm({
   onSuccess,
 }: {
   onSuccess: () => void;
 }) {
+  const { t } = useTranslation("stock");
+  const tc = useTranslation("common").t;
+
+  const transferSchema = z
+    .object({
+      fromBranchId: z.string().min(1, t("source_branch_required")),
+      toBranchId: z.string().min(1, t("destination_branch_required")),
+      productId: z.string().min(1, t("product_required")),
+      quantity: z.coerce.number().min(0.01, t("quantity_min")),
+      batchNumber: z.string().optional(),
+      referenceNumber: z.string().optional(),
+    })
+    .refine((data) => data.fromBranchId !== data.toBranchId, {
+      message: t("transfer_same_branch_error"),
+      path: ["toBranchId"],
+    });
+
+  type TransferFormValues = z.infer<typeof transferSchema>;
+
   const [branches, setBranches] = useState<BranchDto[]>([]);
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +74,7 @@ export default function StockTransferForm({
     setIsLoading(true);
     try {
       await stockService.transfer(formData as CreateStockTransferDto);
-      toast.success("Stock transfer successful");
+      toast.success(t("transfer_success"));
       reset();
       onSuccess();
     } catch (err) {
@@ -86,7 +90,7 @@ export default function StockTransferForm({
         <div className="flex-1 w-full">
           <Select
             {...register("fromBranchId")}
-            label="Source Branch*"
+            label={t("source_branch") + "*"}
             options={branches.map((b) => ({
               value: b.oid,
               label: b.branchName ?? "",
@@ -101,7 +105,7 @@ export default function StockTransferForm({
         <div className="flex-1 w-full">
           <Select
             {...register("toBranchId")}
-            label="Destination Branch*"
+            label={t("destination_branch") + "*"}
             options={branches.map((b) => ({
               value: b.oid,
               label: b.branchName ?? "",
@@ -115,14 +119,14 @@ export default function StockTransferForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Select
           {...register("productId")}
-          label="Product to Transfer*"
+          label={t("product_to_transfer") + "*"}
           options={products.map((p) => ({ value: p.oid, label: p.drugName }))}
           error={errors.productId?.message}
           disabled={isLoading}
         />
         <Input
           {...register("quantity")}
-          label="Quantity*"
+          label={t("qty") + "*"}
           type="number"
           step="0.01"
           error={errors.quantity?.message}
@@ -130,14 +134,14 @@ export default function StockTransferForm({
         />
         <Input
           {...register("batchNumber")}
-          label="Batch Number"
+          label={t("batch_number")}
           placeholder="e.g. BATCH-2024-X"
           error={errors.batchNumber?.message}
           disabled={isLoading}
         />
         <Input
           {...register("referenceNumber")}
-          label="Transfer Reference #"
+          label={t("transfer_reference")}
           placeholder="TRF-001"
           error={errors.referenceNumber?.message}
           disabled={isLoading}
@@ -150,7 +154,7 @@ export default function StockTransferForm({
           isLoading={isLoading}
           className="w-full md:w-auto px-12 h-12 shadow-lg shadow-blue-100 bg-blue-600 hover:bg-blue-700"
         >
-          Confirm Transfer
+          {t("confirm_transfer")}
         </Button>
       </div>
     </form>

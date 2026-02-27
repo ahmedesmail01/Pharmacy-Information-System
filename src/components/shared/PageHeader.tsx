@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Button from "../ui/Button";
 import { Plus } from "lucide-react";
 
@@ -11,9 +12,11 @@ interface PageHeaderProps {
 export default function PageHeader({
   title,
   onAddClick,
-  addLabel = "Add New",
+  addLabel,
   children,
 }: PageHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
       <div>
@@ -24,7 +27,7 @@ export default function PageHeader({
         {onAddClick && (
           <Button onClick={onAddClick} className="gap-2">
             <Plus className="h-4 w-4" />
-            {addLabel}
+            {addLabel || t("common:addNew")}
           </Button>
         )}
       </div>

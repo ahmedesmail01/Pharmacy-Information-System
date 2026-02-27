@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard,
   MapPin,
@@ -19,38 +20,49 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const menuItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { label: "Branches", icon: MapPin, path: "/branches" },
-  { label: "Products", icon: Package, path: "/products" },
-  { label: "Sales", icon: ShoppingCart, path: "/sales" },
+const menuIcons: Record<string, any> = {
+  "/": LayoutDashboard,
+  "/branches": MapPin,
+  "/products": Package,
+  "/sales": ShoppingCart,
+  "/stock": Database,
+  "/stakeholders": UserCircle,
+  "/users": Users,
+  "/roles": ShieldCheck,
+  "/lookups": Settings,
+  "/integrations": Plug,
+};
+
+// paths → translation keys (sidebar namespace)
+const menuKeys: {
+  labelKey: string;
+  icon: string;
+  path: string;
+  children?: { labelKey: string; path: string }[];
+}[] = [
+  { labelKey: "dashboard", icon: "/", path: "/" },
+  { labelKey: "branches", icon: "/branches", path: "/branches" },
+  { labelKey: "products", icon: "/products", path: "/products" },
+  { labelKey: "sales", icon: "/sales", path: "/sales" },
+  { labelKey: "stock", icon: "/stock", path: "/stock" },
+  { labelKey: "stakeholders", icon: "/stakeholders", path: "/stakeholders" },
+  { labelKey: "systemUsers", icon: "/users", path: "/users" },
+  { labelKey: "roles", icon: "/roles", path: "/roles" },
+  { labelKey: "lookups", icon: "/lookups", path: "/lookups" },
   {
-    label: "Stock",
-    icon: Database,
-    path: "/stock",
-    children: [
-      { label: "Stock Levels", path: "/stock" },
-      { label: "Transactions", path: "/stock/transactions" },
-    ],
-  },
-  { label: "Stakeholders", icon: UserCircle, path: "/stakeholders" },
-  { label: "System Users", icon: Users, path: "/users" },
-  { label: "Roles", icon: ShieldCheck, path: "/roles" },
-  { label: "Lookups", icon: Settings, path: "/lookups" },
-  {
-    label: "Integrations",
-    icon: Plug,
+    labelKey: "integrations",
+    icon: "/integrations",
     path: "/integrations",
     children: [
-      { label: "Providers", path: "/integrations/providers" },
-      { label: "Branch Settings", path: "/integrations/settings" },
+      { labelKey: "providers", path: "/integrations/providers" },
+      { labelKey: "branchSettings", path: "/integrations/settings" },
     ],
   },
 ];
 
 interface SidebarProps {
   isCollapsed: boolean;
-  setIsCollapsed: (value: boolean) => void;
+  setIsCollapsed: (v: boolean) => void;
   isMobileOpen: boolean;
 }
 
@@ -60,39 +72,42 @@ export default function Sidebar({
   isMobileOpen,
 }: SidebarProps) {
   const location = useLocation();
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const { t, i18n } = useTranslation("sidebar");
+  const dir = i18n.dir();
+  const isRtl = dir === "rtl";
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
   };
 
-  const toggleSubmenu = (label: string) => {
-    if (isCollapsed) {
-      setIsCollapsed(false);
-      setOpenSubmenu(label);
-    } else {
-      setOpenSubmenu(openSubmenu === label ? null : label);
-    }
-  };
-
   return (
     <aside
-      className={`bg-gray-900 text-white h-screen fixed left-0 top-0 z-40 flex flex-col transition-all duration-300 ${
-        isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-      } ${isCollapsed ? "w-20" : "w-64"}`}
+      className={`fixed top-0 ${isRtl ? "right-0" : "left-0"} h-full bg-[#111827] border-gray-100 z-40 transition-all duration-300 flex flex-col shadow-xl shadow-gray-100/50
+      ${isCollapsed ? "w-20" : "w-64"}
+      ${isMobileOpen ? "translate-x-0" : isRtl ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"}
+      ${isRtl ? "border-l" : "border-r"}
+      `}
     >
-      <div className="p-6 flex items-center justify-between overflow-hidden">
+      {/* Logo */}
+      <div className="h-16 flex items-center justify-between px-4 ">
         {!isCollapsed && (
-          <h2 className="text-xl font-bold tracking-tight text-blue-400 truncate">
-            Pharmacy IS
-          </h2>
+          <h1 className="text-xl font-black tracking-tight text-[#2563eb]">
+            {t("pharmacyIS")}
+          </h1>
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-800 text-gray-400 transition-colors ml-auto"
+          className="hidden lg:flex p-2 text-gray-200 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
         >
           {isCollapsed ? (
+            isRtl ? (
+              <ChevronLeft className="h-5 w-5" />
+            ) : (
+              <ChevronRightIcon className="h-5 w-5" />
+            )
+          ) : isRtl ? (
             <ChevronRightIcon className="h-5 w-5" />
           ) : (
             <ChevronLeft className="h-5 w-5" />
@@ -100,88 +115,86 @@ export default function Sidebar({
         </button>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto no-scrollbar overflow-x-hidden">
-        {menuItems.map((item) => (
-          <div key={item.label}>
-            {item.children ? (
-              <>
+      {/* Nav Items */}
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        {menuKeys.map((item) => {
+          const Icon = menuIcons[item.icon] || Settings;
+          const active = isActive(item.path);
+          const hasChildren = item.children && item.children.length > 0;
+          const isExpanded = expandedMenu === item.path;
+
+          if (hasChildren) {
+            return (
+              <div key={item.path}>
                 <button
-                  onClick={() => toggleSubmenu(item.label)}
-                  className={`w-full flex items-center justify-between px-3 py-3 rounded-xl transition-colors ${
-                    isActive(item.path)
-                      ? "bg-blue-600 text-white"
-                      : "hover:bg-gray-800 text-gray-400"
+                  onClick={() => setExpandedMenu(isExpanded ? null : item.path)}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
+                    active
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
-                  title={isCollapsed ? item.label : ""}
                 >
-                  <div className="flex items-center gap-3">
-                    <item.icon className="h-5 w-5 min-w-[20px]" />
-                    {!isCollapsed && (
-                      <span className="font-medium whitespace-nowrap">
-                        {item.label}
+                  <Icon
+                    className={`h-5 w-5 flex-shrink-0 ${active ? "text-blue-600" : "text-gray-200 group-hover:text-gray-600"}`}
+                  />
+                  {!isCollapsed && (
+                    <>
+                      <span
+                        className={`flex-1 text-start ${active ? "text-blue-600" : "text-gray-200 group-hover:text-gray-600"}`}
+                      >
+                        {t(item.labelKey)}
                       </span>
-                    )}
-                  </div>
-                  {!isCollapsed &&
-                    (openSubmenu === item.label ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    ))}
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                      />
+                    </>
+                  )}
                 </button>
-                {openSubmenu === item.label && !isCollapsed && (
-                  <div className="ml-10 mt-1 space-y-1 transition-all">
-                    {item.children.map((child) => (
+                {!isCollapsed && isExpanded && (
+                  <div className={`${isRtl ? "pr-8" : "pl-8"} mt-1 space-y-1`}>
+                    {item.children!.map((child) => (
                       <Link
                         key={child.path}
                         to={child.path}
-                        className={`block px-4 py-2 rounded-lg text-sm transition-colors ${
+                        className={`block px-3 py-2 rounded-lg text-sm transition-all ${
                           location.pathname === child.path
-                            ? "text-white"
-                            : "text-gray-500 hover:text-white"
+                            ? "bg-blue-100 text-blue-700 font-semibold"
+                            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                         }`}
                       >
-                        {child.label}
+                        {t(child.labelKey)}
                       </Link>
                     ))}
                   </div>
                 )}
-              </>
-            ) : (
-              <Link
-                to={item.path}
-                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors ${
-                  isActive(item.path)
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-gray-800 text-gray-400"
-                }`}
-                title={isCollapsed ? item.label : ""}
-              >
-                <item.icon className="h-5 w-5 min-w-[20px]" />
-                {!isCollapsed && (
-                  <span className="font-medium whitespace-nowrap">
-                    {item.label}
-                  </span>
-                )}
-              </Link>
-            )}
-          </div>
-        ))}
-      </nav>
+              </div>
+            );
+          }
 
-      <div className="p-6 border-t border-gray-800 flex flex-col items-center">
-        {!isCollapsed && (
-          <div className="w-full">
-            <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2 px-1">
-              Version
-            </div>
-            <div className="px-1 text-sm text-gray-400 font-medium">v1.0.0</div>
-          </div>
-        )}
-        {isCollapsed && (
-          <div className="text-[10px] text-gray-600 font-bold">V1.0</div>
-        )}
-      </div>
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
+                active
+                  ? "bg-blue-50 text-blue-700 shadow-sm shadow-blue-100"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <Icon
+                className={`h-5 w-5 flex-shrink-0 ${active ? "text-blue-600" : "text-gray-200 group-hover:text-gray-600"}`}
+              />
+              {!isCollapsed && (
+                <span
+                  className={`${active ? "text-blue-600" : "text-gray-200 group-hover:text-gray-600"}`}
+                >
+                  {t(item.labelKey)}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
     </aside>
   );
 }

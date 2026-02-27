@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { useTranslation } from "react-i18next";
 import { BranchDto, AppLookupDetailDto } from "@/types";
 import { lookupService } from "@/api/lookupService";
 
@@ -41,6 +42,8 @@ export default function BranchForm({
   onSubmit,
   isLoading = false,
 }: BranchFormProps) {
+  const { t } = useTranslation("branches");
+  const tc = useTranslation("common").t;
   const [identifyTypes, setIdentifyTypes] = useState<AppLookupDetailDto[]>([]);
   const {
     register,
@@ -115,14 +118,14 @@ export default function BranchForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           {...register("branchName")}
-          label="Branch Name*"
+          label={t("branchName") + "*"}
           placeholder="e.g. Main Branch"
           error={errors.branchName?.message}
           disabled={isLoading}
         />
         <Input
           {...register("branchCode")}
-          label="Branch Code"
+          label={t("branchCode")}
           placeholder="e.g. BR-001"
           error={errors.branchCode?.message}
           disabled={isLoading}
@@ -131,7 +134,7 @@ export default function BranchForm({
 
       <Input
         {...register("gln")}
-        label="GLN (Global Location Number)"
+        label={t("gln")}
         placeholder="13-digit number"
         error={errors.gln?.message}
         disabled={isLoading}
@@ -140,14 +143,14 @@ export default function BranchForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           {...register("city")}
-          label="City"
+          label={t("city")}
           placeholder="e.g. Riyadh"
           error={errors.city?.message}
           disabled={isLoading}
         />
         <Input
           {...register("district")}
-          label="District"
+          label={t("district")}
           placeholder="e.g. Al-Olaya"
           error={errors.district?.message}
           disabled={isLoading}
@@ -156,7 +159,7 @@ export default function BranchForm({
 
       <Input
         {...register("address")}
-        label="Full Address"
+        label={t("address")}
         placeholder="Street name, building number..."
         error={errors.address?.message}
         disabled={isLoading}
@@ -164,10 +167,10 @@ export default function BranchForm({
 
       <Select
         {...register("status")}
-        label="Status"
+        label={tc("status")}
         options={[
-          { value: 1, label: "Active" },
-          { value: 0, label: "Inactive" },
+          { value: 1, label: tc("active") },
+          { value: 0, label: tc("inactive") },
         ]}
         error={errors.status?.message}
         disabled={isLoading}
@@ -176,26 +179,26 @@ export default function BranchForm({
       {/* ── Legal & Regulatory ───────────────────────────────────────── */}
       <div className="pt-4 mt-4 border-t border-gray-100">
         <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
-          Legal & Regulatory
+          {t("legalRegulatory")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             {...register("crn")}
-            label="CRN (Commercial Registration No.)"
+            label={t("crn")}
             placeholder="Max 20 characters"
             error={errors.crn?.message}
             disabled={isLoading}
           />
           <Input
             {...register("vatNumber")}
-            label="VAT Number"
+            label={t("vatNumber")}
             placeholder="Max 20 characters"
             error={errors.vatNumber?.message}
             disabled={isLoading}
           />
           <Select
             {...register("identifyLookupId")}
-            label="Identification Type"
+            label={t("identificationType")}
             options={identifyTypes.map((t) => ({
               value: t.oid,
               label: t.valueNameEn || t.valueNameAr || "",
@@ -204,13 +207,13 @@ export default function BranchForm({
           />
           <Input
             {...register("identifyValue")}
-            label="Identification Value"
+            label={t("identificationValue")}
             placeholder="Enter identification value"
             disabled={isLoading}
           />
           <Input
             {...register("registrationName")}
-            label="Registration Name"
+            label={t("registrationName")}
             placeholder="Max 200 characters"
             error={errors.registrationName?.message}
             disabled={isLoading}
@@ -222,40 +225,40 @@ export default function BranchForm({
       {/* ── Address Details ───────────────────────────────────────────── */}
       <div className="pt-4 mt-4 border-t border-gray-100">
         <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
-          Address Details
+          {t("addressDetails")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             {...register("streetName")}
-            label="Street Name"
+            label={t("streetName")}
             placeholder="Max 100 characters"
             error={errors.streetName?.message}
             disabled={isLoading}
           />
           <Input
             {...register("buildingNumber")}
-            label="Building Number"
+            label={t("buildingNumber")}
             placeholder="Max 10 characters"
             error={errors.buildingNumber?.message}
             disabled={isLoading}
           />
           <Input
             {...register("citySubdivisionName")}
-            label="City Subdivision / District"
+            label={t("citySubdivision")}
             placeholder="Max 100 characters"
             error={errors.citySubdivisionName?.message}
             disabled={isLoading}
           />
           <Input
             {...register("cityName")}
-            label="City Name"
+            label={t("cityName")}
             placeholder="Max 100 characters"
             error={errors.cityName?.message}
             disabled={isLoading}
           />
           <Input
             {...register("postalZone")}
-            label="Postal / ZIP Code"
+            label={t("postalZone")}
             placeholder="Max 10 characters"
             error={errors.postalZone?.message}
             disabled={isLoading}
@@ -269,7 +272,7 @@ export default function BranchForm({
           isLoading={isLoading}
           className="w-full md:w-auto px-10"
         >
-          {initialData ? "Update Branch" : "Create Branch"}
+          {initialData ? t("updateBranch") : t("createBranch")}
         </Button>
       </div>
     </form>

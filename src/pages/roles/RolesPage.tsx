@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ShieldCheck, Edit2, Trash2, Search as SearchIcon } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/shared/PageHeader";
 import SearchBar from "@/components/shared/SearchBar";
 import Table from "@/components/ui/Table";
@@ -16,6 +17,8 @@ import { handleApiError } from "@/utils/handleApiError";
 import { RoleDto, FilterOperation } from "@/types";
 
 export default function RolesPage() {
+  const { t } = useTranslation("roles");
+  const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -57,10 +60,10 @@ export default function RolesPage() {
     try {
       if (selectedRole) {
         await roleService.update(selectedRole.oid, formData);
-        toast.success("Role updated successfully");
+        toast.success(t("roleUpdated"));
       } else {
         await roleService.create(formData);
-        toast.success("Role created successfully");
+        toast.success(t("roleCreated"));
       }
       setIsFormOpen(false);
       loadData();
@@ -76,7 +79,7 @@ export default function RolesPage() {
     setIsActionLoading(true);
     try {
       await roleService.delete(selectedRole.oid);
-      toast.success("Role deleted successfully");
+      toast.success(t("roleDeleted"));
       setIsDeleteOpen(false);
       loadData();
     } catch (err) {
@@ -88,7 +91,7 @@ export default function RolesPage() {
 
   const columns = [
     {
-      header: "Role Name",
+      header: t("roleName"),
       accessorKey: "roleName",
       cell: (info: any) => (
         <div className="flex items-center gap-3">
@@ -105,7 +108,7 @@ export default function RolesPage() {
       ),
     },
     {
-      header: "Assigned Users",
+      header: t("assignedUsers"),
       accessorKey: "userCount",
       cell: (info: any) => (
         <span className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-bold border border-gray-100">
@@ -114,16 +117,16 @@ export default function RolesPage() {
       ),
     },
     {
-      header: "Status",
+      header: tc("status"),
       accessorKey: "status",
       cell: (info: any) => (
         <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Inactive"}
+          {info.getValue() === 1 ? tc("active") : tc("inactive")}
         </Badge>
       ),
     },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <div className="flex items-center gap-1">
@@ -157,21 +160,22 @@ export default function RolesPage() {
   return (
     <div className="max-w-full mx-auto space-y-6">
       <PageHeader
-        title="Access Control Roles"
+        title={t("title")}
         onAddClick={() => {
           setSelectedRole(null);
           setIsFormOpen(true);
         }}
-        addLabel="Create Role"
+        addLabel={t("addRole")}
       />
 
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
         <SearchBar
           onSearch={setSearchTerm}
-          placeholder="Filter roles by name..."
+          placeholder={t("searchPlaceholder")}
         />
         <div className="text-sm text-gray-500 font-medium">
-          Total Roles: <span className="text-gray-900">{totalRecords}</span>
+          {t("totalRoles")}:{" "}
+          <span className="text-gray-900">{totalRecords}</span>
         </div>
       </div>
 
@@ -187,7 +191,7 @@ export default function RolesPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={selectedRole ? "Edit Access Role" : "Create New Access Role"}
+        title={selectedRole ? t("editRole") : t("addRole")}
       >
         <RoleForm
           initialData={selectedRole}
@@ -200,8 +204,8 @@ export default function RolesPage() {
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
-        title="Delete Access Role"
-        message={`Are you sure you want to delete the "${selectedRole?.roleName}" role? Users currently assigned to this role might lose access.`}
+        title={t("deleteRole")}
+        message={tc("deleteConfirm")}
         isLoading={isActionLoading}
       />
     </div>

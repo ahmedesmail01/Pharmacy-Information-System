@@ -5,29 +5,14 @@ import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { useTranslation } from "react-i18next";
 import { SystemUserDto, RoleDto, BranchDto } from "@/types";
 import { roleService } from "@/api/roleService";
 import { branchService } from "@/api/branchService";
 
-const userSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters").max(50),
-  fullName: z.string().min(1, "Full name is required").max(200),
-  email: z.string().email().optional().or(z.literal("")),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .optional()
-    .or(z.literal("")),
-  roleId: z.coerce.number().min(1, "Role is required"),
-  branchId: z.string().min(1, "Branch is required"),
-  status: z.coerce.number().default(1),
-});
-
-type UserFormValues = z.infer<typeof userSchema>;
-
 interface UserFormProps {
   initialData?: SystemUserDto | null;
-  onSubmit: (data: UserFormValues) => void;
+  onSubmit: (data: any) => void;
   isLoading?: boolean;
 }
 
@@ -36,6 +21,21 @@ export default function UserForm({
   onSubmit,
   isLoading = false,
 }: UserFormProps) {
+  const { t } = useTranslation("users");
+  const tc = useTranslation("common").t;
+
+  const userSchema = z.object({
+    username: z.string().min(3, t("usernameMin")).max(50),
+    fullName: z.string().min(1, t("fullNameRequired")).max(200),
+    email: z.string().email().optional().or(z.literal("")),
+    password: z.string().min(6, t("passwordMin")).optional().or(z.literal("")),
+    roleId: z.coerce.number().min(1, t("roleRequired")),
+    branchId: z.string().min(1, t("branchRequired")),
+    status: z.coerce.number().default(1),
+  });
+
+  type UserFormValues = z.infer<typeof userSchema>;
+
   const [roles, setRoles] = useState<RoleDto[]>([]);
   const [branches, setBranches] = useState<BranchDto[]>([]);
 
@@ -93,14 +93,14 @@ export default function UserForm({
         />
         <Input
           {...register("fullName")}
-          label="Full Name*"
+          label={t("fullName") + "*"}
           placeholder="e.g. John Doe"
           error={errors.fullName?.message}
           disabled={isLoading}
         />
         <Input
           {...register("email")}
-          label="Email Address"
+          label={t("email")}
           type="email"
           placeholder="e.g. john@example.com"
           error={errors.email?.message}
@@ -108,11 +108,7 @@ export default function UserForm({
         />
         <Input
           {...register("password")}
-          label={
-            initialData
-              ? "New Password (Leave blank to keep current)"
-              : "Password*"
-          }
+          label={initialData ? t("newPassword") : t("password") + "*"}
           type="password"
           placeholder="••••••••"
           error={errors.password?.message}
@@ -120,7 +116,7 @@ export default function UserForm({
         />
         <Select
           {...register("roleId")}
-          label="System Role*"
+          label={t("role") + "*"}
           options={roles.map((r) => ({
             value: String(r.status || 0),
             label: r.roleName ?? "",
@@ -130,7 +126,7 @@ export default function UserForm({
         />
         <Select
           {...register("branchId")}
-          label="Primary Branch*"
+          label={t("branch") + "*"}
           options={branches.map((b) => ({
             value: b.oid,
             label: b.branchName ?? "",
@@ -142,10 +138,10 @@ export default function UserForm({
 
       <Select
         {...register("status")}
-        label="Account Status"
+        label={tc("status")}
         options={[
-          { value: 1, label: "Active" },
-          { value: 0, label: "Inactive" },
+          { value: 1, label: tc("active") },
+          { value: 0, label: tc("inactive") },
         ]}
         disabled={isLoading}
       />
@@ -156,7 +152,7 @@ export default function UserForm({
           isLoading={isLoading}
           className="w-full md:w-auto px-10 shadow-lg shadow-blue-100"
         >
-          {initialData ? "Update User" : "Create User"}
+          {initialData ? t("updateUser") : t("createUser")}
         </Button>
       </div>
     </form>

@@ -10,6 +10,7 @@ import {
   Calculator,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
@@ -34,6 +35,8 @@ interface CartItem {
 }
 
 export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
+  const { t } = useTranslation("sales");
+  const tc = useTranslation("common").t;
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [branches, setBranches] = useState<BranchDto[]>([]);
@@ -146,11 +149,11 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
 
   const handleSubmit = async () => {
     if (cart.length === 0) {
-      toast.error("Cart is empty");
+      toast.error(t("cart_empty"));
       return;
     }
     if (!selectedBranchId) {
-      toast.error("Please select a branch");
+      toast.error(t("branch_required"));
       return;
     }
 
@@ -172,7 +175,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
       };
 
       await salesService.create(dto);
-      toast.success("Sale processed successfully");
+      toast.success(t("sale_success"));
       setCart([]);
       onSuccess();
     } catch (err) {
@@ -187,7 +190,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
       <div className="xl:col-span-2 space-y-6 min-w-0">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Select
-            label="Source Branch"
+            label={t("source_branch")}
             value={selectedBranchId}
             onChange={(e) => setSelectedBranchId(e.target.value)}
             options={branches.map((b) => ({
@@ -196,7 +199,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             }))}
           />
           <Select
-            label="Customer (Optional)"
+            label={t("customer_optional")}
             value={selectedCustomerId}
             onChange={(e) => setSelectedCustomerId(e.target.value)}
             options={customers.map((c) => ({
@@ -211,7 +214,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             <Search className="h-5 w-5" />
           </div>
           <Input
-            placeholder="Search products by name or scan barcode (GTIN)..."
+            placeholder={t("pos_search_placeholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10 h-14 text-lg"
@@ -236,7 +239,8 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
                             {p.drugName}
                           </p>
                           <p className="text-xs text-gray-500 font-medium">
-                            GTIN: {p.gtin} | Box of {p.packageSize}
+                            {t("gtin")}: {p.gtin} | {t("box_of")}{" "}
+                            {p.packageSize}
                           </p>
                         </div>
                       </div>
@@ -245,7 +249,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
                           ${p.price?.toFixed(2)}
                         </span>
                         <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">
-                          IN STOCK: {p.availableQuantity || 0}
+                          {t("in_stock")}: {p.availableQuantity || 0}
                         </span>
                       </div>
                     </button>
@@ -253,7 +257,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
                 </div>
               ) : (
                 <div className="p-8 text-center text-gray-400 font-medium">
-                  No products found matching "{search}"
+                  {t("no_products_found")} "{search}"
                 </div>
               )}
             </div>
@@ -264,13 +268,13 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
           <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
             <h3 className="flex items-center gap-2 font-bold text-gray-700">
               <ShoppingCart className="h-4 w-4" />
-              Cart Items ({cart.length})
+              {t("cart_items")} ({cart.length})
             </h3>
             <button
               onClick={() => setCart([])}
               className="text-xs font-bold text-red-500 hover:text-red-600 uppercase tracking-wider"
             >
-              Clear Cart
+              {t("clear_cart")}
             </button>
           </div>
 
@@ -278,20 +282,22 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-300 gap-2">
                 <ShoppingCart className="h-12 w-12 opacity-20" />
-                <p className="font-medium italic">
-                  Cart is empty. Add products to start.
-                </p>
+                <p className="font-medium italic">{t("cart_empty_msg")}</p>
               </div>
             ) : (
               <div className="min-w-[600px] lg:min-w-0">
                 <table className="w-full">
                   <thead className="sticky top-0 bg-white border-b border-gray-50">
                     <tr className="text-left text-[10px] text-gray-400 uppercase tracking-widest">
-                      <th className="px-6 py-3 font-bold">Product</th>
-                      <th className="px-6 py-3 font-bold text-center">Qty</th>
-                      <th className="px-6 py-3 font-bold text-right">Price</th>
+                      <th className="px-6 py-3 font-bold">{t("product")}</th>
+                      <th className="px-6 py-3 font-bold text-center">
+                        {t("qty")}
+                      </th>
                       <th className="px-6 py-3 font-bold text-right">
-                        Subtotal
+                        {t("price")}
+                      </th>
+                      <th className="px-6 py-3 font-bold text-right">
+                        {t("subtotal")}
                       </th>
                       <th className="px-6 py-3"></th>
                     </tr>
@@ -307,7 +313,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
                             {item.product.drugName}
                           </p>
                           <p className="text-[10px] text-gray-400">
-                            Unit: ${item.unitPrice.toFixed(2)}
+                            {t("unit")}: ${item.unitPrice.toFixed(2)}
                           </p>
                         </td>
                         <td className="px-6 py-4">
@@ -359,21 +365,23 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
 
       <div className="space-y-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-0 space-y-6">
-          <h3 className="font-bold text-gray-700">Order Summary</h3>
+          <h3 className="font-bold text-gray-700">{t("order_summary")}</h3>
           <div className="space-y-6">
             <div className="space-y-3">
               <div className="flex justify-between text-gray-500 text-sm">
-                <span>Subtotal</span>
+                <span>{t("subtotal")}</span>
                 <span className="font-medium">
                   ${totals.subtotal.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-gray-500 text-sm">
-                <span>VAT (15%)</span>
+                <span>{t("vat")} (15%)</span>
                 <span className="font-medium">${totals.tax.toFixed(2)}</span>
               </div>
               <div className="border-t border-dashed border-gray-200 pt-3 flex justify-between">
-                <span className="font-bold text-gray-900">Total Amount</span>
+                <span className="font-bold text-gray-900">
+                  {t("total_amount")}
+                </span>
                 <span className="font-bold text-blue-600 text-2xl tracking-tighter">
                   ${totals.total.toFixed(2)}
                 </span>
@@ -384,7 +392,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
 
             <div className="space-y-4">
               <Select
-                label="Payment Method"
+                label={t("payment_method")}
                 value={selectedPaymentMethodId}
                 onChange={(e) => setSelectedPaymentMethodId(e.target.value)}
                 options={paymentMethods.map((pm) => ({
@@ -396,11 +404,8 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex gap-3">
                 <Calculator className="h-5 w-5 text-blue-600 flex-shrink-0" />
                 <div className="text-xs text-blue-800">
-                  <p className="font-bold mb-1">POS Calculation</p>
-                  <p>
-                    Invoices are generated instantly and inventory levels are
-                    updated automatically.
-                  </p>
+                  <p className="font-bold mb-1">{t("pos_calculation")}</p>
+                  <p>{t("pos_calculation_msg")}</p>
                 </div>
               </div>
 
@@ -410,7 +415,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
                 disabled={cart.length === 0 || isLoading}
                 isLoading={isLoading}
               >
-                Complete Transaction
+                {t("complete_transaction")}
               </Button>
             </div>
           </div>

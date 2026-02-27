@@ -1,0 +1,18 @@
+{
+  "title": "Pharmacy IS",
+  "subtitle": "الرجاء تسجيل الدخول إلى حسابك",
+  "username": "اسم المستخدم",
+  "usernamePlaceholder": "أدخل اسم المستخدم",
+  "password": "كلمة المرور",
+  "passwordPlaceholder": "أدخل كلمة المرور",
+  "rememberMe": "تذكرني",
+  "forgotPassword": "نسيت كلمة المرور؟",
+  "signIn": "تسجيل الدخول",
+  "usernameRequired": "اسم المستخدم مطلوب",
+  "usernameTooLong": "اسم المستخدم طويل جداً",
+  "passwordRequired": "كلمة المرور مطلوبة",
+  "passwordTooLong": "كلمة المرور طويلة جداً",
+  "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة",
+  "poweredBy": "powered By",
+  "company": "HealthTech Solutions"
+}

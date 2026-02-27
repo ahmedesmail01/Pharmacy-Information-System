@@ -10,6 +10,7 @@ import {
   Beaker,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/shared/PageHeader";
 import SearchBar from "@/components/shared/SearchBar";
 import Table from "@/components/ui/Table";
@@ -27,13 +28,15 @@ import { handleApiError } from "@/utils/handleApiError";
 import { ProductDto, AppLookupDetailDto, FilterOperation } from "@/types";
 
 export default function ProductsPage() {
+  const { t } = useTranslation("products");
+  const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [productTypeId, setProductTypeId] = useState("");
   const [productTypes, setProductTypes] = useState<AppLookupDetailDto[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDto | null>(
-    null
+    null,
   );
   const [isActionLoading, setIsActionLoading] = useState(false);
 
@@ -93,10 +96,10 @@ export default function ProductsPage() {
           ...formData,
           oid: selectedProduct.oid,
         });
-        toast.success("Product updated successfully");
+        toast.success(t("productUpdated"));
       } else {
         await productService.create(formData);
-        toast.success("Product added successfully");
+        toast.success(t("productCreated"));
       }
       setIsFormOpen(false);
       loadData();
@@ -112,7 +115,7 @@ export default function ProductsPage() {
     setIsActionLoading(true);
     try {
       await productService.delete(selectedProduct.oid);
-      toast.success("Product deleted successfully");
+      toast.success(t("productDeleted"));
       setIsDeleteOpen(false);
       loadData();
     } catch (err) {
@@ -152,24 +155,24 @@ export default function ProductsPage() {
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       setProductTypeId(e.target.value);
     },
-    []
+    [],
   );
 
   const columns = [
     {
-      header: "GTIN / Drug Name",
+      header: t("drugName"),
       accessorKey: "drugName",
       cell: (info: any) => (
         <div className="flex flex-col">
           <span className="font-bold text-gray-900">{info.getValue()}</span>
           <span className="text-xs text-gray-400 font-medium tracking-tight">
-            GTIN: {info.row.original.gtin || "N/A"}
+            {t("gtin")}: {info.row.original.gtin || "N/A"}
           </span>
         </div>
       ),
     },
     {
-      header: "Generic Name",
+      header: t("genericName"),
       accessorKey: "genericName",
       cell: (info: any) => (
         <div className="flex flex-col">
@@ -180,7 +183,7 @@ export default function ProductsPage() {
       ),
     },
     {
-      header: "Package Type",
+      header: t("packageType"),
       accessorKey: "packageType",
       cell: (info: any) => (
         <Badge className="bg-blue-50 text-blue-700">
@@ -196,7 +199,7 @@ export default function ProductsPage() {
     //     info.getValue() || <span className="text-gray-400">---</span>,
     // },
     {
-      header: "Price",
+      header: t("price"),
       accessorKey: "price",
       cell: (info: any) => (
         <span className="font-mono font-bold text-blue-600">
@@ -205,25 +208,25 @@ export default function ProductsPage() {
       ),
     },
     {
-      header: "Marketing Status",
+      header: t("marketingStatus"),
       accessorKey: "marketingStatus",
       cell: (info: any) => (
         <Badge variant={info.getValue() === "1" ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Inactive"}
+          {info.getValue() === 1 ? tc("active") : tc("inactive")}
         </Badge>
       ),
     },
     {
-      header: "legal Status",
+      header: t("legalStatus"),
       accessorKey: "legalStatus",
       cell: (info: any) => (
         <Badge variant={info.getValue() === "1" ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Inactive"}
+          {info.getValue() === 1 ? tc("active") : tc("inactive")}
         </Badge>
       ),
     },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <div className="flex items-center gap-1">
@@ -257,28 +260,28 @@ export default function ProductsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Products Inventory"
+        title={t("title")}
         onAddClick={() => {
           setSelectedProduct(null);
           setIsFormOpen(true);
         }}
-        addLabel="Add Product"
+        addLabel={t("addProduct")}
       />
 
       <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
           <div className="flex-1">
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">
-              Search Products
+              {tc("search")}
             </label>
             <SearchBar
               onSearch={handleSearch}
-              placeholder="Search by drug name or GTIN..."
+              placeholder={t("searchPlaceholder")}
             />
           </div>
           <div className="w-full sm:w-64">
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">
-              Category Filter
+              {t("productGroup")}
             </label>
             <Select
               value={productTypeId}
@@ -293,10 +296,9 @@ export default function ProductsPage() {
         </div>
         <div className="text-sm text-gray-500 flex items-center gap-2">
           <div className="h-1 w-1 bg-gray-300 rounded-full"></div>
-          Found <span className="font-bold text-gray-900">
-            {totalRecords}
-          </span>{" "}
-          matching products
+          {tc("total")}{" "}
+          <span className="font-bold text-gray-900">{totalRecords}</span>{" "}
+          {t("title")}
         </div>
       </div>
 
@@ -312,11 +314,7 @@ export default function ProductsPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={
-          selectedProduct
-            ? `Edit ${selectedProduct.drugName}`
-            : "Add New Product"
-        }
+        title={selectedProduct ? t("editProduct") : t("addProduct")}
         size="2xl"
       >
         <ProductForm
@@ -330,8 +328,8 @@ export default function ProductsPage() {
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
-        title="Delete Product"
-        message={`Are you sure you want to remove "${selectedProduct?.drugName}" from the inventory? This action is permanent.`}
+        title={t("deleteProduct")}
+        message={t("deleteConfirm")}
         isLoading={isActionLoading}
       />
     </div>

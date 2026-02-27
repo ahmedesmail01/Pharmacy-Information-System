@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Edit2, Trash2, MapPin, Search as SearchIcon } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/shared/PageHeader";
 import SearchBar from "@/components/shared/SearchBar";
 import Table from "@/components/ui/Table";
@@ -16,6 +17,8 @@ import { handleApiError } from "@/utils/handleApiError";
 import { BranchDto, FilterOperation } from "@/types";
 
 export default function BranchesPage() {
+  const { t } = useTranslation("branches");
+  const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -54,10 +57,10 @@ export default function BranchesPage() {
           ...formData,
           oid: selectedBranch.oid,
         });
-        toast.success("Branch updated successfully");
+        toast.success(t("branchUpdated"));
       } else {
         await branchService.create(formData);
-        toast.success("Branch created successfully");
+        toast.success(t("branchCreated"));
       }
       setIsFormOpen(false);
       loadData();
@@ -73,7 +76,7 @@ export default function BranchesPage() {
     setIsActionLoading(true);
     try {
       await branchService.delete(selectedBranch.oid);
-      toast.success("Branch deleted successfully");
+      toast.success(t("branchDeleted"));
       setIsDeleteOpen(false);
       loadData();
     } catch (err) {
@@ -85,7 +88,7 @@ export default function BranchesPage() {
 
   const columns = [
     {
-      header: "Branch Code",
+      header: t("branchCode"),
       accessorKey: "branchCode",
       cell: (info: any) =>
         info.getValue() || (
@@ -93,7 +96,7 @@ export default function BranchesPage() {
         ),
     },
     {
-      header: "Branch Name",
+      header: t("branchName"),
       accessorKey: "branchName",
       cell: (info: any) => (
         <div className="flex items-center gap-2">
@@ -105,7 +108,7 @@ export default function BranchesPage() {
       ),
     },
     {
-      header: "Location",
+      header: t("city"),
       accessorFn: (row: BranchDto) =>
         `${row.city || ""}${row.city && row.district ? ", " : ""}${
           row.district || ""
@@ -147,7 +150,7 @@ export default function BranchesPage() {
     //   ),
     // },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <div className="flex items-center gap-2">
@@ -181,18 +184,18 @@ export default function BranchesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Branches"
+        title={t("title")}
         onAddClick={() => {
           setSelectedBranch(null);
           setIsFormOpen(true);
         }}
-        addLabel="Add Branch"
+        addLabel={t("addBranch")}
       />
 
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         <SearchBar
           onSearch={setSearchTerm}
-          placeholder="Filter by branch name..."
+          placeholder={t("searchPlaceholder")}
         />
         <div className="text-sm text-gray-500">
           Showing <span className="font-bold text-gray-900">{data.length}</span>{" "}
@@ -212,7 +215,7 @@ export default function BranchesPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={selectedBranch ? "Edit Branch" : "Add New Branch"}
+        title={selectedBranch ? t("editBranch") : t("addBranch")}
         size="lg"
       >
         <BranchForm
@@ -226,8 +229,8 @@ export default function BranchesPage() {
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
-        title="Delete Branch"
-        message={`Are you sure you want to delete "${selectedBranch?.branchName}"? This action cannot be undone.`}
+        title={t("deleteBranch")}
+        message={t("deleteConfirm")}
         isLoading={isActionLoading}
       />
     </div>

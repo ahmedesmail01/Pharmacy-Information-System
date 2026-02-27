@@ -11,6 +11,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -20,6 +21,8 @@ import { SalesInvoiceDto } from "@/types";
 import { handleApiError } from "@/utils/handleApiError";
 
 export default function SaleDetailPage() {
+  const { t } = useTranslation("sales");
+  const tc = useTranslation("common").t;
   const { id } = useParams();
   const [invoice, setInvoice] = useState<SalesInvoiceDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +46,7 @@ export default function SaleDetailPage() {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
         <Spinner size="lg" />
-        <p className="text-gray-500 font-medium">Fetching invoice details...</p>
+        <p className="text-gray-500 font-medium">{t("fetching_invoice")}</p>
       </div>
     );
   }
@@ -51,10 +54,10 @@ export default function SaleDetailPage() {
   if (!invoice) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Invoice not found</p>
+        <p className="text-gray-500">{t("invoice_not_found")}</p>
         <Link to="/sales">
           <Button variant="ghost" className="mt-4">
-            Back to Sales
+            {t("back_to_sales")}
           </Button>
         </Link>
       </div>
@@ -69,21 +72,21 @@ export default function SaleDetailPage() {
             variant="ghost"
             className="gap-2 text-gray-500 hover:text-gray-900"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Sales
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+            {t("back_to_sales")}
           </Button>
         </Link>
         <div className="flex items-center gap-3">
           <Button variant="secondary" size="sm" className="gap-2">
             <Download className="h-4 w-4" />
-            Export PDF
+            {t("export_pdf")}
           </Button>
           <Button
             onClick={() => window.print()}
             className="gap-2 shadow-lg shadow-blue-100"
           >
             <Printer className="h-4 w-4" />
-            Print Invoice
+            {t("print_invoice")}
           </Button>
         </div>
       </div>
@@ -98,7 +101,7 @@ export default function SaleDetailPage() {
               <div className="flex justify-between items-start relative z-10">
                 <div>
                   <h1 className="text-3xl font-black tracking-tight">
-                    INVOICE
+                    {t("invoice").toUpperCase()}
                   </h1>
                   <p className="text-blue-100 font-mono mt-1">
                     #{invoice.invoiceNumber}
@@ -114,7 +117,7 @@ export default function SaleDetailPage() {
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    Customer
+                    {t("customer")}
                   </h3>
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-gray-50 rounded-lg">
@@ -122,7 +125,7 @@ export default function SaleDetailPage() {
                     </div>
                     <div>
                       <p className="font-bold text-gray-900">
-                        {invoice.customerName || "Walk-in Customer"}
+                        {invoice.customerName || t("walk_in_customer")}
                       </p>
                       <p className="text-sm text-gray-500">
                         {invoice.customerPhone || "---"}
@@ -132,7 +135,7 @@ export default function SaleDetailPage() {
                 </div>
                 <div className="space-y-4 text-right">
                   <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    Store
+                    {t("store")}
                   </h3>
                   <div className="flex items-start gap-3 justify-end">
                     <div className="text-right">
@@ -161,10 +164,14 @@ export default function SaleDetailPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="text-left text-[10px] text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                      <th className="pb-4 font-bold">Item Description</th>
-                      <th className="pb-4 font-bold text-center">Qty</th>
-                      <th className="pb-4 font-bold text-right">Unit Price</th>
-                      <th className="pb-4 font-bold text-right">Total</th>
+                      <th className="pb-4 font-bold">{t("product")}</th>
+                      <th className="pb-4 font-bold text-center">{t("qty")}</th>
+                      <th className="pb-4 font-bold text-right">
+                        {t("unit_price")}
+                      </th>
+                      <th className="pb-4 font-bold text-right">
+                        {t("total")}
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -175,7 +182,7 @@ export default function SaleDetailPage() {
                             {item.productName}
                           </p>
                           <p className="text-xs text-gray-400">
-                            Batch: {item.batchNumber || "---"}
+                            {t("batch")}: {item.batchNumber || "---"}
                           </p>
                         </td>
                         <td className="py-6 text-center font-medium text-gray-600">
@@ -195,7 +202,7 @@ export default function SaleDetailPage() {
 
               <div className="flex flex-col items-end space-y-3 pt-6 border-t border-gray-100">
                 <div className="flex justify-between w-full max-w-[240px] text-sm text-gray-500">
-                  <span>Subtotal</span>
+                  <span>{t("subtotal")}</span>
                   <span className="font-semibold text-gray-900">
                     $
                     {(
@@ -204,14 +211,14 @@ export default function SaleDetailPage() {
                   </span>
                 </div>
                 <div className="flex justify-between w-full max-w-[240px] text-sm text-gray-500">
-                  <span>Tax (VAT 15%)</span>
+                  <span>{t("vat")} (15%)</span>
                   <span className="font-semibold text-gray-900">
                     ${invoice.taxAmount?.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between w-full max-w-[240px] pt-3 border-t border-gray-100">
                   <span className="font-black text-gray-900">
-                    Total Payable
+                    {t("total_payable")}
                   </span>
                   <span className="text-2xl font-black text-blue-600 tracking-tighter">
                     ${invoice.totalAmount?.toFixed(2)}
@@ -221,15 +228,15 @@ export default function SaleDetailPage() {
             </div>
 
             <div className="bg-gray-50 px-8 py-6 border-t border-gray-100 flex justify-between items-center italic text-sm text-gray-400">
-              <p>Thank you for choosing Pharmacy Information System.</p>
-              <p>Generated by POS Terminal</p>
+              <p>{t("thank_you")}</p>
+              <p>{t("generated_by_pos")}</p>
             </div>
           </Card>
         </div>
 
         <div className="space-y-6">
           <Card
-            title="Status"
+            title={tc("status")}
             className="bg-gradient-to-br from-blue-600 to-blue-700 text-white border-none shadow-lg"
           >
             <div className="space-y-6">
@@ -242,7 +249,7 @@ export default function SaleDetailPage() {
                     Method
                   </p>
                   <p className="font-bold text-lg">
-                    {invoice.paymentMethodName || "Cash"}
+                    {invoice.paymentMethodName || t("cash")}
                   </p>
                 </div>
               </div>
@@ -254,7 +261,7 @@ export default function SaleDetailPage() {
                   <p className="text-xs text-blue-100 uppercase font-bold tracking-widest">
                     Status
                   </p>
-                  <p className="font-bold text-lg">Settled</p>
+                  <p className="font-bold text-lg">{t("settled")}</p>
                 </div>
               </div>
             </div>

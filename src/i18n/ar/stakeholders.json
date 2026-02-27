@@ -1,0 +1,18 @@
+{
+  "title": "stakeholders",
+  "addStakeholder": "إضافة",
+  "editStakeholder": "تعديل",
+  "deleteStakeholder": "حذف",
+  "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا السجل؟",
+  "deleted": "تم الحذف بنجاح",
+  "created": "تم الإنشاء بنجاح",
+  "updated": "تم التحديث بنجاح",
+  "searchPlaceholder": "البحث بالاسم...",
+  "stakeholderName": "الاسم",
+  "stakeholderType": "النوع",
+  "phone": "الهاتف",
+  "email": "البريد الإلكتروني",
+  "address": "العنوان",
+  "createStakeholder": "إنشاء",
+  "updateStakeholder": "تحديث"
+}

@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { useTranslation } from "react-i18next";
 import { IntegrationProviderDto } from "@/types";
 
 const providerSchema = z.object({
@@ -26,6 +27,8 @@ export default function IntegrationProviderForm({
   onSubmit,
   isLoading = false,
 }: IntegrationProviderFormProps) {
+  const { t } = useTranslation("integrations");
+  const tc = useTranslation("common").t;
   const {
     register,
     handleSubmit,
@@ -58,19 +61,19 @@ export default function IntegrationProviderForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Input
         {...register("name")}
-        label="Provider Name"
-        placeholder="e.g. ZATCA, NHC, Seha"
+        label={t("providerName")}
+        placeholder={t("providerNamePlaceholder")}
         error={errors.name?.message}
         disabled={isLoading}
       />
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description
+          {tc("description")}
         </label>
         <textarea
           {...register("description")}
-          placeholder="Brief description of this integration provider"
+          placeholder={t("descriptionPlaceholder")}
           disabled={isLoading}
           rows={3}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:opacity-50 disabled:cursor-not-allowed resize-none"
@@ -79,10 +82,10 @@ export default function IntegrationProviderForm({
 
       <Select
         {...register("status")}
-        label="Status"
+        label={tc("status")}
         options={[
-          { value: 1, label: "Active" },
-          { value: 0, label: "Inactive" },
+          { value: 1, label: tc("active") },
+          { value: 0, label: tc("inactive") },
         ]}
         error={errors.status?.message}
         disabled={isLoading}
@@ -94,7 +97,7 @@ export default function IntegrationProviderForm({
           isLoading={isLoading}
           className="w-full md:w-auto px-10"
         >
-          {initialData ? "Update Provider" : "Create Provider"}
+          {initialData ? t("updateProvider") : t("createProvider")}
         </Button>
       </div>
     </form>

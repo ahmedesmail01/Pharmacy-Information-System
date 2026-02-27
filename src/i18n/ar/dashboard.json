@@ -1,0 +1,19 @@
+{
+  "title": "لوحة التحكم",
+  "totalBranches": "إجمالي الفروع",
+  "totalProducts": "إجمالي المنتجات",
+  "totalUsers": "إجمالي المستخدمين",
+  "todayRevenue": "إيرادات اليوم",
+  "recentSales": "المبيعات الأخيرة",
+  "lowStockAlerts": "تنبيهات المخزون المنخفض",
+  "viewAllSales": "عرض جميع المبيعات",
+  "manageInventory": "إدارة المخزون",
+  "loadingDashboard": "جاري تحميل بيانات لوحة التحكم...",
+  "invoiceNo": "رقم الفاتورة",
+  "customer": "العميل",
+  "walkInCustomer": "عميل زائر",
+  "amount": "المبلغ",
+  "product": "المنتج",
+  "currentStock": "المخزون الحالي",
+  "minLevel": "الحد الأدنى"
+}

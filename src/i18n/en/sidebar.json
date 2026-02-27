@@ -1,0 +1,15 @@
+{
+  "dashboard": "Dashboard",
+  "branches": "Branches",
+  "products": "Products",
+  "sales": "Sales",
+  "stock": "Stock",
+  "systemUsers": "System Users",
+  "roles": "Roles",
+  "lookups": "Lookups",
+  "integrations": "Integrations",
+  "providers": "Providers",
+  "branchSettings": "Branch Settings",
+  "stakeholders": "Stakeholders",
+  "pharmacyIS": "Pharmacy IS"
+}

@@ -1,0 +1,16 @@
+{
+  "title": "إدارة الأدوار",
+  "addRole": "إضافة دور",
+  "editRole": "تعديل الدور",
+  "deleteRole": "حذف الدور",
+  "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا الدور؟",
+  "roleDeleted": "تم حذف الدور بنجاح",
+  "roleCreated": "تم إنشاء الدور بنجاح",
+  "roleUpdated": "تم تحديث الدور بنجاح",
+  "searchPlaceholder": "البحث بالاسم...",
+  "roleName": "اسم الدور",
+  "roleNameRequired": "اسم الدور مطلوب",
+  "permissions": "الصلاحيات",
+  "createRole": "إنشاء دور",
+  "updateRole": "تحديث الدور"
+}

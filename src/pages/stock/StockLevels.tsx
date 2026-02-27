@@ -4,12 +4,15 @@ import Table from "@/components/ui/Table";
 import Pagination from "@/components/ui/Pagination";
 import SearchBar from "@/components/shared/SearchBar";
 import Select from "@/components/ui/Select";
+import { useTranslation } from "react-i18next";
 import { stockService } from "@/api/stockService";
 import { branchService } from "@/api/branchService";
 import { useQueryTable } from "@/hooks/useQuery";
 import { StockDto, BranchDto, FilterOperation } from "@/types";
 
 export default function StockLevels() {
+  const { t } = useTranslation("stock");
+  const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [branchId, setBranchId] = useState("");
   const [branches, setBranches] = useState<BranchDto[]>([]);
@@ -57,7 +60,7 @@ export default function StockLevels() {
 
   const columns = [
     {
-      header: "Product",
+      header: t("product"),
       accessorKey: "productName",
       cell: (info: any) => (
         <div className="flex flex-col">
@@ -69,7 +72,7 @@ export default function StockLevels() {
       ),
     },
     {
-      header: "Branch",
+      header: t("branch"),
       accessorKey: "branchName",
       cell: (info: any) => (
         <div className="flex items-center gap-1.5 text-gray-600">
@@ -79,7 +82,7 @@ export default function StockLevels() {
       ),
     },
     {
-      header: "Available",
+      header: t("available"),
       accessorKey: "availableQuantity",
       cell: (info: any) => {
         const qty = info.getValue() || 0;
@@ -95,7 +98,7 @@ export default function StockLevels() {
             {isLow && (
               <span className="flex items-center gap-1 text-[10px] text-red-500 font-bold uppercase animate-pulse">
                 <AlertTriangle className="h-2.5 w-2.5" />
-                Low Stock
+                {t("low_stock")}
               </span>
             )}
           </div>
@@ -103,14 +106,14 @@ export default function StockLevels() {
       },
     },
     {
-      header: "Reserved",
+      header: t("reserved"),
       accessorKey: "reservedQuantity",
       cell: (info: any) => (
         <span className="text-gray-400 font-bold">{info.getValue() || 0}</span>
       ),
     },
     {
-      header: "Expiry",
+      header: t("expiry"),
       accessorKey: "expiryDate",
       cell: (info: any) => (
         <span className="text-xs font-medium text-gray-500">
@@ -127,16 +130,16 @@ export default function StockLevels() {
       <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-6 sm:items-end">
         <div className="flex-1 space-y-2">
           <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-            Search Products
+            {t("search_products")}
           </label>
           <SearchBar
             onSearch={setSearchTerm}
-            placeholder="Search by product name or GTIN..."
+            placeholder={t("search_products_placeholder")}
           />
         </div>
         <div className="w-full sm:w-64 space-y-2">
           <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-            Branch Location
+            {t("branch_location")}
           </label>
           <Select
             value={branchId}

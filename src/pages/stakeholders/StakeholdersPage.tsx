@@ -8,6 +8,7 @@ import {
   Briefcase,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/shared/PageHeader";
 import SearchBar from "@/components/shared/SearchBar";
 import Table from "@/components/ui/Table";
@@ -25,6 +26,8 @@ import { handleApiError } from "@/utils/handleApiError";
 import { StakeholderDto, AppLookupDetailDto, FilterOperation } from "@/types";
 
 export default function StakeholdersPage() {
+  const { t } = useTranslation("stakeholders");
+  const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [stakeholderTypeCode, setStakeholderTypeCode] = useState("");
   const [types, setTypes] = useState<AppLookupDetailDto[]>([]);
@@ -86,11 +89,10 @@ export default function StakeholdersPage() {
     setIsActionLoading(true);
     try {
       if (selectedStakeholder) {
-        await stakeholderService.update(selectedStakeholder.oid, formData);
-        toast.success("Stakeholder updated successfully");
+        toast.success(t("stakeholderUpdated"));
       } else {
         await stakeholderService.create(formData);
-        toast.success("Stakeholder added successfully");
+        toast.success(t("stakeholderAdded"));
       }
       setIsFormOpen(false);
       loadData();
@@ -106,7 +108,7 @@ export default function StakeholdersPage() {
     setIsActionLoading(true);
     try {
       await stakeholderService.delete(selectedStakeholder.oid);
-      toast.success("Stakeholder removed successfully");
+      toast.success(t("stakeholderDeleted"));
       setIsDeleteOpen(false);
       loadData();
     } catch (err) {
@@ -118,7 +120,7 @@ export default function StakeholdersPage() {
 
   const columns = [
     {
-      header: "Name",
+      header: t("name"),
       accessorKey: "fullName",
       cell: (info: any) => (
         <div className="flex items-center gap-3">
@@ -135,7 +137,7 @@ export default function StakeholdersPage() {
       ),
     },
     {
-      header: "Type",
+      header: t("type"),
       accessorKey: "stakeholderTypeName",
       cell: (info: any) => (
         <Badge
@@ -151,7 +153,7 @@ export default function StakeholdersPage() {
       ),
     },
     {
-      header: "Contact Info",
+      header: t("contactInfo"),
       id: "contact",
       cell: (info: any) => (
         <div className="flex flex-col gap-1">
@@ -189,16 +191,16 @@ export default function StakeholdersPage() {
       ),
     },
     {
-      header: "Status",
+      header: tc("status"),
       accessorKey: "status",
       cell: (info: any) => (
         <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Inactive"}
+          {info.getValue() === 1 ? tc("active") : tc("inactive")}
         </Badge>
       ),
     },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <div className="flex items-center gap-1">
@@ -232,27 +234,27 @@ export default function StakeholdersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Stakeholders Registry"
+        title={t("title")}
         onAddClick={() => {
           setSelectedStakeholder(null);
           setIsFormOpen(true);
         }}
-        addLabel="Add Stakeholder"
+        addLabel={t("addStakeholder")}
       />
 
       <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-end">
         <div className="flex-1 space-y-2">
           <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-            Search Database
+            {tc("search")}
           </label>
           <SearchBar
             onSearch={setSearchTerm}
-            placeholder="Search by name, email, or tax number..."
+            placeholder={t("searchPlaceholder")}
           />
         </div>
         <div className="w-full md:w-64 space-y-2">
           <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-            Stakeholder Type
+            {t("type")}
           </label>
           <Select
             value={stakeholderTypeCode}
@@ -278,11 +280,7 @@ export default function StakeholdersPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={
-          selectedStakeholder
-            ? `Edit ${selectedStakeholder.fullName}`
-            : "Add New Stakeholder"
-        }
+        title={selectedStakeholder ? t("editStakeholder") : t("addStakeholder")}
         size="lg"
       >
         <StakeholderForm
@@ -296,8 +294,8 @@ export default function StakeholdersPage() {
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
-        title="Remove Stakeholder"
-        message={`Are you sure you want to remove "${selectedStakeholder?.fullName}"? All associated transaction history will be preserved but the entity will be marked inactive.`}
+        title={t("deleteStakeholder")}
+        message={tc("deleteConfirm")}
         isLoading={isActionLoading}
       />
     </div>

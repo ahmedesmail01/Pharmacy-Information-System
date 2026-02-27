@@ -8,6 +8,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import PageHeader from "@/components/shared/PageHeader";
 import SearchBar from "@/components/shared/SearchBar";
@@ -23,6 +24,8 @@ import { SalesInvoiceDto, FilterOperation } from "@/types";
 import SaleForm from "./SaleForm";
 
 export default function SalesPage() {
+  const { t } = useTranslation("sales");
+  const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [dateRange, setDateRange] = useState({
@@ -61,7 +64,7 @@ export default function SalesPage() {
 
   const columns = [
     {
-      header: "Invoice #",
+      header: t("invoice_number"),
       accessorKey: "invoiceNumber",
       cell: (info: any) => (
         <span className="font-bold text-blue-600 font-mono tracking-tight">
@@ -70,7 +73,7 @@ export default function SalesPage() {
       ),
     },
     {
-      header: "Date",
+      header: tc("date"),
       accessorKey: "invoiceDate",
       cell: (info: any) => (
         <div className="flex items-center gap-2 text-gray-500">
@@ -84,7 +87,7 @@ export default function SalesPage() {
       ),
     },
     {
-      header: "Customer",
+      header: t("customer"),
       accessorKey: "customerName",
       cell: (info: any) => (
         <div className="flex items-center gap-2">
@@ -92,13 +95,13 @@ export default function SalesPage() {
             <UserIcon className="h-3.5 w-3.5 text-gray-400" />
           </div>
           <span className="font-semibold text-gray-900">
-            {info.getValue() || "Walk-in Customer"}
+            {info.getValue() || t("walk_in_customer")}
           </span>
         </div>
       ),
     },
     {
-      header: "Amount",
+      header: t("amount"),
       accessorKey: "totalAmount",
       cell: (info: any) => (
         <div className="flex flex-col">
@@ -112,28 +115,28 @@ export default function SalesPage() {
       ),
     },
     {
-      header: "Payment",
+      header: t("payment_method"),
       accessorKey: "paymentMethodName",
       cell: (info: any) => (
         <div className="flex items-center gap-1.5">
           <CreditCard className="h-3.5 w-3.5 text-gray-400" />
           <span className="text-xs font-medium text-gray-600">
-            {info.getValue() || "Cash"}
+            {info.getValue() || t("cash")}
           </span>
         </div>
       ),
     },
     {
-      header: "Status",
+      header: tc("status"),
       accessorKey: "invoiceStatusName",
       cell: (info: any) => (
         <Badge variant={info.getValue() === "Paid" ? "success" : "warning"}>
-          {info.getValue() || "Pending"}
+          {info.getValue() || t("pending")}
         </Badge>
       ),
     },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <div className="flex items-center gap-1">
@@ -164,9 +167,9 @@ export default function SalesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Sales Invoices"
+        title={t("title")}
         onAddClick={() => setIsFormOpen(true)}
-        addLabel="New Sale"
+        addLabel={t("new_sale")}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -199,7 +202,7 @@ export default function SalesPage() {
           <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
             <SearchBar
               onSearch={setSearchTerm}
-              placeholder="Search by invoice #..."
+              placeholder={t("search_placeholder")}
             />
             <div className="flex items-center gap-3">
               <input
@@ -210,7 +213,7 @@ export default function SalesPage() {
                 }
                 className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
               />
-              <span className="text-gray-400">to</span>
+              <span className="text-gray-400">{tc("to")}</span>
               <input
                 type="date"
                 value={dateRange.end}
@@ -236,7 +239,7 @@ export default function SalesPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title="Point of Sale (New Order)"
+        title={t("pos_title")}
         size="full"
       >
         <SaleForm

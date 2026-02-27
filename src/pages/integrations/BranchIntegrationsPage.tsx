@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Edit2, Trash2, Eye, EyeOff, SlidersHorizontal } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import PageHeader from "@/components/shared/PageHeader";
 import Table from "@/components/ui/Table";
 import Badge from "@/components/ui/Badge";
@@ -21,6 +22,8 @@ import {
 } from "@/types";
 
 export default function BranchIntegrationsPage() {
+  const { t } = useTranslation("integrations");
+  const tc = useTranslation("common").t;
   const [branches, setBranches] = useState<BranchDto[]>([]);
   const [providers, setProviders] = useState<IntegrationProviderDto[]>([]);
   const [selectedBranchId, setSelectedBranchId] = useState<string>("");
@@ -94,10 +97,10 @@ export default function BranchIntegrationsPage() {
           ...formData,
           oid: editItem.oid,
         });
-        toast.success("Setting updated successfully");
+        toast.success(t("settingUpdated"));
       } else {
         await branchIntegrationSettingService.create(formData);
-        toast.success("Setting created successfully");
+        toast.success(t("settingCreated"));
       }
       setIsModalOpen(false);
       setEditItem(null);
@@ -115,7 +118,7 @@ export default function BranchIntegrationsPage() {
     try {
       const res = await branchIntegrationSettingService.delete(deleteTarget);
       if (res.data.data === true) {
-        toast.success("Setting deleted");
+        toast.success(t("settingDeleted"));
         refreshSettings();
       } else {
         toast.error(res.data.message || "Delete failed");
@@ -148,7 +151,7 @@ export default function BranchIntegrationsPage() {
 
   const columns = [
     {
-      header: "Provider",
+      header: t("provider"),
       accessorKey: "integrationProviderName",
       cell: (info: any) => (
         <span className="font-semibold text-gray-900">
@@ -157,7 +160,7 @@ export default function BranchIntegrationsPage() {
       ),
     },
     {
-      header: "Integration Key",
+      header: t("integrationKey"),
       accessorKey: "integrationKey",
       cell: (info: any) => (
         <span className="font-mono text-sm text-gray-600">
@@ -166,7 +169,7 @@ export default function BranchIntegrationsPage() {
       ),
     },
     {
-      header: "Integration Value",
+      header: t("integrationValue"),
       accessorKey: "integrationValue",
       cell: (info: any) => {
         const oid = info.row.original.oid;
@@ -194,16 +197,16 @@ export default function BranchIntegrationsPage() {
       },
     },
     {
-      header: "Status",
+      header: tc("status"),
       accessorKey: "status",
       cell: (info: any) => (
         <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Inactive"}
+          {info.getValue() === 1 ? tc("active") : tc("inactive")}
         </Badge>
       ),
     },
     {
-      header: "Created",
+      header: tc("createdAt"),
       accessorKey: "createdAt",
       cell: (info: any) => (
         <span className="text-sm text-gray-500">
@@ -212,7 +215,7 @@ export default function BranchIntegrationsPage() {
       ),
     },
     {
-      header: "Updated",
+      header: tc("updatedAt"),
       accessorKey: "updatedAt",
       cell: (info: any) => (
         <span className="text-sm text-gray-500">
@@ -221,7 +224,7 @@ export default function BranchIntegrationsPage() {
       ),
     },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <div className="flex items-center gap-1">
@@ -261,16 +264,16 @@ export default function BranchIntegrationsPage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <PageHeader
-        title="Branch Integration Settings"
+        title={t("settingsTitle")}
         onAddClick={() => {
           if (!selectedBranchId) {
-            toast.error("Please select a branch first");
+            toast.error(t("selectBranchFirst"));
             return;
           }
           setEditItem(null);
           setIsModalOpen(true);
         }}
-        addLabel="Add Setting"
+        addLabel={t("addSetting")}
       />
 
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
@@ -282,7 +285,7 @@ export default function BranchIntegrationsPage() {
               onChange={(e) => setSelectedBranchId(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
-              <option value="">Select a branch...</option>
+              <option value="">{t("selectBranch")}</option>
               {branches.map((b) => (
                 <option key={b.oid} value={b.oid}>
                   {b.branchName}
@@ -296,10 +299,8 @@ export default function BranchIntegrationsPage() {
       {!selectedBranchId ? (
         <div className="flex flex-col items-center justify-center py-20 text-gray-400">
           <SlidersHorizontal className="h-12 w-12 mb-4 opacity-30" />
-          <p className="font-medium text-lg">Select a branch</p>
-          <p className="text-sm">
-            Choose a branch above to view or manage its integration settings.
-          </p>
+          <p className="font-medium text-lg">{t("selectBranchPrompt")}</p>
+          <p className="text-sm">{t("selectBranchDescription")}</p>
         </div>
       ) : (
         <Table
@@ -315,7 +316,7 @@ export default function BranchIntegrationsPage() {
           setIsModalOpen(false);
           setEditItem(null);
         }}
-        title={editItem ? "Edit Setting" : "Add Integration Setting"}
+        title={editItem ? t("editSetting") : t("addSetting")}
       >
         <BranchIntegrationForm
           isOpen={isModalOpen}
@@ -336,8 +337,8 @@ export default function BranchIntegrationsPage() {
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Setting"
-        message="Are you sure you want to delete this integration setting? This action cannot be undone."
+        title={t("deleteSetting")}
+        message={t("deleteSettingConfirm")}
         isLoading={isActionLoading}
       />
     </div>

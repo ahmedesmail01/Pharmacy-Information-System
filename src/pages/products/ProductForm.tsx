@@ -6,46 +6,14 @@ import { Info, Package, ShieldCheck, Database, Layers } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { useTranslation } from "react-i18next";
 import { ProductDto, CreateProductDto, AppLookupDetailDto } from "@/types";
 import { lookupService } from "@/api/lookupService";
 import { positiveNumberInputProps } from "@/utils/positiveNumberInputProps";
 
-const productSchema = z.object({
-  drugName: z.string().min(1, "Drug name is required").max(200),
-  gtin: z.string().optional(),
-  barcode: z.string().optional(),
-  drugNameAr: z.string().optional(),
-  genericName: z.string().optional(),
-  productTypeId: z.string().optional(),
-  strengthValue: z.string().optional(),
-  strengthUnit: z.string().optional(),
-  packageType: z.string().optional(),
-  packageSize: z.string().optional(),
-  price: z.coerce.number().min(0).optional(),
-  registrationNumber: z.string().optional(),
-  volume: z.coerce.number().optional(),
-  unitOfVolume: z.string().optional(),
-  manufacturer: z.string().optional(),
-  countryOfOrigin: z.string().optional(),
-  minStockLevel: z.coerce.number().optional(),
-  maxStockLevel: z.coerce.number().optional(),
-  isExportable: z.boolean().default(false),
-  isImportable: z.boolean().default(false),
-  drugStatus: z.string().optional(),
-  marketingStatus: z.string().optional(),
-  legalStatus: z.string().optional(),
-  vatTypeId: z.string().optional(),
-  packageTypeId: z.string().optional(),
-  dosageFormId: z.string().optional(),
-  productGroupId: z.string().optional(),
-  status: z.coerce.number().default(1),
-});
-
-type ProductFormValues = z.infer<typeof productSchema>;
-
 interface ProductFormProps {
   initialData?: ProductDto | null;
-  onSubmit: (data: ProductFormValues) => void;
+  onSubmit: (data: any) => void;
   isLoading?: boolean;
 }
 
@@ -54,6 +22,42 @@ export default function ProductForm({
   onSubmit,
   isLoading = false,
 }: ProductFormProps) {
+  const { t } = useTranslation("products");
+  const tc = useTranslation("common").t;
+
+  const productSchema = z.object({
+    drugName: z.string().min(1, t("drugNameRequired")).max(200),
+    gtin: z.string().optional(),
+    barcode: z.string().optional(),
+    drugNameAr: z.string().optional(),
+    genericName: z.string().optional(),
+    productTypeId: z.string().optional(),
+    strengthValue: z.string().optional(),
+    strengthUnit: z.string().optional(),
+    packageType: z.string().optional(),
+    packageSize: z.string().optional(),
+    price: z.coerce.number().min(0).optional(),
+    registrationNumber: z.string().optional(),
+    volume: z.coerce.number().optional(),
+    unitOfVolume: z.string().optional(),
+    manufacturer: z.string().optional(),
+    countryOfOrigin: z.string().optional(),
+    minStockLevel: z.coerce.number().optional(),
+    maxStockLevel: z.coerce.number().optional(),
+    isExportable: z.boolean().default(false),
+    isImportable: z.boolean().default(false),
+    drugStatus: z.string().optional(),
+    marketingStatus: z.string().optional(),
+    legalStatus: z.string().optional(),
+    vatTypeId: z.string().optional(),
+    packageTypeId: z.string().optional(),
+    dosageFormId: z.string().optional(),
+    productGroupId: z.string().optional(),
+    status: z.coerce.number().default(1),
+  });
+
+  type ProductFormValues = z.infer<typeof productSchema>;
+
   const [activeTab, setActiveTab] = useState<
     "basic" | "strength" | "regulatory" | "stock"
   >("basic");
@@ -161,10 +165,10 @@ export default function ProductForm({
   }, [initialData, reset]);
 
   const tabs = [
-    { id: "basic", label: "Basic Info", icon: Info },
-    { id: "strength", label: "Strength & Packaging", icon: Layers },
-    { id: "regulatory", label: "Regulatory", icon: ShieldCheck },
-    { id: "stock", label: "Stock Levels", icon: Database },
+    { id: "basic", label: t("basicInfo"), icon: Info },
+    { id: "strength", label: t("strengthPackaging"), icon: Layers },
+    { id: "regulatory", label: t("regulatory"), icon: ShieldCheck },
+    { id: "stock", label: t("stockLevels"), icon: Database },
   ];
 
   const onInvalid = (errs: any) => {
@@ -196,38 +200,38 @@ export default function ProductForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-left-4 duration-300">
             <Input
               {...register("drugName")}
-              label="Drug Name*"
+              label={t("drugName") + "*"}
               placeholder="e.g. Panadol Extra"
               error={errors.drugName?.message}
               disabled={isLoading}
             />
             <Input
               {...register("gtin")}
-              label="GTIN"
+              label={t("gtin")}
               placeholder="Global Trade Item Number"
               disabled={isLoading}
             />
             <Input
               {...register("barcode")}
-              label="Barcode"
+              label={t("barcode")}
               placeholder="Standard barcode"
               disabled={isLoading}
             />
             <Input
               {...register("genericName")}
-              label="Generic Name"
+              label={t("genericName")}
               placeholder="e.g. Paracetamol"
               disabled={isLoading}
             />
             <Input
               {...register("drugNameAr")}
-              label="Drug Name (Arabic)"
+              label={t("drugNameAr")}
               placeholder="اسم الدواء بالعربية"
               disabled={isLoading}
             />
             <Select
               {...register("productTypeId")}
-              label="Product Type"
+              label={t("productType")}
               options={productTypes.map((pt) => ({
                 value: String(pt.oid),
                 label: pt.valueNameEn || pt.valueNameAr || "",
@@ -236,7 +240,7 @@ export default function ProductForm({
             />
             <Input
               {...register("price")}
-              label="Retail Price"
+              label={t("price")}
               type="number"
               {...positiveNumberInputProps}
               step="0.01"
@@ -244,10 +248,10 @@ export default function ProductForm({
             />
             <Select
               {...register("status")}
-              label="Status"
+              label={tc("status")}
               options={[
-                { value: "1", label: "Active" },
-                { value: "0", label: "Inactive" },
+                { value: "1", label: tc("active") },
+                { value: "0", label: tc("inactive") },
               ]}
               disabled={isLoading}
             />
@@ -259,14 +263,14 @@ export default function ProductForm({
             <div className="grid grid-cols-2 gap-4">
               <Input
                 {...register("strengthValue")}
-                label="Strength Value"
+                label={t("strengthValue")}
                 placeholder="500"
                 {...positiveNumberInputProps}
                 disabled={isLoading}
               />
               <Input
                 {...register("strengthUnit")}
-                label="Strength Unit"
+                label={t("strengthUnit")}
                 placeholder="mg"
                 {...positiveNumberInputProps}
                 disabled={isLoading}
@@ -274,13 +278,13 @@ export default function ProductForm({
             </div>
             <Input
               {...register("packageType")}
-              label="Package Type"
+              label={t("packageType")}
               placeholder="e.g. Box"
               disabled={isLoading}
             />
             <Input
               {...register("packageSize")}
-              label="Package Size"
+              label={t("packageSize")}
               placeholder="e.g. 24 Tablets"
               disabled={isLoading}
               {...positiveNumberInputProps}
@@ -288,14 +292,14 @@ export default function ProductForm({
             <div className="grid grid-cols-2 gap-4">
               <Input
                 {...register("volume")}
-                label="Volume"
+                label={t("volume")}
                 type="number"
                 {...positiveNumberInputProps}
                 disabled={isLoading}
               />
               <Input
                 {...register("unitOfVolume")}
-                label="Unit of Volume"
+                label={t("unitOfVolume")}
                 placeholder="ml"
                 {...positiveNumberInputProps}
                 disabled={isLoading}
@@ -308,23 +312,23 @@ export default function ProductForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-left-4 duration-300">
             <Input
               {...register("registrationNumber")}
-              label="Registration Number"
+              label={t("registrationNumber")}
               disabled={isLoading}
               {...positiveNumberInputProps}
             />
             <Input
               {...register("manufacturer")}
-              label="Manufacturer"
+              label={t("manufacturer")}
               disabled={isLoading}
             />
             <Input
               {...register("countryOfOrigin")}
-              label="Country of Origin"
+              label={t("countryOfOrigin")}
               disabled={isLoading}
             />
             <Select
               {...register("vatTypeId")}
-              label="VAT Type"
+              label={t("vatType")}
               options={vatTypes.map((v) => ({
                 value: String(v.oid),
                 label: v.valueNameEn || v.valueNameAr || "",
@@ -342,7 +346,7 @@ export default function ProductForm({
             />
             <Select
               {...register("dosageFormId")}
-              label="Dosage Form"
+              label={t("dosageForm")}
               options={dosageForms.map((d) => ({
                 value: String(d.oid),
                 label: d.valueNameEn || d.valueNameAr || "",
@@ -351,7 +355,7 @@ export default function ProductForm({
             />
             <Select
               {...register("productGroupId")}
-              label="Product Group"
+              label={t("productGroup")}
               options={productGroups.map((g) => ({
                 value: String(g.oid),
                 label: g.valueNameEn || g.valueNameAr || "",
@@ -366,7 +370,7 @@ export default function ProductForm({
                   className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                  Exportable Product
+                  {t("exportable")}
                 </span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer group">
@@ -376,7 +380,7 @@ export default function ProductForm({
                   className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                  Importable Product
+                  {t("importable")}
                 </span>
               </label>
             </div>
@@ -387,14 +391,14 @@ export default function ProductForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-left-4 duration-300">
             <Input
               {...register("minStockLevel")}
-              label="Minimum Stock Level"
+              label={t("minStockLevel")}
               type="number"
               disabled={isLoading}
               {...positiveNumberInputProps}
             />
             <Input
               {...register("maxStockLevel")}
-              label="Maximum Stock Level"
+              label={t("maxStockLevel")}
               type="number"
               disabled={isLoading}
               {...positiveNumberInputProps}
@@ -403,11 +407,8 @@ export default function ProductForm({
               <div className="flex gap-3 text-blue-700">
                 <Info className="h-5 w-5 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-bold mb-1">Stock Level Alerts</p>
-                  <p>
-                    When current stock falls below the minimum level, it will be
-                    highlighted in the dashboard and inventory reports.
-                  </p>
+                  <p className="font-bold mb-1">{t("stockLevels")}</p>
+                  <p>{t("stockLevels")} info...</p>
                 </div>
               </div>
             </div>
@@ -420,7 +421,7 @@ export default function ProductForm({
             isLoading={isLoading}
             className="px-10 py-3 shadow-lg shadow-blue-200"
           >
-            {initialData ? "Update Product" : "Add Product"}
+            {initialData ? t("updateProduct") : t("createProduct")}
           </Button>
         </div>
       </form>

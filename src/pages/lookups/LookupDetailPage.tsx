@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Settings, List, Edit2, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -16,6 +17,8 @@ import { handleApiError } from "@/utils/handleApiError";
 import { AppLookupMasterDto, AppLookupDetailDto } from "@/types";
 
 export default function LookupDetailPage() {
+  const { t } = useTranslation("lookups");
+  const tc = useTranslation("common").t;
   const { lookupCode } = useParams();
   const navigate = useNavigate();
   const [master, setMaster] = useState<AppLookupMasterDto | null>(null);
@@ -67,7 +70,7 @@ export default function LookupDetailPage() {
     setIsActionLoading(true);
     try {
       await lookupService.createDetail(data);
-      toast.success("Lookup option added");
+      toast.success(t("optionAdded"));
       setIsFormOpen(false);
       fetchLookup();
     } catch (err) {
@@ -97,7 +100,7 @@ export default function LookupDetailPage() {
     setIsActionLoading(true);
     try {
       await lookupService.updateDetail(editDetail.oid, data);
-      toast.success("Detail updated");
+      toast.success(t("detailUpdated"));
       setEditDetail(null);
       fetchLookup();
     } catch (err) {
@@ -114,7 +117,7 @@ export default function LookupDetailPage() {
     try {
       const res = await lookupService.deleteDetail(deleteDetailTarget);
       if (res.data.data === true) {
-        toast.success("Detail deleted");
+        toast.success(t("detailDeleted"));
         fetchLookup();
       } else {
         toast.error(res.data.message || "Delete failed");
@@ -145,7 +148,7 @@ export default function LookupDetailPage() {
     setIsActionLoading(true);
     try {
       await lookupService.updateMaster(master.oid, data);
-      toast.success("Lookup category updated");
+      toast.success(t("categoryUpdated"));
       setIsEditMasterOpen(false);
       fetchLookup();
     } catch (err) {
@@ -162,7 +165,7 @@ export default function LookupDetailPage() {
     try {
       const res = await lookupService.deleteMaster(master.oid);
       if (res.data.data === true) {
-        toast.success("Lookup category deleted");
+        toast.success(t("categoryDeleted"));
         navigate("/lookups");
       } else {
         toast.error(res.data.message || "Delete failed");
@@ -177,7 +180,7 @@ export default function LookupDetailPage() {
 
   const columns = [
     {
-      header: "Detail Code",
+      header: t("optionCode"),
       accessorKey: "lookupDetailCode",
       cell: (info: any) => (
         <span className="font-mono text-[10px] font-bold text-gray-400 uppercase tracking-widest">
@@ -186,14 +189,14 @@ export default function LookupDetailPage() {
       ),
     },
     {
-      header: "Value (English)",
+      header: t("valueEn"),
       accessorKey: "valueNameEn",
       cell: (info: any) => (
         <span className="font-bold text-gray-900">{info.getValue()}</span>
       ),
     },
     {
-      header: "Value (Arabic)",
+      header: t("valueAr"),
       accessorKey: "valueNameAr",
       cell: (info: any) => (
         <span className="font-medium text-gray-500">
@@ -202,16 +205,16 @@ export default function LookupDetailPage() {
       ),
     },
     {
-      header: "Status",
+      header: tc("status"),
       accessorKey: "status",
       cell: (info: any) => (
         <Badge variant={info.getValue() === 1 ? "success" : "danger"}>
-          {info.getValue() === 1 ? "Active" : "Inactive"}
+          {info.getValue() === 1 ? tc("active") : tc("inactive")}
         </Badge>
       ),
     },
     {
-      header: "Actions",
+      header: tc("actions"),
       id: "actions",
       cell: (info: any) => (
         <div className="flex items-center gap-1">
@@ -240,15 +243,13 @@ export default function LookupDetailPage() {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
         <Spinner size="lg" />
-        <p className="text-gray-500 font-medium">
-          Loading lookup configurations...
-        </p>
+        <p className="text-gray-500 font-medium">{t("loadingLookups")}</p>
       </div>
     );
   }
 
   if (!master)
-    return <div className="text-center py-12">Lookup category not found</div>;
+    return <div className="text-center py-12">{t("lookupNotFound")}</div>;
 
   return (
     <div className="max-w-full mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -259,7 +260,7 @@ export default function LookupDetailPage() {
             className="gap-2 text-gray-500 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Categories
+            {t("backToCategories")}
           </Button>
         </Link>
       </div>
@@ -273,7 +274,7 @@ export default function LookupDetailPage() {
               </div>
               <div>
                 <h2 className="font-black text-gray-900 tracking-tight leading-none uppercase text-xs text-gray-400 mb-1">
-                  Lookup Category
+                  {t("lookupCategory")}
                 </h2>
                 <p className="font-bold text-xl">{master.lookupNameEn}</p>
               </div>
@@ -282,7 +283,7 @@ export default function LookupDetailPage() {
             <div className="space-y-4 pt-4 border-t border-gray-100">
               <div className="flex flex-col">
                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                  Internal Code
+                  {t("internalCode")}
                 </span>
                 <span className="font-mono text-sm bg-gray-50 p-2 rounded border border-gray-100">
                   {master.lookupCode}
@@ -290,10 +291,10 @@ export default function LookupDetailPage() {
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                  Localized Name
+                  {t("localizedName")}
                 </span>
                 <span className="text-sm font-medium">
-                  {master.lookupNameAr || "Not set"}
+                  {master.lookupNameAr || t("notSet")}
                 </span>
               </div>
             </div>
@@ -304,7 +305,7 @@ export default function LookupDetailPage() {
                 className="w-full gap-2 shadow-lg shadow-blue-100"
               >
                 <Plus className="h-4 w-4" />
-                Add Detail Option
+                {t("addDetailOption")}
               </Button>
               <div className="flex gap-2">
                 <Button
@@ -313,7 +314,7 @@ export default function LookupDetailPage() {
                   className="flex-1 gap-1 text-blue-600 hover:bg-blue-50"
                 >
                   <Edit2 className="h-3.5 w-3.5" />
-                  Edit
+                  {tc("edit")}
                 </Button>
                 <Button
                   variant="ghost"
@@ -321,7 +322,7 @@ export default function LookupDetailPage() {
                   className="flex-1 gap-1 text-red-600 hover:bg-red-50"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  Delete
+                  {tc("delete")}
                 </Button>
               </div>
             </div>
@@ -332,16 +333,13 @@ export default function LookupDetailPage() {
           <div className="flex items-center gap-2 mb-2">
             <List className="h-5 w-5 text-gray-400" />
             <h3 className="font-black text-lg text-gray-900 tracking-tight">
-              Available Options
+              {t("availableOptions")}
             </h3>
           </div>
           <Table columns={columns} data={master.lookupDetails || []} />
 
           <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200 italic text-xs text-gray-400">
-            <p>
-              These options are used system-wide in dropdowns and selectors
-              related to this category.
-            </p>
+            <p>{t("systemNote")}</p>
           </div>
         </div>
       </div>
@@ -350,25 +348,25 @@ export default function LookupDetailPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={`Add Option to ${master.lookupNameEn}`}
+        title={t("addDetailOption")}
       >
         <form onSubmit={handleCreateDetail} className="space-y-6">
           <div className="space-y-4">
             <Input
               name="detailCode"
-              label="Option Code (Uppercase)*"
+              label={t("optionCode")}
               placeholder="e.g. TYPE_RX"
               required
             />
             <Input
               name="nameEn"
-              label="Name (English)*"
+              label={t("valueEn") + "*"}
               placeholder="e.g. Prescription Drug"
               required
             />
             <Input
               name="nameAr"
-              label="Name (Arabic)"
+              label={t("valueAr")}
               placeholder="e.g. دواء بوصفة"
             />
           </div>
@@ -378,7 +376,7 @@ export default function LookupDetailPage() {
               isLoading={isActionLoading}
               className="w-full shadow-lg shadow-blue-100"
             >
-              Save Option
+              {t("saveOption")}
             </Button>
           </div>
         </form>
@@ -388,38 +386,38 @@ export default function LookupDetailPage() {
       <Modal
         isOpen={!!editDetail}
         onClose={() => setEditDetail(null)}
-        title="Edit Detail Option"
+        title={t("editDetail")}
       >
         <form onSubmit={handleUpdateDetail} className="space-y-6">
           <div className="space-y-4">
             <Input
               name="detailCode"
-              label="Option Code*"
+              label={t("optionCode") + "*"}
               defaultValue={editDetail?.lookupDetailCode || ""}
               required
             />
             <Input
               name="nameEn"
-              label="Name (English)*"
+              label={t("valueEn") + "*"}
               defaultValue={editDetail?.valueNameEn || ""}
               required
             />
             <Input
               name="nameAr"
-              label="Name (Arabic)"
+              label={t("valueAr")}
               defaultValue={editDetail?.valueNameAr || ""}
             />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Active
+                {tc("status")}
               </label>
               <select
                 name="isActive"
                 defaultValue={editDetail?.isActive === false ? "0" : "1"}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
+                <option value="1">{tc("active")}</option>
+                <option value="0">{tc("inactive")}</option>
               </select>
             </div>
           </div>
@@ -429,7 +427,7 @@ export default function LookupDetailPage() {
               isLoading={isActionLoading}
               className="w-full shadow-lg shadow-blue-100"
             >
-              Update Option
+              {t("updateOption")}
             </Button>
           </div>
         </form>
@@ -440,8 +438,8 @@ export default function LookupDetailPage() {
         isOpen={!!deleteDetailTarget}
         onClose={() => setDeleteDetailTarget(null)}
         onConfirm={handleDeleteDetail}
-        title="Delete Detail"
-        message="Are you sure you want to delete this lookup detail? This action cannot be undone."
+        title={t("deleteDetail")}
+        message={tc("deleteConfirm")}
         isLoading={isActionLoading}
       />
 
@@ -449,31 +447,31 @@ export default function LookupDetailPage() {
       <Modal
         isOpen={isEditMasterOpen}
         onClose={() => setIsEditMasterOpen(false)}
-        title="Edit Lookup Category"
+        title={t("editCategory")}
       >
         <form onSubmit={handleUpdateMaster} className="space-y-6">
           <div className="space-y-4">
             <Input
               name="lookupCode"
-              label="Lookup Code*"
+              label={t("lookupCode") + "*"}
               defaultValue={master.lookupCode}
               required
             />
             <Input
               name="lookupNameEn"
-              label="Name (English)*"
+              label={t("lookupNameEn") + "*"}
               defaultValue={master.lookupNameEn || ""}
               required
             />
             <Input
               name="lookupNameAr"
-              label="Name (Arabic)*"
+              label={t("lookupNameAr") + "*"}
               defaultValue={master.lookupNameAr || ""}
               required
             />
             <Input
               name="description"
-              label="Description"
+              label={tc("description")}
               defaultValue={master.description || ""}
             />
           </div>
@@ -483,7 +481,7 @@ export default function LookupDetailPage() {
               isLoading={isActionLoading}
               className="w-full shadow-lg shadow-blue-100"
             >
-              Update Category
+              {tc("update")}
             </Button>
           </div>
         </form>
@@ -494,8 +492,8 @@ export default function LookupDetailPage() {
         isOpen={isDeleteMasterOpen}
         onClose={() => setIsDeleteMasterOpen(false)}
         onConfirm={handleDeleteMaster}
-        title="Delete Lookup Category"
-        message={`Are you sure you want to delete "${master.lookupNameEn}" and all its details? This action cannot be undone.`}
+        title={t("deleteCategory")}
+        message={t("deleteCategoryConfirm", { name: master.lookupNameEn })}
         isLoading={isActionLoading}
       />
     </div>

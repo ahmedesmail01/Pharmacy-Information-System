@@ -5,25 +5,13 @@ import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { useTranslation } from "react-i18next";
 import { StakeholderDto, AppLookupDetailDto } from "@/types";
 import { lookupService } from "@/api/lookupService";
 
-const stakeholderSchema = z.object({
-  fullName: z.string().min(1, "Full name is required").max(200),
-  stakeholderTypeCode: z.string().min(1, "Stakeholder type is required"),
-  email: z.string().email().optional().or(z.literal("")),
-  phoneNumber: z.string().optional(),
-  address: z.string().optional(),
-  taxNumber: z.string().optional(),
-  crNumber: z.string().optional(),
-  status: z.coerce.number().default(1),
-});
-
-type StakeholderFormValues = z.infer<typeof stakeholderSchema>;
-
 interface StakeholderFormProps {
   initialData?: StakeholderDto | null;
-  onSubmit: (data: StakeholderFormValues) => void;
+  onSubmit: (data: any) => void;
   isLoading?: boolean;
 }
 
@@ -32,6 +20,22 @@ export default function StakeholderForm({
   onSubmit,
   isLoading = false,
 }: StakeholderFormProps) {
+  const { t } = useTranslation("stakeholders");
+  const tc = useTranslation("common").t;
+
+  const stakeholderSchema = z.object({
+    fullName: z.string().min(1, t("fullNameRequired")).max(200),
+    stakeholderTypeCode: z.string().min(1, t("typeRequired")),
+    email: z.string().email().optional().or(z.literal("")),
+    phoneNumber: z.string().optional(),
+    address: z.string().optional(),
+    taxNumber: z.string().optional(),
+    crNumber: z.string().optional(),
+    status: z.coerce.number().default(1),
+  });
+
+  type StakeholderFormValues = z.infer<typeof stakeholderSchema>;
+
   const [types, setTypes] = useState<AppLookupDetailDto[]>([]);
 
   const {
@@ -78,14 +82,14 @@ export default function StakeholderForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
           {...register("fullName")}
-          label="Full Name / Company Name*"
+          label={t("fullName") + "*"}
           placeholder="e.g. John Doe or Pfizer Inc."
           error={errors.fullName?.message}
           disabled={isLoading}
         />
         <Select
           {...register("stakeholderTypeCode")}
-          label="Stakeholder Type*"
+          label={t("type") + "*"}
           options={types.map((t) => ({
             value: t.lookupDetailCode,
             label: t.valueNameEn ?? "",
@@ -95,7 +99,7 @@ export default function StakeholderForm({
         />
         <Input
           {...register("email")}
-          label="Email Address"
+          label={t("email")}
           type="email"
           placeholder="e.g. contact@example.com"
           error={errors.email?.message}
@@ -103,7 +107,7 @@ export default function StakeholderForm({
         />
         <Input
           {...register("phoneNumber")}
-          label="Phone Number"
+          label={t("phoneNumber")}
           placeholder="e.g. +966..."
           error={errors.phoneNumber?.message}
           disabled={isLoading}
@@ -112,7 +116,7 @@ export default function StakeholderForm({
 
       <Input
         {...register("address")}
-        label="Address"
+        label={t("address")}
         placeholder="Full street address..."
         error={errors.address?.message}
         disabled={isLoading}
@@ -121,14 +125,14 @@ export default function StakeholderForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
           {...register("taxNumber")}
-          label="Tax / VAT Number"
+          label={t("taxNumber")}
           placeholder="e.g. 300123456700003"
           error={errors.taxNumber?.message}
           disabled={isLoading}
         />
         <Input
           {...register("crNumber")}
-          label="CR Number"
+          label={t("crNumber")}
           placeholder="e.g. 1010123456"
           error={errors.crNumber?.message}
           disabled={isLoading}
@@ -137,10 +141,10 @@ export default function StakeholderForm({
 
       <Select
         {...register("status")}
-        label="Status"
+        label={tc("status")}
         options={[
-          { value: 1, label: "Active" },
-          { value: 0, label: "Inactive" },
+          { value: 1, label: tc("active") },
+          { value: 0, label: tc("inactive") },
         ]}
         disabled={isLoading}
       />
@@ -151,7 +155,7 @@ export default function StakeholderForm({
           isLoading={isLoading}
           className="px-10 shadow-lg shadow-blue-100"
         >
-          {initialData ? "Update Stakeholder" : "Add Stakeholder"}
+          {initialData ? t("updateStakeholder") : t("addStakeholder")}
         </Button>
       </div>
     </form>

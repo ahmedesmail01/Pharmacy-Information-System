@@ -2,31 +2,33 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Pill, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Pill, Lock, User, Eye, EyeOff, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import FormError from "@/components/ui/FormError";
-
-const loginSchema = z.object({
-  username: z
-    .string()
-    .min(1, "Username is required")
-    .max(50, "Username is too long"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .max(100, "Password is too long"),
-  rememberMe: z.boolean().optional(),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
+  const { t, i18n } = useTranslation("login");
+
+  const loginSchema = z.object({
+    username: z
+      .string()
+      .min(1, t("usernameRequired"))
+      .max(50, t("usernameTooLong")),
+    password: z
+      .string()
+      .min(1, t("passwordRequired"))
+      .max(100, t("passwordTooLong")),
+    rememberMe: z.boolean().optional(),
+  });
+
+  type LoginFormValues = z.infer<typeof loginSchema>;
 
   const {
     register,
@@ -45,25 +47,39 @@ export default function LoginPage() {
     try {
       await login(data);
     } catch (err: any) {
-      setError(err.message || "Invalid username or password");
+      setError(err.message || t("invalidCredentials"));
     } finally {
       setIsLoading(false);
     }
   };
 
+  const toggleLanguage = () => {
+    const next = i18n.language === "ar" ? "en" : "ar";
+    i18n.changeLanguage(next);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
+        {/* Language Toggle */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-colors"
+          >
+            <Globe className="h-4 w-4" />
+            <span>{i18n.language === "ar" ? "English" : "العربية"}</span>
+          </button>
+        </div>
+
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center p-3 bg-blue-600 rounded-2xl shadow-lg shadow-blue-200 mb-4">
             <Pill className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            Pharmacy IS
+            {t("title")}
           </h1>
-          <p className="text-gray-500 mt-2 font-medium">
-            Please sign in to your account
-          </p>
+          <p className="text-gray-500 mt-2 font-medium">{t("subtitle")}</p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
@@ -71,36 +87,36 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="relative">
-              <div className="absolute inset-y-0 top-5 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+              <div className="absolute inset-y-0 top-5 start-0 ps-3 flex items-center pointer-events-none text-gray-400">
                 <User className="h-4 w-4" />
               </div>
               <Input
                 {...register("username")}
-                label="Username"
-                placeholder="Enter your username"
-                className="pl-10"
+                label={t("username")}
+                placeholder={t("usernamePlaceholder")}
+                className="ps-10"
                 error={errors.username?.message}
                 disabled={isLoading}
               />
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 top-5 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+              <div className="absolute inset-y-0 top-5 start-0 ps-3 flex items-center pointer-events-none text-gray-400">
                 <Lock className="h-4 w-4" />
               </div>
               <Input
                 {...register("password")}
-                label="Password"
+                label={t("password")}
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                className="pl-10"
+                placeholder={t("passwordPlaceholder")}
+                className="ps-10"
                 error={errors.password?.message}
                 disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[34px] text-gray-400 hover:text-gray-600 focus:outline-none"
+                className="absolute end-3 top-[34px] text-gray-400 hover:text-gray-600 focus:outline-none"
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -117,15 +133,15 @@ export default function LoginPage() {
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <span className="ml-2 text-sm text-gray-600 font-medium">
-                  Remember me
+                <span className="ms-2 text-sm text-gray-600 font-medium">
+                  {t("rememberMe")}
                 </span>
               </label>
               <a
                 href="#"
                 className="text-sm font-semibold text-blue-600 hover:text-blue-700"
               >
-                Forgot password?
+                {t("forgotPassword")}
               </a>
             </div>
 
@@ -134,13 +150,13 @@ export default function LoginPage() {
               className="w-full py-3 rounded-xl shadow-lg shadow-blue-200"
               isLoading={isLoading}
             >
-              Sign In
+              {t("signIn")}
             </Button>
           </form>
         </div>
 
         <p className="text-center mt-8 text-sm text-gray-500 font-medium">
-          Powered by <span className="text-gray-900">HealthTech Solutions</span>
+          {t("poweredBy")} <span className="text-gray-900">{t("company")}</span>
         </p>
       </div>
     </div>
