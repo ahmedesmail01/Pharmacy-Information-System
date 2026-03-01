@@ -26,6 +26,8 @@ import {
   StakeholderDto,
   AppLookupDetailDto,
   CreateSalesInvoiceDto,
+  FilterOperation,
+  FilterRequest,
 } from "@/types";
 
 interface CartItem {
@@ -73,11 +75,11 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
         const cRes = await stakeholderService.query({
           request: {
             filters: [
-              {
-                propertyName: "stakeholderTypeCode",
-                value: "CUSTOMER",
-                operation: 2, // contains
-              },
+              new FilterRequest(
+                "stakeholderTypeCode",
+                "CUSTOMER",
+                FilterOperation.Equals,
+              ),
             ],
             sort: [],
             pagination: { pageNumber: 1, pageSize: 50 },
@@ -111,11 +113,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
         const pRes = await productService.query({
           request: {
             filters: [
-              {
-                propertyName: "drugName",
-                value: search,
-                operation: 2, // Contains
-              },
+              new FilterRequest("drugName", search, FilterOperation.Contains),
             ],
             sort: [],
             pagination: { pageNumber: 1, pageSize: 10 },
@@ -144,7 +142,13 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
           const res = await branchService.query({
             request: {
               filters: val.trim()
-                ? [{ propertyName: "branchName", value: val, operation: 6 }]
+                ? [
+                    new FilterRequest(
+                      "branchName",
+                      val,
+                      FilterOperation.LessThan,
+                    ),
+                  ]
                 : [],
               sort: [],
               pagination: { pageNumber: 1, pageSize: 50 },
@@ -168,13 +172,19 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
           const res = await stakeholderService.query({
             request: {
               filters: [
-                {
-                  propertyName: "stakeholderTypeCode",
-                  value: "CUSTOMER",
-                  operation: 2,
-                },
+                new FilterRequest(
+                  "stakeholderTypeCode",
+                  "CUSTOMER",
+                  FilterOperation.Contains,
+                ),
                 ...(val.trim()
-                  ? [{ propertyName: "fullName", value: val, operation: 6 }]
+                  ? [
+                      new FilterRequest(
+                        "fullName",
+                        val,
+                        FilterOperation.LessThan,
+                      ),
+                    ]
                   : []),
               ] as any,
               sort: [],

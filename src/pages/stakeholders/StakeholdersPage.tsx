@@ -23,7 +23,12 @@ import { stakeholderService } from "@/api/stakeholderService";
 import { lookupService } from "@/api/lookupService";
 import { useQueryTable } from "@/hooks/useQuery";
 import { handleApiError } from "@/utils/handleApiError";
-import { StakeholderDto, AppLookupDetailDto, FilterOperation } from "@/types";
+import {
+  StakeholderDto,
+  AppLookupDetailDto,
+  FilterOperation,
+  FilterRequest,
+} from "@/types";
 import { useLookup } from "@/context/LookupContext";
 
 export default function StakeholdersPage() {
@@ -70,20 +75,14 @@ export default function StakeholdersPage() {
   }, []);
 
   const loadData = useCallback(() => {
-    const filters = [];
+    const filters: FilterRequest[] = [];
     if (searchTerm) {
-      filters.push({
-        propertyName: "name",
-        value: searchTerm,
-        operation: FilterOperation.Contains,
-      });
+      filters.push(
+        new FilterRequest("name", searchTerm, FilterOperation.Contains),
+      );
     }
     if (stakeholderTypeCode) {
-      filters.push({
-        propertyName: "stakeholderTypeId",
-        value: stakeholderTypeCode,
-        operation: FilterOperation.Equals,
-      });
+      filters.push(new FilterRequest("stakeholderTypeId", stakeholderTypeCode));
     }
     fetch("", filters);
   }, [fetch, searchTerm, stakeholderTypeCode]);

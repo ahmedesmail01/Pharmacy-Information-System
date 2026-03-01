@@ -54,10 +54,20 @@ export enum FilterOperation {
   IsNotNull = 12,
 }
 
-export interface FilterRequest {
+export class FilterRequest {
   propertyName: string;
   value: string;
   operation: FilterOperation;
+
+  constructor(
+    propertyName: string,
+    value: string,
+    operation: FilterOperation = FilterOperation.Contains,
+  ) {
+    this.propertyName = propertyName;
+    this.value = value;
+    this.operation = operation;
+  }
 }
 
 export interface SortRequest {
