@@ -38,38 +38,32 @@ export const LookupProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const refreshLookups = useCallback(async (masterCodes?: string[]) => {
-    if (!masterCodes || masterCodes.length === 0) return;
-
     setIsLoading(true);
     try {
-      const results = await Promise.all(
-        masterCodes.map(async (code) => {
-          try {
-            const res = await lookupService.getByCode(code);
-            if (res.data.success && res.data.data) {
-              return { code, details: res.data.data.lookupDetails || [] };
-            }
-          } catch (err) {
-            console.error(`Failed to fetch lookup: ${code}`, err);
-          }
-          return null;
-        }),
-      );
+      // Use bulk query to fetch lookups.
+      // We pass an empty filter or a specific filter if masterCodes are provided.
+      const res = await lookupService.query({
+        request: {
+          pagination: { getAll: true, pageNumber: 1, pageSize: 100 },
+          sort: [{ sortBy: "LookupCode", sortDirection: "asc" }],
+        },
+      });
 
-      const validResults = results.filter(
-        (r): r is { code: string; details: AppLookupDetailDto[] } => r !== null,
-      );
-
-      if (validResults.length > 0) {
+      if (res.data.success && res.data.data) {
         setCache((prev) => {
           const newCache = { ...prev };
-          validResults.forEach(({ code, details }) => {
-            newCache[code] = details;
+          res.data.data.data.forEach((master) => {
+            // Apply filtering if specific codes were requested, otherwise take all
+            if (!masterCodes || masterCodes.includes(master.lookupCode)) {
+              newCache[master.lookupCode] = master.lookupDetails || [];
+            }
           });
           localStorage.setItem(CACHE_KEY, JSON.stringify(newCache));
           return newCache;
         });
       }
+    } catch (err) {
+      console.error("Failed to fetch lookups", err);
     } finally {
       setIsLoading(false);
     }
@@ -103,13 +97,7 @@ export const LookupProvider: React.FC<{ children: React.ReactNode }> = ({
   const { isAuthenticated } = useAuthStore();
   useEffect(() => {
     if (isAuthenticated && Object.keys(cache).length === 0) {
-      refreshLookups([
-        "PAYMENT_METHOD",
-        "INVOICE_STATUS",
-        "DOSAGE_FORM",
-        "VAT_TYPE",
-        "STAKEHOLDER_TYPE",
-      ]);
+      refreshLookups();
     }
   }, [cache, refreshLookups, isAuthenticated]);
 

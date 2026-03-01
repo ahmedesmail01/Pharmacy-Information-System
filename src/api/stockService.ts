@@ -5,6 +5,8 @@ import {
   StockTransactionDto,
   CreateStockInDto,
   CreateStockTransferDto,
+  CreateStockTransactionDto,
+  StockTransactionResponseDto,
   PagedResult,
   QueryRequest,
 } from "@/types";
@@ -44,4 +46,11 @@ export const stockService = {
   // ── Stock Transfer ────────────────────────────────────────────────────────
   transfer: (dto: CreateStockTransferDto) =>
     api.post<ApiResponse<StockTransactionDto>>("/api/Stock/transfer", dto),
+
+  // ── General Stock Transaction ──────────────────────────────────────────────
+  createStockTransaction: (dto: CreateStockTransactionDto) =>
+    api.post<ApiResponse<StockTransactionResponseDto>>(
+      "/api/StockTransaction",
+      dto,
+    ),
 };

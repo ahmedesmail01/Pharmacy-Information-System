@@ -464,6 +464,60 @@ export interface CreateStockTransferDto {
   referenceNumber?: string;
 }
 
+export interface StockTransactionDetailDto {
+  oid?: string;
+  stockTransactionId?: string;
+  productId: string;
+  productName?: string;
+  productGTIN?: string;
+  quantity: number;
+  gtin?: string;
+  batchNumber?: string;
+  expiryDate?: string;
+  serialNumber?: string;
+  unitCost: number;
+  totalCost: number;
+  lineNumber: number;
+  notes?: string;
+  createdAt?: string;
+}
+
+export interface CreateStockTransactionDto {
+  transactionTypeId: string;
+  fromBranchId?: string;
+  toBranchId?: string;
+  referenceNumber?: string;
+  notificationId?: string;
+  transactionDate: string;
+  supplierId?: string;
+  notes?: string;
+  status: string;
+  details: StockTransactionDetailDto[];
+}
+
+export interface StockTransactionResponseDto {
+  oid: string;
+  transactionTypeId: string;
+  transactionTypeName: string;
+  fromBranchId: string | null;
+  fromBranchName: string | null;
+  toBranchId: string | null;
+  toBranchName: string | null;
+  referenceNumber: string | null;
+  notificationId: string | null;
+  transactionDate: string;
+  totalValue: number;
+  supplierId: string | null;
+  supplierName: string | null;
+  notes: string | null;
+  status: string;
+  approvedBy: string | null;
+  approvedDate: string | null;
+  createdAt: string;
+  createdBy: string;
+  details: StockTransactionDetailDto[];
+}
+
 // ─── AppLookup ────────────────────────────────────────────────────────────────
 
 export interface AppLookupDetailDto {
