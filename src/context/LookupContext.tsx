@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { lookupService } from "@/api/lookupService";
 import { AppLookupMasterDto, AppLookupDetailDto } from "@/types";
+import { useAuthStore } from "@/store/authStore";
 
 interface LookupCache {
   [masterCode: string]: AppLookupDetailDto[];
@@ -36,35 +37,43 @@ export const LookupProvider: React.FC<{ children: React.ReactNode }> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const refreshLookups = useCallback(
-    async (masterCodes?: string[]) => {
-      setIsLoading(true);
-      try {
-        // If specific codes are provided, fetch only those. Otherwise, we might want to fetch common ones.
-        // For now, let's implement a way to fetch by code and merge into cache.
-        if (masterCodes) {
-          const newCache = { ...cache };
-          await Promise.all(
-            masterCodes.map(async (code) => {
-              try {
-                const res = await lookupService.getByCode(code);
-                if (res.data.success && res.data.data) {
-                  newCache[code] = res.data.data.lookupDetails || [];
-                }
-              } catch (err) {
-                console.error(`Failed to fetch lookup: ${code}`, err);
-              }
-            }),
-          );
-          setCache(newCache);
+  const refreshLookups = useCallback(async (masterCodes?: string[]) => {
+    if (!masterCodes || masterCodes.length === 0) return;
+
+    setIsLoading(true);
+    try {
+      const results = await Promise.all(
+        masterCodes.map(async (code) => {
+          try {
+            const res = await lookupService.getByCode(code);
+            if (res.data.success && res.data.data) {
+              return { code, details: res.data.data.lookupDetails || [] };
+            }
+          } catch (err) {
+            console.error(`Failed to fetch lookup: ${code}`, err);
+          }
+          return null;
+        }),
+      );
+
+      const validResults = results.filter(
+        (r): r is { code: string; details: AppLookupDetailDto[] } => r !== null,
+      );
+
+      if (validResults.length > 0) {
+        setCache((prev) => {
+          const newCache = { ...prev };
+          validResults.forEach(({ code, details }) => {
+            newCache[code] = details;
+          });
           localStorage.setItem(CACHE_KEY, JSON.stringify(newCache));
-        }
-      } finally {
-        setIsLoading(false);
+          return newCache;
+        });
       }
-    },
-    [cache],
-  );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const getLookupDetails = useCallback(
     (masterCode: string) => {
@@ -91,8 +100,9 @@ export const LookupProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   // Initial fetch of commonly used lookups if cache is empty
+  const { isAuthenticated } = useAuthStore();
   useEffect(() => {
-    if (Object.keys(cache).length === 0) {
+    if (isAuthenticated && Object.keys(cache).length === 0) {
       refreshLookups([
         "PAYMENT_METHOD",
         "INVOICE_STATUS",
@@ -101,7 +111,7 @@ export const LookupProvider: React.FC<{ children: React.ReactNode }> = ({
         "STAKEHOLDER_TYPE",
       ]);
     }
-  }, [cache, refreshLookups]);
+  }, [cache, refreshLookups, isAuthenticated]);
 
   return (
     <LookupContext.Provider
