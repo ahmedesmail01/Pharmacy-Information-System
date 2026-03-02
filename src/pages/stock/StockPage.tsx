@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -46,17 +46,18 @@ export default function StockPage() {
       fromBranchId: z.string().optional(),
       toBranchId: z.string().optional(),
       supplierId: z.string().optional(),
-      referenceNumber: z.string().optional(),
+      referenceNumber: z.string().min(1, t("reference_number_required")),
       notes: z.string().optional(),
       transactionDate: z.string().min(1, t("date_required")),
       details: z
         .array(
           z.object({
             productId: z.string().min(1, t("product_required")),
+            qrcode: z.string().optional(),
             quantity: z.number().min(0.01, t("quantity_min")),
             unitCost: z.number().min(0),
-            batchNumber: z.string().optional(),
-            expiryDate: z.string().optional(),
+            batchNumber: z.string().min(1, t("batch_number_required")),
+            expiryDate: z.string().min(1, t("expiry_date_required")),
             notes: z.string().optional(),
           }),
         )
@@ -78,13 +79,23 @@ export default function StockPage() {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     reset,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       transactionDate: new Date().toISOString().split("T")[0],
-      details: [{ productId: "", quantity: 1, unitCost: 0 }],
+      details: [
+        {
+          productId: "",
+          qrcode: "",
+          quantity: 1,
+          unitCost: 0,
+          batchNumber: "",
+          expiryDate: "",
+        },
+      ],
     },
   });
 
@@ -98,6 +109,8 @@ export default function StockPage() {
     (type) => type.oid === selectedTypeId,
   );
   const typeCode = selectedType?.lookupDetailCode;
+
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
   const fetchProducts = async (search?: string) => {
     try {
@@ -115,6 +128,15 @@ export default function StockPage() {
     } catch (err) {
       console.error("Failed to fetch products", err);
     }
+  };
+
+  const debouncedFetchProducts = (search: string) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchProducts(search);
+    }, 300);
   };
 
   useEffect(() => {
@@ -261,7 +283,7 @@ export default function StockPage() {
           </div>
         </Card>
 
-        <Card className="overflow-visible min-h-[500px]">
+        <Card className="overflow-visible min-h-[400px]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">{t("items")}</h2>
             <Button
@@ -269,7 +291,14 @@ export default function StockPage() {
               variant="secondary"
               size="sm"
               onClick={() =>
-                append({ productId: "", quantity: 1, unitCost: 0 })
+                append({
+                  productId: "",
+                  qrcode: "",
+                  quantity: 1,
+                  unitCost: 0,
+                  batchNumber: "",
+                  expiryDate: "",
+                })
               }
               className="flex items-center gap-1"
             >
@@ -283,6 +312,7 @@ export default function StockPage() {
               <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 min-w-[250px]">{t("product")}</th>
+                  <th className="px-4 py-3 min-w-[250px]">{t("qrcode")}</th>
                   <th className="px-4 py-3 w-32">{t("quantity")}</th>
                   <th className="px-4 py-3 w-32">{t("unit_cost")}</th>
                   <th className="px-4 py-3 w-40">{t("batch_number")}</th>
@@ -297,16 +327,107 @@ export default function StockPage() {
                       <Select
                         options={getProductOptions()}
                         error={errors.details?.[index]?.productId?.message}
-                        {...register(`details.${index}.productId`)}
-                        onChange={(e) => {
-                          const prod = products.find(
-                            (p) => p.oid === e.target.value,
-                          );
-                          if (prod) {
-                            setValue(
-                              `details.${index}.unitCost`,
-                              prod.price || 0,
+                        {...register(`details.${index}.productId`, {
+                          onChange: (e) => {
+                            const prod = products.find(
+                              (p) => p.oid === e.target.value,
                             );
+                            if (prod) {
+                              setValue(
+                                `details.${index}.unitCost`,
+                                prod.price || 0,
+                              );
+                              trigger(`details.${index}.unitCost`);
+                            }
+                            trigger(`details.${index}.productId`);
+                          },
+                        })}
+                        onSearchChange={debouncedFetchProducts}
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <Input
+                        placeholder={t("qrcode")}
+                        {...register(`details.${index}.qrcode`)}
+                        onKeyDown={async (e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            const currentBarcode = watch(
+                              `details.${index}.qrcode`,
+                            );
+                            if (currentBarcode) {
+                              try {
+                                const res =
+                                  await productService.parseAndGetProduct({
+                                    barcodeInput: currentBarcode,
+                                  });
+                                if (
+                                  res.data.success &&
+                                  res.data.data?.productFound
+                                ) {
+                                  const prod = res.data.data.product;
+                                  const barcodeData = res.data.data.barcodeData;
+
+                                  // Ensure product is in our current options list
+                                  if (
+                                    prod &&
+                                    !products.find((p) => p.oid === prod.oid)
+                                  ) {
+                                    setProducts((prev) => [...prev, prod]);
+                                  }
+
+                                  if (prod) {
+                                    setValue(
+                                      `details.${index}.productId`,
+                                      prod.oid,
+                                    );
+                                    setValue(
+                                      `details.${index}.unitCost`,
+                                      prod.price || 0,
+                                    );
+                                  }
+
+                                  if (barcodeData?.batchNumber) {
+                                    setValue(
+                                      `details.${index}.batchNumber`,
+                                      barcodeData.batchNumber,
+                                    );
+                                  }
+
+                                  if (barcodeData?.expiryDate) {
+                                    try {
+                                      // Format date if needed, assuming the format comes back properly but we may need to grab the first part (y-m-d)
+                                      const formattedExpiry = new Date(
+                                        barcodeData.expiryDate,
+                                      )
+                                        .toISOString()
+                                        .split("T")[0];
+                                      setValue(
+                                        `details.${index}.expiryDate`,
+                                        formattedExpiry,
+                                      );
+                                    } catch {
+                                      setValue(
+                                        `details.${index}.expiryDate`,
+                                        barcodeData.expiryDate,
+                                      );
+                                    }
+                                  }
+
+                                  toast.success("Product found via scanning");
+                                } else {
+                                  toast.error(
+                                    res.data.data?.productMessage ||
+                                      "Product not found",
+                                  );
+                                }
+                              } catch (err: any) {
+                                toast.error(
+                                  err.response?.data?.message ||
+                                    t("error_occurred"),
+                                );
+                              }
+                            }
                           }
                         }}
                       />
@@ -326,6 +447,13 @@ export default function StockPage() {
                         {...register(`details.${index}.quantity`, {
                           valueAsNumber: true,
                           min: 0,
+                          onChange: (e) => {
+                            setValue(
+                              `details.${index}.quantity`,
+                              parseFloat(e.target.value) || 0,
+                            );
+                            trigger(`details.${index}.quantity`);
+                          },
                         })}
                       />
                     </td>
@@ -344,19 +472,42 @@ export default function StockPage() {
                         {...register(`details.${index}.unitCost`, {
                           valueAsNumber: true,
                           min: 0,
+                          onChange: (e) => {
+                            setValue(
+                              `details.${index}.unitCost`,
+                              parseFloat(e.target.value) || 0,
+                            );
+                            trigger(`details.${index}.unitCost`);
+                          },
                         })}
                       />
                     </td>
                     <td className="px-4 py-3">
                       <Input
                         placeholder={t("batch_placeholder")}
-                        {...register(`details.${index}.batchNumber`)}
+                        {...register(`details.${index}.batchNumber`, {
+                          onChange: (e) => {
+                            setValue(
+                              `details.${index}.batchNumber`,
+                              e.target.value,
+                            );
+                            trigger(`details.${index}.batchNumber`);
+                          },
+                        })}
                       />
                     </td>
                     <td className="px-4 py-3">
                       <Input
                         type="date"
-                        {...register(`details.${index}.expiryDate`)}
+                        {...register(`details.${index}.expiryDate`, {
+                          onChange: (e) => {
+                            setValue(
+                              `details.${index}.expiryDate`,
+                              e.target.value,
+                            );
+                            trigger(`details.${index}.expiryDate`);
+                          },
+                        })}
                       />
                     </td>
                     <td className="px-4 py-3 text-right">

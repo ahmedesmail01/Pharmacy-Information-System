@@ -321,6 +321,28 @@ export interface UpdateProductDto extends CreateProductDto {
   oid: string;
 }
 
+export interface ParseBarcodeRequest {
+  barcodeInput: string;
+}
+
+export interface BarcodeData {
+  gtin: string | null;
+  serialNumber: string | null;
+  batchNumber: string | null;
+  expiryDate: string | null;
+  productionDate: string | null;
+  success: boolean;
+  errorMessage: string | null;
+  rawData: Record<string, string> | null;
+}
+
+export interface ParseBarcodeResponse {
+  barcodeData: BarcodeData | null;
+  product: ProductDto | null;
+  productFound: boolean;
+  productMessage: string | null;
+}
+
 // ─── Stakeholder ─────────────────────────────────────────────────────────────
 
 export interface StakeholderDto {

@@ -6,11 +6,19 @@ import {
   UpdateProductDto,
   PagedResult,
   QueryRequest,
+  ParseBarcodeRequest,
+  ParseBarcodeResponse,
 } from "@/types";
 
 export const productService = {
   query: (req: QueryRequest) =>
     api.post<ApiResponse<PagedResult<ProductDto>>>("/api/Product/query", req),
+
+  parseAndGetProduct: (req: ParseBarcodeRequest) =>
+    api.post<ApiResponse<ParseBarcodeResponse>>(
+      "/api/Product/parse-and-get-product",
+      req,
+    ),
 
   getAll: (params?: { productTypeId?: string; searchTerm?: string }) =>
     api.get<ApiResponse<ProductDto[]>>("/api/Product", { params }),
