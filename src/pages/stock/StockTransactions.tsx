@@ -8,7 +8,7 @@ import Badge from "@/components/ui/Badge";
 import { useTranslation } from "react-i18next";
 import { stockService } from "@/api/stockService";
 import { useQueryTable } from "@/hooks/useQuery";
-import { StockTransactionDto, FilterOperation } from "@/types";
+import { StockTransactionResponseDto, FilterOperation } from "@/types";
 
 export default function StockTransactions() {
   const { t } = useTranslation("stock");
@@ -23,8 +23,8 @@ export default function StockTransactions() {
     totalPages,
     totalRecords,
     fetch,
-  } = useQueryTable<StockTransactionDto>({
-    service: stockService.queryTransactions,
+  } = useQueryTable<StockTransactionResponseDto>({
+    service: stockService.queryStockTransactions,
     pageSize: 10,
   });
 
@@ -85,24 +85,50 @@ export default function StockTransactions() {
     },
     {
       header: t("product"),
-      accessorKey: "productName",
-      cell: (info: any) => (
-        <p className="font-bold text-gray-900 text-sm">{info.getValue()}</p>
-      ),
+      accessorKey: "details",
+      cell: (info: any) => {
+        const details = info.getValue() || [];
+        if (details.length === 0)
+          return <span className="text-gray-400">---</span>;
+
+        if (details.length === 1) {
+          return (
+            <p className="font-bold text-gray-900 text-sm">
+              {details[0].productName}
+            </p>
+          );
+        }
+
+        return (
+          <div className="flex flex-col">
+            <p className="font-bold text-gray-900 text-sm">
+              {details[0].productName}
+            </p>
+            <p className="text-xs text-gray-500">
+              +{details.length - 1} {t("items")}
+            </p>
+          </div>
+        );
+      },
     },
     {
       header: t("qty"),
-      accessorKey: "quantity",
-      cell: (info: any) => (
-        <span className="font-black text-gray-900">{info.getValue()}</span>
-      ),
+      accessorKey: "details",
+      cell: (info: any) => {
+        const details = info.getValue() || [];
+        const totalQty = details.reduce(
+          (sum: number, d: any) => sum + (d.quantity || 0),
+          0,
+        );
+        return <span className="font-black text-gray-900">{totalQty}</span>;
+      },
     },
     {
-      header: t("batch_number"),
-      accessorKey: "batchNumber",
+      header: t("total_value"),
+      accessorKey: "totalValue",
       cell: (info: any) => (
-        <span className="font-mono text-[10px] font-bold text-gray-400">
-          {info.getValue() || "---"}
+        <span className="font-mono text-sm font-bold text-gray-700">
+          {info.getValue()?.toFixed(2) || "0.00"}
         </span>
       ),
     },

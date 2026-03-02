@@ -26,6 +26,12 @@ export const stockService = {
       req,
     ),
 
+  queryStockTransactions: (req: QueryRequest) =>
+    api.post<ApiResponse<PagedResult<StockTransactionResponseDto>>>(
+      "/api/StockTransaction/query",
+      req,
+    ),
+
   getTransactions: (params?: {
     branchId?: string;
     startDate?: string;
