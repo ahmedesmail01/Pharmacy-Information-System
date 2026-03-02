@@ -79,6 +79,7 @@ export default function StockPage() {
     handleSubmit,
     watch,
     setValue,
+    getValues,
     trigger,
     reset,
     formState: { errors },
@@ -123,7 +124,27 @@ export default function StockPage() {
         },
       });
       if (res.data.success && res.data.data) {
-        setProducts(res.data.data.data);
+        setProducts((prev) => {
+          const fetchedProducts = res.data.data.data;
+          const currentDetails = getValues("details") || [];
+          const selectedProductIds = currentDetails
+            .map((d) => d.productId)
+            .filter(Boolean);
+
+          // Keep previously selected products so existing rows don't lose their product names
+          const selectedProducts = prev.filter((p) =>
+            selectedProductIds.includes(p.oid),
+          );
+
+          const merged = [...fetchedProducts];
+          selectedProducts.forEach((sp) => {
+            if (!merged.find((m) => m.oid === sp.oid)) {
+              merged.push(sp);
+            }
+          });
+
+          return merged;
+        });
       }
     } catch (err) {
       console.error("Failed to fetch products", err);
