@@ -59,5 +59,11 @@
   "transaction_updated_success": "تم تحديث الحركة بنجاح",
   "transaction_failed": "فشل تنفيذ الحركة",
   "error_occurred": "حدث خطأ ما",
-  "error_loading_transaction": "خطأ في تحميل تفاصيل الحركة"
+  "error_loading_transaction": "خطأ في تحميل تفاصيل الحركة",
+  "delete": "حذف",
+  "delete_transaction": "حذف الحركة",
+  "delete_confirm_title": "حذف الحركة؟",
+  "delete_confirm_message": "هل أنت متأكد من رغبتك في حذف هذه الحركة؟ لا يمكن التراجع عن هذا الإجراء.",
+  "delete_success": "تم حذف الحركة بنجاح",
+  "delete_failed": "فشل حذف الحركة"
 }

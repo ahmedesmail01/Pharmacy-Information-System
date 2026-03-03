@@ -60,5 +60,11 @@
   "transaction_updated_success": "Transaction updated successfully",
   "transaction_failed": "Failed to process transaction",
   "error_occurred": "An error occurred",
-  "error_loading_transaction": "Error loading transaction details"
+  "error_loading_transaction": "Error loading transaction details",
+  "delete": "Delete",
+  "delete_transaction": "Delete Transaction",
+  "delete_confirm_title": "Delete Transaction?",
+  "delete_confirm_message": "Are you sure you want to delete this transaction? This action cannot be undone.",
+  "delete_success": "Transaction deleted successfully",
+  "delete_failed": "Failed to delete transaction"
 }

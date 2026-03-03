@@ -69,4 +69,7 @@ export const stockService = {
       `/api/StockTransaction/${id}`,
       dto,
     ),
+
+  delete: (id: string) =>
+    api.delete<ApiResponse<any>>(`/api/StockTransaction/${id}`),
 };

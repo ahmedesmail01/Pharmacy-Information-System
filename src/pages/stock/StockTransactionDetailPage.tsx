@@ -4,10 +4,11 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import * as z from "zod";
-import { Save, ArrowLeft, Loader2 } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
 import { useLookup } from "@/context/LookupContext";
 import { branchService } from "@/api/branchService";
 import { stakeholderService } from "@/api/stakeholderService";
@@ -36,6 +37,8 @@ export default function StockTransactionDetailPage() {
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const transactionTypes = getLookupDetails("TRANSACTION_TYPE");
 
@@ -261,6 +264,25 @@ export default function StockTransactionDetailPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!id) return;
+    setIsDeleting(true);
+    try {
+      const res = await stockService.delete(id);
+      if (res.data.success) {
+        toast.success(t("delete_success"));
+        navigate("/stock/transactions");
+      } else {
+        toast.error(res.data.message || t("delete_failed"));
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || t("error_occurred"));
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
   const getBranchOptions = () =>
     branches.map((b) => ({ value: b.oid, label: b.branchName }));
 
@@ -316,26 +338,66 @@ export default function StockTransactionDetailPage() {
               debouncedFetchProducts={debouncedFetchProducts}
             />
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <Button
                 type="button"
-                variant="secondary"
-                onClick={() => navigate("/stock/transactions")}
-              >
-                {t("cancel")}
-              </Button>
-              <Button
-                type="submit"
-                isLoading={isSaving}
+                variant="danger"
+                size="sm"
+                onClick={() => setShowDeleteModal(true)}
+                isLoading={isDeleting}
                 className="flex items-center gap-2"
               >
-                <Save size={18} />
-                {t("update_transaction")}
+                <Trash2 size={18} />
+                {t("delete")}
               </Button>
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => navigate("/stock/transactions")}
+                >
+                  {t("cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  isLoading={isSaving}
+                  className="flex items-center gap-2"
+                >
+                  <Save size={18} />
+                  {t("update_transaction")}
+                </Button>
+              </div>
             </div>
           </form>
         </div>
       </FormProvider>
+
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title={t("delete_confirm_title")}
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-600">{t("delete_confirm_message")}</p>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="secondary"
+              onClick={() => setShowDeleteModal(false)}
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleDelete}
+              isLoading={isDeleting}
+            >
+              {t("delete")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
