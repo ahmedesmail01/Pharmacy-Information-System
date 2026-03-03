@@ -39,11 +39,11 @@ export default function App() {
           <Route
             path="/"
             element={
-              <ProtectedRoute>
-                <LookupProvider>
+              <LookupProvider>
+                <ProtectedRoute>
                   <AppLayout />
-                </LookupProvider>
-              </ProtectedRoute>
+                </ProtectedRoute>
+              </LookupProvider>
             }
           >
             <Route index element={<DashboardPage />} />

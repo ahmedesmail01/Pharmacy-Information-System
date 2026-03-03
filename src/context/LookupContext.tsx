@@ -96,10 +96,21 @@ export const LookupProvider: React.FC<{ children: React.ReactNode }> = ({
   // Initial fetch of commonly used lookups if cache is empty
   const { isAuthenticated } = useAuthStore();
   useEffect(() => {
-    if (isAuthenticated && Object.keys(cache).length === 0) {
-      refreshLookups();
+    if (isAuthenticated) {
+      // If we just logged in and cache is empty, fetch.
+      // This ensures that after login success, lookups are fetched.
+      if (Object.keys(cache).length === 0) {
+        refreshLookups();
+      }
+    } else {
+      // Clear all local storage on logout
+      // We check if cache is not already empty to avoid redundant clears
+      if (Object.keys(cache).length > 0) {
+        setCache({});
+        localStorage.clear();
+      }
     }
-  }, [cache, refreshLookups, isAuthenticated]);
+  }, [isAuthenticated, refreshLookups, cache]);
 
   return (
     <LookupContext.Provider
