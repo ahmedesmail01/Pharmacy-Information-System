@@ -23,7 +23,7 @@ export default function TransactionGeneralInfo({
     formState: { errors },
   } = useFormContext();
 
-  console.log("typeCode", typeCode);
+  // console.log("typeCode", typeCode);
 
   return (
     <Card className="overflow-visible h-fit">

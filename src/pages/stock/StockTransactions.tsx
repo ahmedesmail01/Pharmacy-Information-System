@@ -6,6 +6,7 @@ import Pagination from "@/components/ui/Pagination";
 import SearchBar from "@/components/shared/SearchBar";
 import Badge from "@/components/ui/Badge";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { stockService } from "@/api/stockService";
 import { useQueryTable } from "@/hooks/useQuery";
 import { StockTransactionResponseDto, FilterOperation } from "@/types";
@@ -13,6 +14,7 @@ import { StockTransactionResponseDto, FilterOperation } from "@/types";
 export default function StockTransactions() {
   const { t } = useTranslation("stock");
   const tc = useTranslation("common").t;
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
@@ -46,13 +48,11 @@ export default function StockTransactions() {
 
   const columns = [
     {
-      header: tc("date"),
-      accessorKey: "transactionDate",
+      header: t("reference"),
+      accessorKey: "referenceNumber",
       cell: (info: any) => (
-        <span className="text-xs font-bold text-gray-500 font-mono">
-          {info.getValue()
-            ? format(new Date(info.getValue()), "MM-dd HH:mm")
-            : "---"}
+        <span className="font-mono text-xs text-gray-400">
+          {info.getValue() || "---"}
         </span>
       ),
     },
@@ -84,45 +84,57 @@ export default function StockTransactions() {
       },
     },
     {
-      header: t("product"),
-      accessorKey: "details",
-      cell: (info: any) => {
-        const details = info.getValue() || [];
-        if (details.length === 0)
-          return <span className="text-gray-400">---</span>;
-
-        if (details.length === 1) {
-          return (
-            <p className="font-bold text-gray-900 text-sm">
-              {details[0].productName}
-            </p>
-          );
-        }
-
-        return (
-          <div className="flex flex-col">
-            <p className="font-bold text-gray-900 text-sm">
-              {details[0].productName}
-            </p>
-            <p className="text-xs text-gray-500">
-              +{details.length - 1} {t("items")}
-            </p>
-          </div>
-        );
-      },
+      header: tc("date"),
+      accessorKey: "transactionDate",
+      cell: (info: any) => (
+        <span className="text-xs font-bold text-gray-500 font-mono">
+          {info.getValue()
+            ? format(new Date(info.getValue()), "MM-dd HH:mm")
+            : "---"}
+        </span>
+      ),
     },
-    {
-      header: t("qty"),
-      accessorKey: "details",
-      cell: (info: any) => {
-        const details = info.getValue() || [];
-        const totalQty = details.reduce(
-          (sum: number, d: any) => sum + (d.quantity || 0),
-          0,
-        );
-        return <span className="font-black text-gray-900">{totalQty}</span>;
-      },
-    },
+
+    // {
+    //   header: t("product"),
+    //   accessorKey: "details",
+    //   cell: (info: any) => {
+    //     const details = info.getValue() || [];
+    //     if (details.length === 0)
+    //       return <span className="text-gray-400">---</span>;
+
+    //     if (details.length === 1) {
+    //       return (
+    //         <p className="font-bold text-gray-900 text-sm">
+    //           {details[0].productName}
+    //         </p>
+    //       );
+    //     }
+
+    //     return (
+    //       <div className="flex flex-col">
+    //         <p className="font-bold text-gray-900 text-sm">
+    //           {details[0].productName}
+    //         </p>
+    //         <p className="text-xs text-gray-500">
+    //           +{details.length - 1} {t("items")}
+    //         </p>
+    //       </div>
+    //     );
+    //   },
+    // },
+    // {
+    //   header: t("qty"),
+    //   accessorKey: "details",
+    //   cell: (info: any) => {
+    //     const details = info.getValue() || [];
+    //     const totalQty = details.reduce(
+    //       (sum: number, d: any) => sum + (d.quantity || 0),
+    //       0,
+    //     );
+    //     return <span className="font-black text-gray-900">{totalQty}</span>;
+    //   },
+    // },
     {
       header: t("total_value"),
       accessorKey: "totalValue",
@@ -137,15 +149,48 @@ export default function StockTransactions() {
       id: "branches",
       cell: (info: any) => (
         <div className="flex flex-col text-[10px] font-bold uppercase tracking-tight">
-          <span className="text-gray-400">
-            {t("from")}: {info.row.original.fromBranchName || "---"}
-          </span>
-          <span className="text-blue-500">
-            {t("to")}: {info.row.original.toBranchName || "---"}
-          </span>
+          {info.row.original.fromBranchName && (
+            <span className="text-gray-400">
+              {t("from")}: {info.row.original.fromBranchName || "---"}
+            </span>
+          )}
+          {info.row.original.toBranchName && (
+            <span className="text-blue-500">
+              {t("to")}: {info.row.original.toBranchName || "---"}
+            </span>
+          )}
         </div>
       ),
     },
+
+    {
+      header: t("supplier"),
+      accessorKey: "supplierName",
+      cell: (info: any) => (
+        <span className="text-xs font-medium text-gray-600">
+          {info.getValue() || "---"}
+        </span>
+      ),
+    },
+    // {
+    //   header: tc("status"),
+    //   accessorKey: "status",
+    //   cell: (info: any) => {
+    //     const status = info.getValue() || "PENDING";
+    //     let variant: "success" | "warning" | "danger" | "default" = "default";
+
+    //     if (status === "APPROVED" || status === "COMPLETED")
+    //       variant = "success";
+    //     else if (status === "PENDING") variant = "warning";
+    //     else if (status === "CANCELLED") variant = "danger";
+
+    //     return (
+    //       <Badge variant={variant} className="uppercase text-[10px]">
+    //         {status}
+    //       </Badge>
+    //     );
+    //   },
+    // },
   ];
 
   return (
@@ -162,7 +207,12 @@ export default function StockTransactions() {
       </div>
 
       <div className="space-y-4">
-        <Table columns={columns} data={data} isLoading={isLoading} />
+        <Table
+          columns={columns}
+          data={data}
+          isLoading={isLoading}
+          onRowClick={(row) => navigate(`/stock/transactions/${row.oid}`)}
+        />
         <Pagination
           pageNumber={pageNumber}
           totalPages={totalPages}

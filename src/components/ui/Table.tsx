@@ -10,12 +10,14 @@ interface TableProps<T> {
   columns: ColumnDef<T, any>[];
   data: T[];
   isLoading?: boolean;
+  onRowClick?: (row: T) => void;
 }
 
 export default function Table<T>({
   columns,
   data,
   isLoading = false,
+  onRowClick,
 }: TableProps<T>) {
   const table = useReactTable({
     data,
@@ -65,7 +67,11 @@ export default function Table<T>({
             </tr>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+              <tr
+                key={row.id}
+                onClick={() => onRowClick?.(row.original)}
+                className={`hover:bg-gray-50 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}

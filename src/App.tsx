@@ -14,6 +14,7 @@ import SaleDetailPage from "@/pages/sales/SaleDetailPage";
 import StakeholdersPage from "@/pages/stakeholders/StakeholdersPage";
 import StockPage from "@/pages/stock/StockPage";
 import StockTransactionsPage from "@/pages/stock/StockTransactionsPage";
+import StockTransactionDetailPage from "@/pages/stock/StockTransactionDetailPage";
 import UsersPage from "@/pages/users/UsersPage";
 import LookupsPage from "@/pages/lookups/LookupsPage";
 import LookupDetailPage from "@/pages/lookups/LookupDetailPage";
@@ -57,6 +58,10 @@ export default function App() {
             <Route
               path="stock/transactions"
               element={<StockTransactionsPage />}
+            />
+            <Route
+              path="stock/transactions/:id"
+              element={<StockTransactionDetailPage />}
             />
             <Route path="users" element={<UsersPage />} />
             <Route path="lookups" element={<LookupsPage />} />
