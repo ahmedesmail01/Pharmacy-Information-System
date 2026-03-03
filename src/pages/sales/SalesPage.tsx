@@ -13,8 +13,8 @@ export default function SalesPage() {
     <div className="space-y-2">
       <PageHeader
         title={t("title")}
-        onAddClick={() => setActiveTab("form")}
-        addLabel={t("new_sale")}
+        // onAddClick={() => setActiveTab("form")}
+        // addLabel={t("new_sale")}
       />
 
       <SalesTabs activeTab={activeTab} setActiveTab={setActiveTab} />

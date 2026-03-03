@@ -213,24 +213,24 @@ export default function ProductsPage() {
         </span>
       ),
     },
-    {
-      header: t("marketingStatus"),
-      accessorKey: "marketingStatus",
-      cell: (info: any) => (
-        <Badge variant={info.getValue() === "1" ? "success" : "danger"}>
-          {info.getValue() === 1 ? tc("active") : tc("inactive")}
-        </Badge>
-      ),
-    },
-    {
-      header: t("legalStatus"),
-      accessorKey: "legalStatus",
-      cell: (info: any) => (
-        <Badge variant={info.getValue() === "1" ? "success" : "danger"}>
-          {info.getValue() === 1 ? tc("active") : tc("inactive")}
-        </Badge>
-      ),
-    },
+    // {
+    //   header: t("marketingStatus"),
+    //   accessorKey: "marketingStatus",
+    //   cell: (info: any) => (
+    //     <Badge variant={info.getValue() === "1" ? "success" : "danger"}>
+    //       {info.getValue() === 1 ? tc("active") : tc("inactive")}
+    //     </Badge>
+    //   ),
+    // },
+    // {
+    //   header: t("legalStatus"),
+    //   accessorKey: "legalStatus",
+    //   cell: (info: any) => (
+    //     <Badge variant={info.getValue() === "1" ? "success" : "danger"}>
+    //       {info.getValue() === 1 ? tc("active") : tc("inactive")}
+    //     </Badge>
+    //   ),
+    // },
     {
       header: tc("actions"),
       id: "actions",

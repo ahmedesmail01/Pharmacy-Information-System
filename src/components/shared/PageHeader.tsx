@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import Button from "../ui/Button";
 import { Plus } from "lucide-react";
@@ -16,9 +18,48 @@ export default function PageHeader({
   children,
 }: PageHeaderProps) {
   const { t } = useTranslation();
+  const [portalNode, setPortalNode] = useState<HTMLElement | null>(() =>
+    typeof document !== "undefined"
+      ? document.getElementById("page-header-portal")
+      : null,
+  );
+
+  useEffect(() => {
+    if (!portalNode) {
+      const node = document.getElementById("page-header-portal");
+      if (node) setPortalNode(node);
+    }
+  }, [portalNode]);
+
+  const content = (
+    <div className="flex flex-1 items-center justify-between gap-3 w-full animate-in fade-in duration-300">
+      <div className="min-w-0 pr-4">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 truncate">
+          {title}
+        </h1>
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        {children}
+        {onAddClick && (
+          <Button onClick={onAddClick} className="gap-2" size="sm">
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">
+              {addLabel || t("common:addNew")}
+            </span>
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
+  // If the portal node is found, render into it.
+  // Otherwise, fallback to the original layout (e.g., if used outside AppLayout).
+  if (portalNode) {
+    return createPortal(content, portalNode);
+  }
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
       </div>

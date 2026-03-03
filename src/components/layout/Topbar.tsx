@@ -18,13 +18,17 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
 
   return (
     <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-1 pr-4 min-w-0">
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 -ml-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          className="lg:hidden p-2 -ml-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
         >
           <Menu className="h-6 w-6" />
         </button>
+        <div
+          id="page-header-portal"
+          className="flex-1 min-w-0 flex items-center"
+        ></div>
       </div>
 
       <div className="flex items-center gap-3 md:gap-6">
