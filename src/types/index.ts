@@ -419,17 +419,26 @@ export interface CreateSalesInvoiceItemDto {
   productId: string;
   quantity: number;
   unitPrice: number;
-  taxAmount: number;
+  discountPercent?: number;
+  batchNumber?: string;
+  serialNumber?: string;
+  expiryDate?: string;
+  notes?: string;
 }
 
 export interface CreateSalesInvoiceDto {
   branchId: string;
-  customerId?: string;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  discountPercent?: number;
   invoiceDate: string;
-  items: CreateSalesInvoiceItemDto[];
-  totalAmount: number;
-  taxAmount: number;
   paymentMethodId?: string;
+  cashierId?: string;
+  prescriptionNumber?: string;
+  doctorName?: string;
+  notes?: string;
+  items: CreateSalesInvoiceItemDto[];
 }
 
 // ─── Stock ────────────────────────────────────────────────────────────────────

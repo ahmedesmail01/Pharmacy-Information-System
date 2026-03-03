@@ -1,16 +1,14 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { productService } from "@/api/productService";
 import { branchService } from "@/api/branchService";
-import { stakeholderService } from "@/api/stakeholderService";
 import { salesService } from "@/api/salesService";
 import { lookupService } from "@/api/lookupService";
 import { handleApiError } from "@/utils/handleApiError";
 import {
   ProductDto,
   BranchDto,
-  StakeholderDto,
   AppLookupDetailDto,
   CreateSalesInvoiceDto,
   FilterOperation,
@@ -22,10 +20,15 @@ import ProductSearch from "./form-components/ProductSearch";
 import CartItemTable from "./form-components/CartItemTable";
 import OrderSummary from "./form-components/OrderSummary";
 
-interface CartItem {
+export interface CartItem {
   product: ProductDto;
   quantity: number;
   unitPrice: number;
+  discountPercent: number;
+  batchNumber: string;
+  serialNumber: string;
+  expiryDate: string;
+  notes: string;
 }
 
 export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
@@ -33,21 +36,34 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [branches, setBranches] = useState<BranchDto[]>([]);
-  const [customers, setCustomers] = useState<StakeholderDto[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<AppLookupDetailDto[]>(
     [],
   );
 
+  // Search states
   const [search, setSearch] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  // General info
   const [selectedBranchId, setSelectedBranchId] = useState("");
-  const [selectedCustomerId, setSelectedCustomerId] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [prescriptionNumber, setPrescriptionNumber] = useState("");
+  const [doctorName, setDoctorName] = useState("");
+  const [notes, setNotes] = useState("");
+
+  // Payment
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState("");
+
+  // Cart
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const [isDataLoading, setIsDataLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
+  const barcodeInputRef = useRef<HTMLInputElement>(null);
 
-  // Initial Fetch: Branches, Stakeholders, Payment Methods
+  // Initial Fetch: Branches, Payment Methods
   useEffect(() => {
     const fetchInitialData = async () => {
       setIsDataLoading(true);
@@ -61,23 +77,21 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
         });
         setBranches(bRes.data.data?.data || []);
 
-        const cRes = await stakeholderService.query({
-          request: {
-            filters: [
-              new FilterRequest(
-                "stakeholderTypeCode",
-                "CUSTOMER",
-                FilterOperation.Equals,
-              ),
-            ],
-            sort: [],
-            pagination: { pageNumber: 1, pageSize: 50 },
-          },
-        });
-        setCustomers(cRes.data.data?.data || []);
-
         const lRes = await lookupService.getByCode("PAYMENT_METHOD");
-        setPaymentMethods(lRes.data.data?.lookupDetails || []);
+        const methods = lRes.data.data?.lookupDetails || [];
+        setPaymentMethods(methods);
+
+        // Default to Cash
+        const cashMethod = methods.find(
+          (m) =>
+            m.lookupDetailCode?.toLowerCase() === "cash" ||
+            m.valueNameEn?.toLowerCase() === "cash",
+        );
+        if (cashMethod) {
+          setSelectedPaymentMethodId(cashMethod.oid);
+        } else if (methods.length > 0) {
+          setSelectedPaymentMethodId(methods[0].oid);
+        }
       } catch (err) {
         console.error("Failed to fetch initial data", err);
       } finally {
@@ -87,7 +101,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
     fetchInitialData();
   }, []);
 
-  // Debounced Product Search
+  // Debounced Product Search by name
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (!search.trim()) {
@@ -131,7 +145,7 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
                     new FilterRequest(
                       "branchName",
                       val,
-                      FilterOperation.LessThan,
+                      FilterOperation.Contains,
                     ),
                   ]
                 : [],
@@ -147,44 +161,43 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
     };
   }, []);
 
-  // Debounced Customer Search
-  const handleCustomerSearch = useMemo(() => {
-    let timer: any;
-    return (val: string) => {
-      clearTimeout(timer);
-      timer = setTimeout(async () => {
-        try {
-          const res = await stakeholderService.query({
-            request: {
-              filters: [
-                new FilterRequest(
-                  "stakeholderTypeCode",
-                  "CUSTOMER",
-                  FilterOperation.Contains,
-                ),
-                ...(val.trim()
-                  ? [
-                      new FilterRequest(
-                        "fullName",
-                        val,
-                        FilterOperation.LessThan,
-                      ),
-                    ]
-                  : []),
-              ] as any,
-              sort: [],
-              pagination: { pageNumber: 1, pageSize: 50 },
-            },
-          });
-          setCustomers(res.data.data?.data || []);
-        } catch (err) {
-          console.error("Customer search failed", err);
-        }
-      }, 400);
-    };
-  }, []);
+  // QR/Barcode scan handler
+  const handleBarcodeScan = async (barcode: string) => {
+    if (!barcode.trim()) return;
+    try {
+      const res = await productService.parseAndGetProduct({
+        barcodeInput: barcode,
+      });
+      if (res.data.success && res.data.data?.productFound) {
+        const prod = res.data.data.product;
+        const barcodeData = res.data.data.barcodeData;
 
-  const addToCart = (product: ProductDto) => {
+        if (prod) {
+          addToCart(prod, {
+            batchNumber: barcodeData?.batchNumber || "",
+            serialNumber: barcodeData?.serialNumber || "",
+            expiryDate: barcodeData?.expiryDate
+              ? new Date(barcodeData.expiryDate).toISOString().split("T")[0]
+              : "",
+          });
+          toast.success(t("productFound"));
+        }
+      } else {
+        toast.error(res.data.data?.productMessage || t("productNotFound"));
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || t("productNotFound"));
+    }
+  };
+
+  const addToCart = (
+    product: ProductDto,
+    extra?: {
+      batchNumber?: string;
+      serialNumber?: string;
+      expiryDate?: string;
+    },
+  ) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.product.oid === product.oid);
       if (existing) {
@@ -194,7 +207,19 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
             : item,
         );
       }
-      return [...prev, { product, quantity: 1, unitPrice: product.price || 0 }];
+      return [
+        ...prev,
+        {
+          product,
+          quantity: 1,
+          unitPrice: product.price || 0,
+          discountPercent: 0,
+          batchNumber: extra?.batchNumber || "",
+          serialNumber: extra?.serialNumber || "",
+          expiryDate: extra?.expiryDate || "",
+          notes: "",
+        },
+      ];
     });
     setSearch("");
   };
@@ -211,19 +236,34 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
     );
   };
 
+  const updateCartItem = (
+    productId: string,
+    field: keyof CartItem,
+    value: any,
+  ) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.product.oid === productId ? { ...item, [field]: value } : item,
+      ),
+    );
+  };
+
   const removeFromCart = (productId: string) => {
     setCart((prev) => prev.filter((item) => item.product.oid !== productId));
   };
 
   const totals = useMemo(() => {
-    const subtotal = cart.reduce(
-      (acc, item) => acc + item.quantity * item.unitPrice,
-      0,
-    );
-    const tax = subtotal * 0.15;
-    const total = subtotal + tax;
-    return { subtotal, tax, total };
-  }, [cart]);
+    const subtotal = cart.reduce((acc, item) => {
+      const lineTotal = item.quantity * item.unitPrice;
+      const lineDiscount = lineTotal * (item.discountPercent / 100);
+      return acc + (lineTotal - lineDiscount);
+    }, 0);
+    const overallDiscount = subtotal * (discountPercent / 100);
+    const afterDiscount = subtotal - overallDiscount;
+    const tax = afterDiscount * 0.15;
+    const total = afterDiscount + tax;
+    return { subtotal, tax, total, overallDiscount };
+  }, [cart, discountPercent]);
 
   const handleSubmit = async () => {
     if (cart.length === 0) {
@@ -239,17 +279,27 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
     try {
       const dto: CreateSalesInvoiceDto = {
         branchId: selectedBranchId,
-        customerId: selectedCustomerId || undefined,
+        customerName: customerName || undefined,
+        customerPhone: customerPhone || undefined,
+        customerEmail: customerEmail || undefined,
+        discountPercent: discountPercent || undefined,
         invoiceDate: new Date().toISOString(),
+        paymentMethodId: selectedPaymentMethodId || undefined,
+        prescriptionNumber: prescriptionNumber || undefined,
+        doctorName: doctorName || undefined,
+        notes: notes || undefined,
         items: cart.map((item) => ({
           productId: item.product.oid,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
-          taxAmount: item.unitPrice * 0.15,
+          discountPercent: item.discountPercent || undefined,
+          batchNumber: item.batchNumber || undefined,
+          serialNumber: item.serialNumber || undefined,
+          expiryDate: item.expiryDate
+            ? new Date(item.expiryDate).toISOString()
+            : undefined,
+          notes: item.notes || undefined,
         })),
-        totalAmount: totals.total,
-        taxAmount: totals.tax,
-        paymentMethodId: selectedPaymentMethodId || undefined,
       };
 
       await salesService.create(dto);
@@ -264,17 +314,25 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 min-h-[70vh]">
-      <div className="xl:col-span-2 space-y-6 min-w-0">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 min-h-[70vh]">
+      <div className="xl:col-span-2 space-y-5 min-w-0">
         <SaleGeneralInfo
           selectedBranchId={selectedBranchId}
           setSelectedBranchId={setSelectedBranchId}
-          selectedCustomerId={selectedCustomerId}
-          setSelectedCustomerId={setSelectedCustomerId}
+          customerName={customerName}
+          setCustomerName={setCustomerName}
+          customerPhone={customerPhone}
+          setCustomerPhone={setCustomerPhone}
+          customerEmail={customerEmail}
+          setCustomerEmail={setCustomerEmail}
+          prescriptionNumber={prescriptionNumber}
+          setPrescriptionNumber={setPrescriptionNumber}
+          doctorName={doctorName}
+          setDoctorName={setDoctorName}
+          notes={notes}
+          setNotes={setNotes}
           branches={branches}
-          customers={customers}
           handleBranchSearch={handleBranchSearch}
-          handleCustomerSearch={handleCustomerSearch}
         />
 
         <ProductSearch
@@ -283,12 +341,15 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
           isSearching={isSearching}
           filteredProducts={products}
           addToCart={addToCart}
+          onBarcodeScan={handleBarcodeScan}
+          barcodeInputRef={barcodeInputRef}
         />
 
         <CartItemTable
           cart={cart}
           setCart={setCart}
           updateQuantity={updateQuantity}
+          updateCartItem={updateCartItem}
           removeFromCart={removeFromCart}
         />
       </div>
@@ -298,6 +359,8 @@ export default function SaleForm({ onSuccess }: { onSuccess: () => void }) {
         paymentMethods={paymentMethods}
         selectedPaymentMethodId={selectedPaymentMethodId}
         setSelectedPaymentMethodId={setSelectedPaymentMethodId}
+        discountPercent={discountPercent}
+        setDiscountPercent={setDiscountPercent}
         handleSubmit={handleSubmit}
         isLoading={isLoading}
         cartLength={cart.length}
