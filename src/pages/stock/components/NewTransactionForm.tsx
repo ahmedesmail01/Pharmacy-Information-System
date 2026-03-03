@@ -17,6 +17,7 @@ import {
   StakeholderDto,
   ProductDto,
   CreateStockTransactionDto,
+  FilterOperation,
 } from "@/types";
 
 import TransactionHeader from "./TransactionHeader";
@@ -133,11 +134,30 @@ export default function NewTransactionForm() {
     const fetchData = async () => {
       try {
         const [bRes, sRes] = await Promise.all([
-          branchService.getAll(),
-          stakeholderService.getAll({ stakeholderTypeCode: "SUPPLIER" }),
+          branchService.query({
+            request: {
+              pagination: { getAll: true, pageNumber: 1, pageSize: 100 },
+              sort: [{ sortBy: "branchName", sortDirection: "asc" }],
+            },
+          }),
+          stakeholderService.query({
+            request: {
+              pagination: { getAll: true, pageNumber: 1, pageSize: 100 },
+              filters: [
+                {
+                  propertyName: "StakeholderTypeCode",
+                  value: "SUPPLIER",
+                  operation: FilterOperation.Equals,
+                },
+              ],
+              sort: [{ sortBy: "name", sortDirection: "asc" }],
+            },
+          }),
         ]);
-        if (bRes.data.success) setBranches(bRes.data.data);
-        if (sRes.data.success) setSuppliers(sRes.data.data);
+        if (bRes.data.success && bRes.data.data)
+          setBranches(bRes.data.data.data);
+        if (sRes.data.success && sRes.data.data)
+          setSuppliers(sRes.data.data.data);
         await fetchProducts();
       } catch (err) {
         console.error("Failed to fetch dependencies", err);
