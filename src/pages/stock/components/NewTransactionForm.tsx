@@ -82,7 +82,8 @@ export default function NewTransactionForm() {
   const selectedType = transactionTypes.find(
     (type) => type.oid === selectedTypeId,
   );
-  const typeCode = selectedType?.lookupDetailCode;
+  const typeCode = selectedType?.oid;
+  // console.log("selectedType", selectedType);
 
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -211,11 +212,11 @@ export default function NewTransactionForm() {
   return (
     <FormProvider {...methods}>
       <div className="space-y-6">
-        <TransactionHeader typeCode={typeCode} />
+        <TransactionHeader typeCode={typeCode || ""} />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <TransactionGeneralInfo
-            typeCode={typeCode}
+            typeCode={typeCode || ""}
             transactionTypeOptions={getTransactionTypeOptions()}
             branchOptions={getBranchOptions()}
             supplierOptions={getSupplierOptions()}

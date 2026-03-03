@@ -23,6 +23,8 @@ export default function TransactionGeneralInfo({
     formState: { errors },
   } = useFormContext();
 
+  console.log("typeCode", typeCode);
+
   return (
     <Card className="overflow-visible h-fit">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -46,7 +48,9 @@ export default function TransactionGeneralInfo({
           {...register("referenceNumber")}
         />
 
-        {(typeCode === "STOCK_IN" || typeCode === "TRANSFER") && (
+        {/* stock in and transfer */}
+        {(typeCode === "22222222-2222-2222-2222-222222222030" ||
+          typeCode === "22222222-2222-2222-2222-222222222032") && (
           <Select
             label={t("to_branch")}
             options={branchOptions}
@@ -55,7 +59,9 @@ export default function TransactionGeneralInfo({
           />
         )}
 
-        {(typeCode === "STOCK_OUT" || typeCode === "TRANSFER") && (
+        {/* stock out and transfer */}
+        {(typeCode === "22222222-2222-2222-2222-222222222031" ||
+          typeCode === "22222222-2222-2222-2222-222222222032") && (
           <Select
             label={t("from_branch")}
             options={branchOptions}
@@ -64,7 +70,8 @@ export default function TransactionGeneralInfo({
           />
         )}
 
-        {typeCode === "STOCK_IN" && (
+        {/* stock in */}
+        {typeCode === "22222222-2222-2222-2222-222222222030" && (
           <Select
             label={t("supplier")}
             options={supplierOptions}
