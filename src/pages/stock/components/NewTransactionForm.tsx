@@ -63,16 +63,7 @@ export default function NewTransactionForm() {
     resolver: zodResolver(schema),
     defaultValues: {
       transactionDate: new Date().toISOString().split("T")[0],
-      details: [
-        {
-          productId: "",
-          qrcode: "",
-          quantity: 1,
-          unitCost: 0,
-          batchNumber: "",
-          expiryDate: "",
-        },
-      ],
+      details: [],
     },
   });
 

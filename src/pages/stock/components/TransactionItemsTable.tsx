@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
 import TransactionItemRow from "./TransactionItemRow";
 import { ProductDto } from "@/types";
 import { productService } from "@/api/productService";
@@ -96,6 +97,30 @@ export default function TransactionItemsTable({
               }
             }}
             autoFocus
+          />
+        </div>
+        <div className="flex-1 max-w-md">
+          <Select
+            options={products.map((p) => ({
+              value: p.oid,
+              label: `${p.drugName} - ${p.gtin || ""}`,
+            }))}
+            searchPlaceholder={t("search_product") || "Search by name"}
+            onSearchChange={debouncedFetchProducts}
+            onChange={(e) => {
+              const prod = products.find((p) => p.oid === e.target.value);
+              if (prod) {
+                append({
+                  productId: prod.oid,
+                  qrcode: "",
+                  quantity: 1,
+                  unitCost: prod.price || 0,
+                  batchNumber: "",
+                  expiryDate: "",
+                });
+              }
+            }}
+            value=""
           />
         </div>
 
