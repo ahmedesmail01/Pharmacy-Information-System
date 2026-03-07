@@ -211,8 +211,8 @@ export default function NewTransactionForm() {
 
   return (
     <FormProvider {...methods}>
-      <div className="space-y-6">
-        <TransactionHeader typeCode={typeCode || ""} />
+      <div className="space-y-4">
+        {/* <TransactionHeader typeCode={typeCode || ""} /> */}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <TransactionGeneralInfo

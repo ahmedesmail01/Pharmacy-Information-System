@@ -1,10 +1,8 @@
 import { Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import toast from "react-hot-toast";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
-import { productService } from "@/api/productService";
 import { ProductDto } from "@/types";
 
 interface TransactionItemRowProps {
@@ -33,50 +31,6 @@ export default function TransactionItemRow({
     formState: { errors },
   } = useFormContext();
 
-  const handleBarcodeScan = async (barcode: string) => {
-    if (!barcode) return;
-    try {
-      const res = await productService.parseAndGetProduct({
-        barcodeInput: barcode,
-      });
-      if (res.data.success && res.data.data?.productFound) {
-        const prod = res.data.data.product;
-        const barcodeData = res.data.data.barcodeData;
-
-        // Ensure product is in our current options list
-        if (prod && !products.find((p) => p.oid === prod.oid)) {
-          setProducts((prev) => [...prev, prod]);
-        }
-
-        if (prod) {
-          setValue(`details.${index}.productId`, prod.oid);
-          setValue(`details.${index}.unitCost`, prod.price || 0);
-        }
-
-        if (barcodeData?.batchNumber) {
-          setValue(`details.${index}.batchNumber`, barcodeData.batchNumber);
-        }
-
-        if (barcodeData?.expiryDate) {
-          try {
-            const formattedExpiry = new Date(barcodeData.expiryDate)
-              .toISOString()
-              .split("T")[0];
-            setValue(`details.${index}.expiryDate`, formattedExpiry);
-          } catch {
-            setValue(`details.${index}.expiryDate`, barcodeData.expiryDate);
-          }
-        }
-
-        toast.success("Product found via scanning");
-      } else {
-        toast.error(res.data.data?.productMessage || "Product not found");
-      }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || t("error_occurred"));
-    }
-  };
-
   const getProductOptions = () =>
     products.map((p) => ({
       value: p.oid,
@@ -87,18 +41,6 @@ export default function TransactionItemRow({
 
   return (
     <tr className="bg-white">
-      <td className="px-4 py-3">
-        <Input
-          placeholder={t("qrcode")}
-          {...register(`details.${index}.qrcode`)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleBarcodeScan(watch(`details.${index}.qrcode`));
-            }
-          }}
-        />
-      </td>
       <td className="px-4 py-3">
         <Select
           options={getProductOptions()}

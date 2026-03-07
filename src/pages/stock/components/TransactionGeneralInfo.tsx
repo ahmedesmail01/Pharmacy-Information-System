@@ -28,7 +28,7 @@ export default function TransactionGeneralInfo({
 
   return (
     <Card className="overflow-visible h-fit">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Select
           label={t("transaction_type")}
           options={transactionTypeOptions}
@@ -50,6 +50,13 @@ export default function TransactionGeneralInfo({
           value={watch("referenceNumber")}
           error={(errors.referenceNumber as any)?.message}
           {...register("referenceNumber")}
+        />
+
+        <Input
+          label={t("notes")}
+          value={watch("notes")}
+          error={(errors.notes as any)?.message}
+          {...register("notes")}
         />
 
         {/* stock in and transfer */}
@@ -86,15 +93,6 @@ export default function TransactionGeneralInfo({
             {...register("supplierId")}
           />
         )}
-      </div>
-
-      <div className="mt-4">
-        <Input
-          label={t("notes")}
-          value={watch("notes")}
-          error={(errors.notes as any)?.message}
-          {...register("notes")}
-        />
       </div>
     </Card>
   );

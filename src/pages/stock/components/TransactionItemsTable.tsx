@@ -1,10 +1,14 @@
 import { Plus } from "lucide-react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import toast from "react-hot-toast";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
 import TransactionItemRow from "./TransactionItemRow";
 import { ProductDto } from "@/types";
+import { productService } from "@/api/productService";
 
 interface TransactionItemsTableProps {
   products: ProductDto[];
@@ -27,10 +31,74 @@ export default function TransactionItemsTable({
     name: "details",
   });
 
+  const [barcodeInput, setBarcodeInput] = useState("");
+
+  const handleGlobalBarcodeScan = async (barcode: string) => {
+    if (!barcode) return;
+    try {
+      const res = await productService.parseAndGetProduct({
+        barcodeInput: barcode,
+      });
+      if (res.data.success && res.data.data?.productFound) {
+        const prod = res.data.data.product;
+        const barcodeData = res.data.data.barcodeData;
+
+        if (prod && !products.find((p) => p.oid === prod.oid)) {
+          setProducts((prev) => [...prev, prod]);
+        }
+
+        let expiryDate = "";
+        if (barcodeData?.expiryDate) {
+          try {
+            expiryDate = new Date(barcodeData.expiryDate)
+              .toISOString()
+              .split("T")[0];
+          } catch {
+            expiryDate = barcodeData.expiryDate;
+          }
+        }
+
+        append({
+          qrcode: barcode,
+          productId: prod?.oid || "",
+          quantity: 1,
+          unitCost: prod?.price || 0,
+          batchNumber: barcodeData?.batchNumber || "",
+          expiryDate: expiryDate,
+        });
+
+        toast.success(t("product_added") || "Product added via scanning");
+        setBarcodeInput("");
+      } else {
+        toast.error(res.data.data?.productMessage || "Product not found");
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || t("error_occurred"));
+    }
+  };
+
   return (
     <Card className="overflow-visible min-h-[400px]">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">{t("items")}</h2>
+      <div className="flex items-center justify-between mb-4 gap-4">
+        <h2 className="text-lg font-semibold whitespace-nowrap">
+          {t("items")}
+        </h2>
+
+        <div className="flex-1 max-w-md">
+          <Input
+            placeholder={t("qrcode") || "Scan barcode"}
+            value={barcodeInput}
+            onChange={(e) => setBarcodeInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleGlobalBarcodeScan(barcodeInput);
+              }
+            }}
+            autoFocus
+          />
+        </div>
+
         <Button
           type="button"
           variant="secondary"
@@ -56,7 +124,6 @@ export default function TransactionItemsTable({
         <table className="w-full text-sm text-left">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
-              <th className="px-4 py-3 min-w-[250px]">{t("qrcode")}</th>
               <th className="px-4 py-3 min-w-[250px]">{t("product")}</th>
               <th className="px-4 py-3 w-32">{t("quantity")}</th>
               <th className="px-4 py-3 w-32">{t("unit_cost")}</th>
