@@ -680,3 +680,29 @@ export interface UpdateBranchIntegrationSettingDto {
   integrationValue?: string;
   status: number;
 }
+
+// ─── RSD Integration ────────────────────────────────────────────────────────
+
+export interface RsdDispatchDetailRequest {
+  dispatchNotificationId: string;
+  branchId: string;
+}
+
+export interface RsdProductDto {
+  gtin: string | null;
+  batchNumber: string | null;
+  expiryDate: string | null;
+  quantity: number;
+  responseCode: string | null;
+}
+
+export interface RsdDispatchDetailResponseData {
+  success: boolean;
+  responseCode: string | null;
+  responseMessage: string | null;
+  dispatchNotificationId: string | null;
+  notificationDate: string | null;
+  fromGLN: string | null;
+  products: RsdProductDto[];
+  rawResponse: string | null;
+}

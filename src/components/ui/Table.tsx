@@ -11,6 +11,7 @@ interface TableProps<T> {
   data: T[];
   isLoading?: boolean;
   onRowClick?: (row: T) => void;
+  className?: string;
 }
 
 export default function Table<T>({
@@ -18,6 +19,7 @@ export default function Table<T>({
   data,
   isLoading = false,
   onRowClick,
+  className = "",
 }: TableProps<T>) {
   const table = useReactTable({
     data,
@@ -26,7 +28,9 @@ export default function Table<T>({
   });
 
   return (
-    <div className="w-full overflow-x-auto border border-gray-200 rounded-xl">
+    <div
+      className={`w-full overflow-x-auto border border-gray-200 rounded-xl ${className}`}
+    >
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           {table.getHeaderGroups().map((headerGroup) => (
