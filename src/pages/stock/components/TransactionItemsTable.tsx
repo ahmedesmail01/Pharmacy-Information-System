@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus, Search, QrCode } from "lucide-react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
@@ -126,88 +126,105 @@ export default function TransactionItemsTable({
   };
 
   return (
-    <Card className="overflow-visible min-h-[400px]">
-      <div className="flex items-center justify-between mb-4 gap-4">
-        <h2 className="text-lg font-semibold whitespace-nowrap">
-          {t("items")}
-        </h2>
-
-        <div className="flex-1 max-w-md">
-          <Input
-            placeholder={t("qrcode") || "Scan barcode"}
-            value={barcodeInput}
-            onChange={(e) => setBarcodeInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleGlobalBarcodeScan(barcodeInput);
-              }
-            }}
-            autoFocus
-          />
-        </div>
-        <div className="flex-1 max-w-md">
-          <Select
-            options={products.map((p) => ({
-              value: p.oid,
-              label: `${p.drugName} - ${p.gtin || ""}`,
-            }))}
-            searchPlaceholder={t("search_product") || "Search by name"}
-            onSearchChange={debouncedFetchProducts}
-            onChange={(e) => {
-              const prod = products.find((p) => p.oid === e.target.value);
-              if (prod) {
-                append({
-                  productId: prod.oid,
-                  qrcode: "",
-                  quantity: 1,
-                  unitCost: prod.price || 0,
-                  batchNumber: "",
-                  expiryDate: "",
-                });
-              }
-            }}
-            value=""
-          />
+    <Card className="overflow-visible min-h-[400px] border-none shadow-lg">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
+            <Plus size={20} />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800">{t("items")}</h2>
         </div>
 
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() =>
-            append({
-              productId: "",
-              qrcode: "",
-              quantity: 1,
-              unitCost: 0,
-              batchNumber: "",
-              expiryDate: "",
-            })
-          }
-          className="flex items-center gap-1"
-        >
-          <Plus size={16} />
-          {t("add_item")}
-        </Button>
+        <div className="flex flex-1 flex-col sm:flex-row items-stretch gap-3 w-full max-w-2xl">
+          <div className="flex-1">
+            <Input
+              placeholder={t("qrcode") || "Scan barcode"}
+              value={barcodeInput}
+              onChange={(e) => setBarcodeInput(e.target.value)}
+              icon={<QrCode size={18} />}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleGlobalBarcodeScan(barcodeInput);
+                }
+              }}
+              autoFocus
+              className="bg-white border-gray-200 focus:ring-blue-500/20"
+            />
+          </div>
+          <div className="flex-1">
+            <Select
+              options={products.map((p) => ({
+                value: p.oid,
+                label: `${p.drugName} - ${p.gtin || ""}`,
+              }))}
+              searchPlaceholder={t("search_product") || "Search by name"}
+              onSearchChange={debouncedFetchProducts}
+              onChange={(e) => {
+                const prod = products.find((p) => p.oid === e.target.value);
+                if (prod) {
+                  append({
+                    productId: prod.oid,
+                    qrcode: "",
+                    quantity: 1,
+                    unitCost: prod.price || 0,
+                    batchNumber: "",
+                    expiryDate: "",
+                  });
+                }
+              }}
+              value=""
+              className="bg-white border-gray-200"
+            />
+          </div>
+
+          <Button
+            type="button"
+            variant="primary"
+            onClick={() =>
+              append({
+                productId: "",
+                qrcode: "",
+                quantity: 1,
+                unitCost: 0,
+                batchNumber: "",
+                expiryDate: "",
+              })
+            }
+            className="flex items-center justify-center gap-2 px-6 shadow-sm shadow-blue-200 active:scale-95 transition-transform"
+          >
+            <Plus size={18} />
+            <span className="whitespace-nowrap">{t("add_item")}</span>
+          </Button>
+        </div>
       </div>
 
       <div
         className="overflow-x-auto overflow-y-visible min-h-[300px]"
         onKeyDown={handleKeyDown}
       >
-        <table className="w-full text-sm text-left">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+        <table className="w-full text-sm text-left border-separate border-spacing-0">
+          <thead className="bg-gray-50/80 sticky top-0 z-10">
             <tr>
-              <th className="px-4 py-3 min-w-[250px]">{t("product")}</th>
-              <th className="px-4 py-3 w-32">{t("quantity")}</th>
-              <th className="px-4 py-3 w-32">{t("unit_cost")}</th>
-              <th className="px-4 py-3 w-40">{t("batch_number")}</th>
-              <th className="px-4 py-3 w-40">{t("expiry_date")}</th>
-              <th className="px-4 py-3 w-20"></th>
+              <th className="px-5 py-4 font-bold text-gray-600 border-b border-gray-100 first:rounded-tl-lg">
+                {t("product")}
+              </th>
+              <th className="px-5 py-4 font-bold text-gray-600 border-b border-gray-100 w-32">
+                {t("quantity")}
+              </th>
+              <th className="px-5 py-4 font-bold text-gray-600 border-b border-gray-100 w-32">
+                {t("unit_cost")}
+              </th>
+              <th className="px-5 py-4 font-bold text-gray-600 border-b border-gray-100 w-48">
+                {t("batch_number")}
+              </th>
+              <th className="px-5 py-4 font-bold text-gray-600 border-b border-gray-100 w-48">
+                {t("expiry_date")}
+              </th>
+              <th className="px-5 py-4 font-bold text-gray-600 border-b border-gray-100 w-20 last:rounded-tr-lg"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-100 bg-white">
             {fields.map((field, index) => (
               <TransactionItemRow
                 key={field.id}

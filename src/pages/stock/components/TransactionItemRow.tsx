@@ -3,6 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import Button from "@/components/ui/Button";
 import { ProductDto } from "@/types";
 
 interface TransactionItemRowProps {
@@ -40,8 +41,8 @@ export default function TransactionItemRow({
   const itemErrors = (errors.details as any)?.[index];
 
   return (
-    <tr className="bg-white">
-      <td className="px-4 py-3">
+    <tr className="group hover:bg-blue-50/30 transition-colors border-b border-gray-50 last:border-0">
+      <td className="px-5 py-3">
         <Select
           data-row={index}
           data-col={0}
@@ -62,7 +63,7 @@ export default function TransactionItemRow({
         />
       </td>
 
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <Input
           data-row={index}
           data-col={1}
@@ -75,6 +76,7 @@ export default function TransactionItemRow({
             if (["-", "e", "E"].includes(e.key)) e.preventDefault();
           }}
           error={itemErrors?.quantity?.message}
+          className="bg-transparent border-gray-200 focus:bg-white transition-all"
           {...register(`details.${index}.quantity`, {
             valueAsNumber: true,
             min: 0,
@@ -88,7 +90,7 @@ export default function TransactionItemRow({
           })}
         />
       </td>
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <Input
           data-row={index}
           data-col={2}
@@ -101,6 +103,7 @@ export default function TransactionItemRow({
             if (["-", "e", "E"].includes(e.key)) e.preventDefault();
           }}
           error={itemErrors?.unitCost?.message}
+          className="bg-transparent border-gray-200 focus:bg-white transition-all"
           {...register(`details.${index}.unitCost`, {
             valueAsNumber: true,
             min: 0,
@@ -114,12 +117,13 @@ export default function TransactionItemRow({
           })}
         />
       </td>
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <Input
           data-row={index}
           data-col={3}
           placeholder={t("batch_placeholder")}
           value={watch(`details.${index}.batchNumber`)}
+          className="bg-transparent border-gray-200 focus:bg-white transition-all"
           {...register(`details.${index}.batchNumber`, {
             onChange: (e) => {
               setValue(`details.${index}.batchNumber`, e.target.value);
@@ -128,12 +132,13 @@ export default function TransactionItemRow({
           })}
         />
       </td>
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <Input
           data-row={index}
           data-col={4}
           type="date"
           value={watch(`details.${index}.expiryDate`)}
+          className="bg-transparent border-gray-200 focus:bg-white transition-all"
           {...register(`details.${index}.expiryDate`, {
             onChange: (e) => {
               setValue(`details.${index}.expiryDate`, e.target.value);
@@ -142,15 +147,17 @@ export default function TransactionItemRow({
           })}
         />
       </td>
-      <td className="px-4 py-3 text-right">
-        <button
+      <td className="px-5 py-3 text-right">
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => remove(index)}
-          className="text-red-500 hover:text-red-700 p-1"
           disabled={isRemoveDisabled}
+          className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-0"
         >
           <Trash2 size={18} />
-        </button>
+        </Button>
       </td>
     </tr>
   );
