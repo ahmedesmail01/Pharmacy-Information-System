@@ -294,7 +294,9 @@ export default function RSDPage() {
             )
           }
           className="w-24 bg-transparent border-gray-200 focus:bg-white transition-all h-9"
-          icon={<Hash size={14} />}
+          //   icon={<Hash size={14}
+          //    />
+          // }
         />
       ),
     },
