@@ -1,18 +1,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { ArrowRight } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { stockService } from "@/api/stockService";
-import { branchService } from "@/api/branchService";
 import { productService } from "@/api/productService";
 import { handleApiError } from "@/utils/handleApiError";
 import { useTranslation } from "react-i18next";
-import { BranchDto, ProductDto, CreateStockTransferDto } from "@/types";
+import { useBranches } from "@/hooks/queries";
+import { useQuery } from "@tanstack/react-query";
+import { CreateStockTransferDto } from "@/types";
 
 export default function StockTransferForm({
   onSuccess,
@@ -38,8 +39,12 @@ export default function StockTransferForm({
 
   type TransferFormValues = z.infer<typeof transferSchema>;
 
-  const [branches, setBranches] = useState<BranchDto[]>([]);
-  const [products, setProducts] = useState<ProductDto[]>([]);
+  const { data: branches = [] } = useBranches();
+  const { data: products = [] } = useQuery({
+    queryKey: ["products", "all"],
+    queryFn: () => productService.getAll().then((r) => r.data.data ?? []),
+    staleTime: 1000 * 60 * 10,
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -49,26 +54,8 @@ export default function StockTransferForm({
     formState: { errors },
   } = useForm<TransferFormValues>({
     resolver: zodResolver(transferSchema),
-    defaultValues: {
-      quantity: 1,
-    },
+    defaultValues: { quantity: 1 },
   });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [bRes, pRes] = await Promise.all([
-          branchService.getAll(),
-          productService.getAll(),
-        ]);
-        setBranches(bRes.data.data || []);
-        setProducts(pRes.data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch transfer data", err);
-      }
-    };
-    fetchData();
-  }, []);
 
   const onSubmit = async (formData: TransferFormValues) => {
     setIsLoading(true);

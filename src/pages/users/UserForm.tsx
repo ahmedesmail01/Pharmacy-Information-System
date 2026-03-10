@@ -6,9 +6,9 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { useTranslation } from "react-i18next";
-import { SystemUserDto, RoleDto, BranchDto } from "@/types";
+import { SystemUserDto, RoleDto } from "@/types";
 import { roleService } from "@/api/roleService";
-import { branchService } from "@/api/branchService";
+import { useBranches } from "@/hooks/queries";
 
 interface UserFormProps {
   initialData?: SystemUserDto | null;
@@ -37,7 +37,7 @@ export default function UserForm({
   type UserFormValues = z.infer<typeof userSchema>;
 
   const [roles, setRoles] = useState<RoleDto[]>([]);
-  const [branches, setBranches] = useState<BranchDto[]>([]);
+  const { data: branches = [] } = useBranches();
 
   const {
     register,
@@ -52,19 +52,12 @@ export default function UserForm({
   });
 
   useEffect(() => {
-    const fetchOptions = async () => {
-      try {
-        const [rRes, bRes] = await Promise.all([
-          roleService.getAll(),
-          branchService.getAll(),
-        ]);
-        setRoles(rRes.data.data || []);
-        setBranches(bRes.data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch user options", err);
-      }
-    };
-    fetchOptions();
+    roleService
+      .getAll()
+      .then((r) => {
+        setRoles(r.data.data || []);
+      })
+      .catch(console.error);
   }, []);
 
   useEffect(() => {

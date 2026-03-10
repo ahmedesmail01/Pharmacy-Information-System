@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 
 import { rsdService } from "@/api/rsdService";
-import { branchService } from "@/api/branchService";
 import { stockService } from "@/api/stockService";
-import { BranchDto, RsdProductDto, CreateStockTransactionDto } from "@/types";
+import { RsdProductDto, CreateStockTransactionDto } from "@/types";
 import PageHeader from "@/components/shared/PageHeader";
+import { useBranches } from "@/hooks/queries";
 
 // Components
 import RSDSearchForm from "./components/RSDSearchForm";
@@ -19,25 +19,12 @@ export default function RSDPage() {
   // State
   const [dispatchNotificationId, setDispatchNotificationId] = useState("");
   const [branchId, setBranchId] = useState("");
-  const [branches, setBranches] = useState<BranchDto[]>([]);
+  const { data: branches = [] } = useBranches();
   const [products, setProducts] = useState<RsdProductDto[]>([]);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [fromGLN, setFromGLN] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isEdited, setIsEdited] = useState(false);
-
-  // Fetch branches on mount
-  useEffect(() => {
-    const fetchBranches = async () => {
-      try {
-        const res = await branchService.getAll();
-        setBranches(res.data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch branches", err);
-      }
-    };
-    fetchBranches();
-  }, []);
 
   const handleFetch = useCallback(async () => {
     if (!dispatchNotificationId || !branchId) {

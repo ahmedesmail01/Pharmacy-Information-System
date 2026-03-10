@@ -7,24 +7,19 @@ import Table from "@/components/ui/Table";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
-import Select from "@/components/ui/Select";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Spinner from "@/components/ui/Spinner";
 import BranchIntegrationForm from "./BranchIntegrationForm";
 import { branchIntegrationSettingService } from "@/api/branchIntegrationSettingService";
 import { integrationProviderService } from "@/api/integrationProviderService";
-import { branchService } from "@/api/branchService";
 import { handleApiError } from "@/utils/handleApiError";
-import {
-  BranchDto,
-  IntegrationProviderDto,
-  BranchIntegrationSettingDto,
-} from "@/types";
+import { useBranches } from "@/hooks/queries";
+import { IntegrationProviderDto, BranchIntegrationSettingDto } from "@/types";
 
 export default function BranchIntegrationsPage() {
   const { t } = useTranslation("integrations");
   const tc = useTranslation("common").t;
-  const [branches, setBranches] = useState<BranchDto[]>([]);
+  const { data: branches = [] } = useBranches();
   const [providers, setProviders] = useState<IntegrationProviderDto[]>([]);
   const [selectedBranchId, setSelectedBranchId] = useState<string>("");
   const [settings, setSettings] = useState<BranchIntegrationSettingDto[]>([]);
@@ -38,23 +33,15 @@ export default function BranchIntegrationsPage() {
   const [visibleValues, setVisibleValues] = useState<Set<string>>(new Set());
   const [isInitLoading, setIsInitLoading] = useState(true);
 
-  // Load branches and providers on mount (parallel)
+  // Load providers on mount
   useEffect(() => {
-    const init = async () => {
-      try {
-        const [branchRes, providerRes] = await Promise.all([
-          branchService.getAll(),
-          integrationProviderService.getAll(),
-        ]);
-        if (branchRes.data.success) setBranches(branchRes.data.data ?? []);
-        if (providerRes.data.success) setProviders(providerRes.data.data ?? []);
-      } catch (e) {
-        handleApiError(e);
-      } finally {
-        setIsInitLoading(false);
-      }
-    };
-    init();
+    integrationProviderService
+      .getAll()
+      .then((res) => {
+        if (res.data.success) setProviders(res.data.data ?? []);
+      })
+      .catch(handleApiError)
+      .finally(() => setIsInitLoading(false));
   }, []);
 
   // Load settings when branch changes

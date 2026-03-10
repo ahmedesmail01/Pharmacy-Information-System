@@ -6,34 +6,22 @@ import SearchBar from "@/components/shared/SearchBar";
 import Select from "@/components/ui/Select";
 import { useTranslation } from "react-i18next";
 import { stockService } from "@/api/stockService";
-import { branchService } from "@/api/branchService";
 import { useQueryTable } from "@/hooks/useQuery";
-import { StockDto, BranchDto, FilterOperation } from "@/types";
+import { useBranches } from "@/hooks/queries";
+import { StockDto, FilterOperation } from "@/types";
 
 export default function StockLevels() {
   const { t } = useTranslation("stock");
   const tc = useTranslation("common").t;
   const [searchTerm, setSearchTerm] = useState("");
   const [branchId, setBranchId] = useState("");
-  const [branches, setBranches] = useState<BranchDto[]>([]);
+  const { data: branches = [] } = useBranches();
 
   const { data, isLoading, pageNumber, setPageNumber, totalPages, fetch } =
     useQueryTable<StockDto>({
       service: stockService.query,
       pageSize: 10,
     });
-
-  useEffect(() => {
-    const fetchBranches = async () => {
-      try {
-        const res = await branchService.getAll();
-        setBranches(res.data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch branches", err);
-      }
-    };
-    fetchBranches();
-  }, []);
 
   const loadData = useCallback(() => {
     const filters = [];

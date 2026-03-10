@@ -19,8 +19,6 @@ import Table from "@/components/ui/Table";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
-import { branchService } from "@/api/branchService";
-import { productService } from "@/api/productService";
 import { systemUserService } from "@/api/systemUserService";
 import { salesService } from "@/api/salesService";
 import { stockService } from "@/api/stockService";

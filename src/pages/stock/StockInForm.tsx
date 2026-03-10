@@ -1,23 +1,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { stockService } from "@/api/stockService";
-import { branchService } from "@/api/branchService";
-import { productService } from "@/api/productService";
 import { useTranslation } from "react-i18next";
 import { stakeholderService } from "@/api/stakeholderService";
 import { handleApiError } from "@/utils/handleApiError";
-import {
-  BranchDto,
-  ProductDto,
-  StakeholderDto,
-  CreateStockInDto,
-} from "@/types";
+import { useBranches } from "@/hooks/queries";
+import { useQuery } from "@tanstack/react-query";
+import { productService } from "@/api/productService";
+import { StakeholderDto, CreateStockInDto } from "@/types";
 
 export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
   const { t } = useTranslation("stock");
@@ -36,8 +32,12 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
 
   type StockInFormValues = z.infer<typeof stockInSchema>;
 
-  const [branches, setBranches] = useState<BranchDto[]>([]);
-  const [products, setProducts] = useState<ProductDto[]>([]);
+  const { data: branches = [] } = useBranches();
+  const { data: products = [] } = useQuery({
+    queryKey: ["products", "all"],
+    queryFn: () => productService.getAll().then((r) => r.data.data ?? []),
+    staleTime: 1000 * 60 * 10,
+  });
   const [suppliers, setSuppliers] = useState<StakeholderDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,35 +48,22 @@ export default function StockInForm({ onSuccess }: { onSuccess: () => void }) {
     formState: { errors },
   } = useForm<StockInFormValues>({
     resolver: zodResolver(stockInSchema),
-    defaultValues: {
-      quantity: 1,
-      unitCost: 0,
-    },
+    defaultValues: { quantity: 1, unitCost: 0 },
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [bRes, pRes, sRes] = await Promise.all([
-          branchService.getAll(),
-          productService.getAll(),
-          stakeholderService.getAll({ stakeholderTypeCode: "VENDOR" }),
-        ]);
-        setBranches(bRes.data.data || []);
-        setProducts(pRes.data.data || []);
-        const rawSuppliers = sRes.data.data || [];
+  // Suppliers fetched once (rarely changes)
+  useQuery({
+    queryKey: ["stakeholders", "vendors"],
+    queryFn: () =>
+      stakeholderService.getAll({ stakeholderTypeCode: "VENDOR" }).then((r) => {
+        const raw = r.data.data || [];
         setSuppliers(
-          rawSuppliers.map((s: any) => ({
-            ...s,
-            fullName: s.fullName || s.name || "",
-          })),
+          raw.map((s: any) => ({ ...s, fullName: s.fullName || s.name || "" })),
         );
-      } catch (err) {
-        console.error("Failed to fetch stock in data", err);
-      }
-    };
-    fetchData();
-  }, []);
+        return raw;
+      }),
+    staleTime: 1000 * 60 * 10,
+  });
 
   const onSubmit = async (formData: StockInFormValues) => {
     setIsLoading(true);
