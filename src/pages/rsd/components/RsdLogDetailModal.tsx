@@ -96,7 +96,7 @@ export default function RsdLogDetailModal({
       isOpen={!!logId}
       onClose={onClose}
       title={t("logDetails")}
-      size="full"
+      size="5xl"
     >
       {isLoading ? (
         <div className="flex h-64 items-center justify-center">
