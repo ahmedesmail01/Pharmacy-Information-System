@@ -40,9 +40,10 @@ export default function ProductForm({
   >("basic");
 
   const productTypes = getLookupDetails("PRODUCT_TYPE");
-  const vatTypes = getLookupDetails("Vat_Type");
+  const vatTypes = getLookupDetails("VAT_TYPE");
   const packageTypeLookups = getLookupDetails("PACKAGE_TYPE");
   const dosageForms = getLookupDetails("Dosage_Form");
+  const productGroups = getLookupDetails("PRODUCT_GROUP");
 
   const {
     register,
@@ -164,6 +165,7 @@ export default function ProductForm({
 
         {activeTab === "regulatory" && (
           <RegulatoryTab
+            productGroups={productGroups}
             register={register}
             isLoading={isLoading}
             countryOptions={countryOptions}

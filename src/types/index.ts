@@ -312,10 +312,10 @@ export interface CreateProductDto {
   countryOfOrigin?: string;
   minStockLevel?: number;
   maxStockLevel?: number;
-  vatTypeId?: string;
+  vatTypeId?: string | null;
   packageTypeId?: string;
   dosageFormId?: string;
-  productGroupId?: string;
+  productGroupId?: string | null;
   status?: number;
   domainId?: string;
 }

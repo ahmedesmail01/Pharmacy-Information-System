@@ -14,6 +14,7 @@ interface RegulatoryTabProps {
   packageTypeLookups: AppLookupDetailDto[];
   dosageForms: AppLookupDetailDto[];
   vatTypes: AppLookupDetailDto[];
+  productGroups: AppLookupDetailDto[];
   control: Control<ProductFormValues>;
 }
 
@@ -24,6 +25,7 @@ export default function RegulatoryTab({
   packageTypeLookups,
   dosageForms,
   vatTypes,
+  productGroups,
   control,
 }: RegulatoryTabProps) {
   const { t } = useTranslation("products");
@@ -57,10 +59,10 @@ export default function RegulatoryTab({
         name="vatTypeId"
         control={control}
         render={({ field }) => (
-          <Input
+          <Select
             {...field}
             label={t("vatType")}
-            // options={getUniqueOptions(vatTypes)}
+            options={getUniqueOptions(vatTypes)}
             disabled={isLoading}
           />
         )}
@@ -91,10 +93,17 @@ export default function RegulatoryTab({
         )}
       />
 
-      <Input
-        {...register("productGroupId")}
-        label={t("productGroup")}
-        disabled={isLoading}
+      <Controller
+        name="productGroupId"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            label={t("productGroup")}
+            options={getUniqueOptions(productGroups)}
+            disabled={isLoading}
+          />
+        )}
       />
       <div className="flex flex-col gap-4 mt-6">
         <label className="flex items-center gap-3 cursor-pointer group">

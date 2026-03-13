@@ -57,16 +57,22 @@ export default function ProductsPage() {
   const totalRecords = pagedData?.totalRecords ?? 0;
 
   const handleCreateOrUpdate = async (formData: CreateProductDto) => {
+    const data = {
+      ...formData,
+      vatTypeId: formData.vatTypeId || null,
+      productGroupId: formData.productGroupId || null,
+    };
+
     setIsActionLoading(true);
     try {
       if (selectedProduct) {
         await productService.update(selectedProduct.oid, {
-          ...formData,
+          ...data,
           oid: selectedProduct.oid,
         });
         toast.success(t("productUpdated"));
       } else {
-        await productService.create(formData);
+        await productService.create(data);
         toast.success(t("productCreated"));
       }
       setIsFormOpen(false);

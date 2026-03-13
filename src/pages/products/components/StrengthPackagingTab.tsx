@@ -47,10 +47,7 @@ export default function StrengthPackagingTab({
           <Select
             {...field}
             label={t("packageType")}
-            options={getUniqueOptions(
-              packageTypeLookups,
-              (p) => p.valueNameEn || p.valueNameAr || "",
-            )}
+            options={getUniqueOptions(packageTypeLookups)}
             disabled={isLoading}
           />
         )}
