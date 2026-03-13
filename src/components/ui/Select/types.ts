@@ -5,6 +5,7 @@ import { SelectHTMLAttributes } from "react";
 export interface SelectOption {
   value: string | number;
   label: string;
+  flag?: string; // ISO 3166-1 alpha-2 code
 }
 
 // ─── Pagination (discriminated union) ────────────────────────────────────────

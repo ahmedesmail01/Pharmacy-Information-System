@@ -10,6 +10,12 @@ import { useTranslation } from "react-i18next";
 import { ProductDto, CreateProductDto, AppLookupDetailDto } from "@/types";
 import { lookupService } from "@/api/lookupService";
 import { positiveNumberInputProps } from "@/utils/positiveNumberInputProps";
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
+import arLocale from "i18n-iso-countries/langs/ar.json";
+
+countries.registerLocale(enLocale);
+countries.registerLocale(arLocale);
 
 interface ProductFormProps {
   initialData?: ProductDto | null;
@@ -22,7 +28,7 @@ export default function ProductForm({
   onSubmit,
   isLoading = false,
 }: ProductFormProps) {
-  const { t } = useTranslation("products");
+  const { t, i18n } = useTranslation("products");
   const tc = useTranslation("common").t;
 
   const productSchema = z.object({
@@ -88,19 +94,25 @@ export default function ProductForm({
   useEffect(() => {
     const fetchLookups = async () => {
       try {
-        const [ptRes, vatRes, pkgRes, doseRes, grpRes] = await Promise.all([
+        const [
+          ptRes,
+          vatRes,
+          pkgRes,
+
+          // doseRes, grpRes
+        ] = await Promise.all([
           lookupService.getByCode("PRODUCT_TYPE"),
-          lookupService.getByCode("VAT_TYPE").catch(() => null),
+          // lookupService.getByCode("VAT_TYPE").catch(() => null),
           lookupService.getByCode("PACKAGE_TYPE").catch(() => null),
           lookupService.getByCode("DOSAGE_FORM").catch(() => null),
-          lookupService.getByCode("PRODUCT_GROUP").catch(() => null),
+          // lookupService.getByCode("PRODUCT_GROUP").catch(() => null),
         ]);
         setProductTypes(ptRes.data.data?.lookupDetails || []);
         if (vatRes) setVatTypes(vatRes.data.data?.lookupDetails || []);
         if (pkgRes)
           setPackageTypeLookups(pkgRes.data.data?.lookupDetails || []);
-        if (doseRes) setDosageForms(doseRes.data.data?.lookupDetails || []);
-        if (grpRes) setProductGroups(grpRes.data.data?.lookupDetails || []);
+        // if (doseRes) setDosageForms(doseRes.data.data?.lookupDetails || []);
+        // if (grpRes) setProductGroups(grpRes.data.data?.lookupDetails || []);
       } catch (err) {
         console.error("Failed to fetch product types", err);
       }
@@ -174,6 +186,15 @@ export default function ProductForm({
   const onInvalid = (errs: any) => {
     console.log("INVALID SUBMIT:", errs);
   };
+
+  const currentLang = i18n.language === "ar" ? "ar" : "en";
+  const countryOptions = Object.entries(
+    countries.getNames(currentLang, { select: "official" }),
+  ).map(([code, name]) => ({
+    value: name, // Keep name as value for compatibility with existing business logic if it expects the name
+    label: name,
+    flag: code,
+  }));
 
   return (
     <div className="space-y-6">
@@ -321,18 +342,15 @@ export default function ProductForm({
               label={t("manufacturer")}
               disabled={isLoading}
             />
-            <Input
+            <Select
               {...register("countryOfOrigin")}
               label={t("countryOfOrigin")}
+              options={countryOptions}
               disabled={isLoading}
             />
-            <Select
+            <Input
               {...register("vatTypeId")}
               label={t("vatType")}
-              options={vatTypes.map((v) => ({
-                value: String(v.oid),
-                label: v.valueNameEn || v.valueNameAr || "",
-              }))}
               disabled={isLoading}
             />
             <Select
@@ -353,13 +371,13 @@ export default function ProductForm({
               }))}
               disabled={isLoading}
             />
-            <Select
+            <Input
               {...register("productGroupId")}
               label={t("productGroup")}
-              options={productGroups.map((g) => ({
-                value: String(g.oid),
-                label: g.valueNameEn || g.valueNameAr || "",
-              }))}
+              // options={productGroups.map((g) => ({
+              //   value: String(g.oid),
+              //   label: g.valueNameEn || g.valueNameAr || "",
+              // }))}
               disabled={isLoading}
             />
             <div className="flex flex-col gap-4 mt-6">

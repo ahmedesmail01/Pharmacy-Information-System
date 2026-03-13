@@ -59,10 +59,18 @@ export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
       >
         {/* Label */}
         <span
-          className={
-            selectedOption ? "text-gray-900 truncate" : "text-gray-400"
-          }
+          className={[
+            "flex items-center gap-2 truncate",
+            selectedOption ? "text-gray-900" : "text-gray-400",
+          ].join(" ")}
         >
+          {selectedOption?.flag && (
+            <img
+              src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${selectedOption.flag}.svg`}
+              alt={selectedOption.flag}
+              className="h-3 w-4.5 rounded-sm object-cover"
+            />
+          )}
           {selectedOption ? selectedOption.label : t("select")}
         </span>
 

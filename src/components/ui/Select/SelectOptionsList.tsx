@@ -98,16 +98,25 @@ export function SelectOptionsList({
                     : "text-gray-700 hover:bg-gray-50",
               ].join(" ")}
             >
-              {/* Local text highlighting — only for client-side filtering */}
-              {search.trim() && !isServerSearch ? (
-                <HighlightMatch
-                  text={opt.label}
-                  query={search}
-                  isSelected={isSelected}
-                />
-              ) : (
-                opt.label
-              )}
+              <div className="flex items-center gap-2">
+                {opt.flag && (
+                  <img
+                    src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${opt.flag}.svg`}
+                    alt={opt.flag}
+                    className="h-3 w-4.5 rounded-sm object-cover"
+                  />
+                )}
+                {/* Local text highlighting — only for client-side filtering */}
+                {search.trim() && !isServerSearch ? (
+                  <HighlightMatch
+                    text={opt.label}
+                    query={search}
+                    isSelected={isSelected}
+                  />
+                ) : (
+                  opt.label
+                )}
+              </div>
             </li>
           );
         })
