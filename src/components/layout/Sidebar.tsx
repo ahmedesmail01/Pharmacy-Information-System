@@ -142,7 +142,7 @@ export default function Sidebar({
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
                     active
                       ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      : "text-gray-200 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   <Icon
@@ -170,7 +170,7 @@ export default function Sidebar({
                         className={`block px-3 py-2 rounded-lg text-sm transition-all ${
                           location.pathname === child.path
                             ? "bg-blue-100 text-blue-700 font-semibold"
-                            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                            : "text-gray-300 font-semibold hover:bg-gray-50 hover:text-gray-900"
                         }`}
                       >
                         {t(child.labelKey)}
