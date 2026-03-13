@@ -13,7 +13,7 @@ import { positiveNumberInputProps } from "@/utils/positiveNumberInputProps";
 
 interface ProductFormProps {
   initialData?: ProductDto | null;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: CreateProductDto) => void;
   isLoading?: boolean;
 }
 

@@ -60,14 +60,29 @@ export default function UsersPage() {
   const totalPages = pagedData?.totalPages || 1;
   const totalRecords = pagedData?.totalRecords || 0;
 
+  const sanitizePayload = (data: any, isUpdate = false) => {
+    const payload = { ...data };
+    if (!payload.genderLookupId) payload.genderLookupId = null;
+    if (!payload.birthDate) payload.birthDate = null;
+    if (!payload.middleName) payload.middleName = null;
+    if (!payload.mobile) payload.mobile = null;
+    if (!payload.email) payload.email = null;
+    if (isUpdate && !payload.password) {
+      delete payload.password;
+    }
+    return payload;
+  };
+
   const handleCreateOrUpdate = async (formData: any) => {
     setIsActionLoading(true);
     try {
       if (selectedUser) {
-        await systemUserService.update(selectedUser.oid, formData);
+        const payload = sanitizePayload(formData, true);
+        await systemUserService.update(selectedUser.oid, payload);
         toast.success(t("userUpdated"));
       } else {
-        await systemUserService.create(formData);
+        const payload = sanitizePayload(formData, false);
+        await systemUserService.create(payload);
         toast.success(t("userCreated"));
       }
       setIsFormOpen(false);

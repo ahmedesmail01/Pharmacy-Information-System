@@ -8,7 +8,7 @@ import Select from "@/components/ui/Select";
 import { useTranslation } from "react-i18next";
 import { SystemUserDto, RoleDto } from "@/types";
 import { roleService } from "@/api/roleService";
-import { useBranches } from "@/hooks/queries";
+import { useLookup } from "@/context/LookupContext";
 
 interface UserFormProps {
   initialData?: SystemUserDto | null;
@@ -26,18 +26,30 @@ export default function UserForm({
 
   const userSchema = z.object({
     username: z.string().min(3, t("usernameMin")).max(50),
-    fullName: z.string().min(1, t("fullNameRequired")).max(200),
+    firstName: z
+      .string()
+      .min(1, t("firstNameRequired", "First name is required"))
+      .max(100),
+    middleName: z.string().max(100).optional().or(z.literal("")),
+    lastName: z
+      .string()
+      .min(1, t("lastNameRequired", "Last name is required"))
+      .max(100),
     email: z.string().email().optional().or(z.literal("")),
+    mobile: z.string().optional().or(z.literal("")),
     password: z.string().min(6, t("passwordMin")).optional().or(z.literal("")),
-    roleId: z.coerce.number().min(1, t("roleRequired")),
-    branchId: z.string().min(1, t("branchRequired")),
-    status: z.coerce.number().default(1),
+    roleId: z.string().min(1, t("roleRequired")),
+    genderLookupId: z.string().optional().or(z.literal("")),
+    birthDate: z.string().optional().or(z.literal("")),
+    isActive: z.boolean().default(true),
+    twoFactorEnabled: z.boolean().default(false),
   });
 
   type UserFormValues = z.infer<typeof userSchema>;
 
   const [roles, setRoles] = useState<RoleDto[]>([]);
-  const { data: branches = [] } = useBranches();
+  const { getLookupDetails } = useLookup();
+  const genders = getLookupDetails("GENDER") || [];
 
   const {
     register,
@@ -47,7 +59,8 @@ export default function UserForm({
   } = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      status: 1,
+      isActive: true,
+      twoFactorEnabled: false,
     },
   });
 
@@ -64,11 +77,16 @@ export default function UserForm({
     if (initialData) {
       reset({
         username: initialData.username || "",
-        fullName: initialData.fullName || "",
+        firstName: initialData.firstName || "",
+        middleName: initialData.middleName || "",
+        lastName: initialData.lastName || "",
         email: initialData.email || "",
-        roleId: initialData.roleId,
-        branchId: initialData.branchId || "",
-        status: initialData.status ?? 1,
+        mobile: initialData.mobile || "",
+        roleId: initialData.roleId?.toString() || "",
+        genderLookupId: initialData.genderLookupId || "",
+        birthDate: initialData.birthDate?.split("T")[0] || "",
+        isActive: initialData.isActive ?? initialData.status === 1,
+        twoFactorEnabled: false,
         password: "", // Don't populate password
       });
     }
@@ -85,10 +103,24 @@ export default function UserForm({
           disabled={isLoading || !!initialData}
         />
         <Input
-          {...register("fullName")}
-          label={t("fullName") + "*"}
-          placeholder="e.g. John Doe"
-          error={errors.fullName?.message}
+          {...register("firstName")}
+          label={t("firstName", "First Name") + "*"}
+          placeholder="e.g. John"
+          error={errors.firstName?.message}
+          disabled={isLoading}
+        />
+        <Input
+          {...register("middleName")}
+          label={t("middleName", "Middle Name")}
+          placeholder="e.g. D."
+          error={errors.middleName?.message}
+          disabled={isLoading}
+        />
+        <Input
+          {...register("lastName")}
+          label={t("lastName", "Last Name") + "*"}
+          placeholder="e.g. Doe"
+          error={errors.lastName?.message}
           disabled={isLoading}
         />
         <Input
@@ -97,6 +129,13 @@ export default function UserForm({
           type="email"
           placeholder="e.g. john@example.com"
           error={errors.email?.message}
+          disabled={isLoading}
+        />
+        <Input
+          {...register("mobile")}
+          label={t("mobile", "Mobile")}
+          placeholder="e.g. +1234567890"
+          error={errors.mobile?.message}
           disabled={isLoading}
         />
         <Input
@@ -111,33 +150,59 @@ export default function UserForm({
           {...register("roleId")}
           label={t("role") + "*"}
           options={roles.map((r) => ({
-            value: String(r.status || 0),
+            value: r.oid,
             label: r.roleName ?? "",
           }))}
           error={errors.roleId?.message}
           disabled={isLoading}
         />
         <Select
-          {...register("branchId")}
-          label={t("branch") + "*"}
-          options={branches.map((b) => ({
-            value: b.oid,
-            label: b.branchName ?? "",
-          }))}
-          error={errors.branchId?.message}
+          {...register("genderLookupId")}
+          label={t("gender", "Gender")}
+          options={[
+            { value: "", label: t("selectGender", "Select Gender") },
+            ...genders.map((g) => ({
+              value: g.oid,
+              label: g.valueNameEn || "",
+            })),
+          ]}
+          error={errors.genderLookupId?.message}
+          disabled={isLoading}
+        />
+        <Input
+          {...register("birthDate")}
+          label={t("birthDate", "Birth Date")}
+          type="date"
+          error={errors.birthDate?.message}
           disabled={isLoading}
         />
       </div>
 
-      <Select
-        {...register("status")}
-        label={tc("status")}
-        options={[
-          { value: 1, label: tc("active") },
-          { value: 0, label: tc("inactive") },
-        ]}
-        disabled={isLoading}
-      />
+      <div className="flex gap-6 items-center pt-2">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            {...register("isActive")}
+            disabled={isLoading}
+            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm font-medium text-gray-700">
+            {tc("active")}
+          </span>
+        </label>
+
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            {...register("twoFactorEnabled")}
+            disabled={isLoading}
+            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm font-medium text-gray-700">
+            {t("twoFactorAuth", "Two-Factor Auth")}
+          </span>
+        </label>
+      </div>
 
       <div className="flex justify-end pt-4">
         <Button

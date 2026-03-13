@@ -25,7 +25,12 @@ import { productService } from "@/api/productService";
 import { lookupService } from "@/api/lookupService";
 import { useQueryTable } from "@/hooks/useQuery";
 import { handleApiError } from "@/utils/handleApiError";
-import { ProductDto, AppLookupDetailDto, FilterOperation } from "@/types";
+import {
+  ProductDto,
+  CreateProductDto,
+  AppLookupDetailDto,
+  FilterOperation,
+} from "@/types";
 
 export default function ProductsPage() {
   const { t, i18n } = useTranslation("products");
@@ -89,7 +94,7 @@ export default function ProductsPage() {
   //   loadData();
   // }, [loadData, pageNumber]);
 
-  const handleCreateOrUpdate = async (formData: any) => {
+  const handleCreateOrUpdate = async (formData: CreateProductDto) => {
     setIsActionLoading(true);
     try {
       if (selectedProduct) {

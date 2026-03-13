@@ -137,7 +137,7 @@ export interface SystemUserDto {
   middleName?: string;
   lastName: string;
   fullName?: string;
-  roleId: number;
+  roleId: string | number;
   roleName?: string;
   branchId?: string;
   branchName?: string;
@@ -145,6 +145,8 @@ export interface SystemUserDto {
   genderName?: string | null;
   status: number;
   isActive?: boolean;
+  birthDate?: string | null;
+  twoFactorEnabled?: boolean;
   lastLogin?: string | null;
   failedLoginCount?: number;
   lockoutEnd?: string | null;
@@ -315,6 +317,7 @@ export interface CreateProductDto {
   dosageFormId?: string;
   productGroupId?: string;
   status?: number;
+  domainId?: string;
 }
 
 export interface UpdateProductDto extends CreateProductDto {
