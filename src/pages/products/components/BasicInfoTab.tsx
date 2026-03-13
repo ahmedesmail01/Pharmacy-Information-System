@@ -10,6 +10,7 @@ import Select from "@/components/ui/Select";
 import { AppLookupDetailDto } from "@/types";
 import { ProductFormValues } from "../schema";
 import { positiveNumberInputProps } from "@/utils/positiveNumberInputProps";
+import { getUniqueOptions } from "@/utils/lookupUtils";
 
 interface BasicInfoTabProps {
   register: UseFormRegister<ProductFormValues>;
@@ -69,10 +70,7 @@ export default function BasicInfoTab({
           <Select
             {...field}
             label={t("productType")}
-            options={productTypes.map((pt) => ({
-              value: String(pt.oid),
-              label: pt.valueNameEn || pt.valueNameAr || "",
-            }))}
+            options={getUniqueOptions(productTypes)}
             disabled={isLoading}
           />
         )}

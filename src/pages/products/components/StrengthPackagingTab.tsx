@@ -5,6 +5,7 @@ import Select from "@/components/ui/Select";
 import { ProductFormValues } from "../schema";
 import { positiveNumberInputProps } from "@/utils/positiveNumberInputProps";
 import { AppLookupDetailDto } from "@/types";
+import { getUniqueOptions } from "@/utils/lookupUtils";
 
 interface StrengthPackagingTabProps {
   register: UseFormRegister<ProductFormValues>;
@@ -46,10 +47,10 @@ export default function StrengthPackagingTab({
           <Select
             {...field}
             label={t("packageType")}
-            options={packageTypeLookups.map((p) => ({
-              value: p.valueNameEn || p.valueNameAr || "",
-              label: p.valueNameEn || p.valueNameAr || "",
-            }))}
+            options={getUniqueOptions(
+              packageTypeLookups,
+              (p) => p.valueNameEn || p.valueNameAr || "",
+            )}
             disabled={isLoading}
           />
         )}

@@ -40,7 +40,7 @@ export default function ProductForm({
   >("basic");
 
   const productTypes = getLookupDetails("PRODUCT_TYPE");
-  const vatTypes = getLookupDetails("VAT_TYPE");
+  const vatTypes = getLookupDetails("Vat_Type");
   const packageTypeLookups = getLookupDetails("PACKAGE_TYPE");
   const dosageForms = getLookupDetails("Dosage_Form");
 

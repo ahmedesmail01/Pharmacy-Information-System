@@ -5,6 +5,7 @@ import Select, { SelectOption } from "@/components/ui/Select";
 import { AppLookupDetailDto } from "@/types";
 import { ProductFormValues } from "../schema";
 import { positiveNumberInputProps } from "@/utils/positiveNumberInputProps";
+import { getUniqueOptions } from "@/utils/lookupUtils";
 
 interface RegulatoryTabProps {
   register: UseFormRegister<ProductFormValues>;
@@ -59,10 +60,7 @@ export default function RegulatoryTab({
           <Input
             {...field}
             label={t("vatType")}
-            // options={vatTypes.map((v) => ({
-            //   value: String(v.oid),
-            //   label: v.valueNameEn || v.valueNameAr || "",
-            // }))}
+            // options={getUniqueOptions(vatTypes)}
             disabled={isLoading}
           />
         )}
@@ -73,15 +71,13 @@ export default function RegulatoryTab({
         render={({ field }) => (
           <Select
             {...field}
-            label="Package Type (Lookup)"
-            options={packageTypeLookups.map((p) => ({
-              value: String(p.oid),
-              label: p.valueNameEn || p.valueNameAr || "",
-            }))}
+            label={t("packageType")}
+            options={getUniqueOptions(packageTypeLookups)}
             disabled={isLoading}
           />
         )}
       /> */}
+
       <Controller
         name="dosageFormId"
         control={control}
@@ -89,14 +85,12 @@ export default function RegulatoryTab({
           <Select
             {...field}
             label={t("dosageForm")}
-            options={dosageForms.map((d) => ({
-              value: String(d.oid),
-              label: d.valueNameEn || d.valueNameAr || "",
-            }))}
+            options={getUniqueOptions(dosageForms)}
             disabled={isLoading}
           />
         )}
       />
+
       <Input
         {...register("productGroupId")}
         label={t("productGroup")}
