@@ -1,4 +1,4 @@
-import { UseFormRegister } from "react-hook-form";
+import { UseFormRegister, Control, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import Input from "@/components/ui/Input";
 import Select, { SelectOption } from "@/components/ui/Select";
@@ -13,6 +13,7 @@ interface RegulatoryTabProps {
   packageTypeLookups: AppLookupDetailDto[];
   dosageForms: AppLookupDetailDto[];
   vatTypes: AppLookupDetailDto[];
+  control: Control<ProductFormValues>;
 }
 
 export default function RegulatoryTab({
@@ -22,6 +23,7 @@ export default function RegulatoryTab({
   packageTypeLookups,
   dosageForms,
   vatTypes,
+  control,
 }: RegulatoryTabProps) {
   const { t } = useTranslation("products");
 
@@ -38,34 +40,52 @@ export default function RegulatoryTab({
         label={t("manufacturer")}
         disabled={isLoading}
       />
-      <Select
-        {...register("countryOfOrigin")}
-        label={t("countryOfOrigin")}
-        options={countryOptions}
-        disabled={isLoading}
+      <Controller
+        name="countryOfOrigin"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            label={t("countryOfOrigin")}
+            options={countryOptions}
+            disabled={isLoading}
+          />
+        )}
       />
       <Input
         {...register("vatTypeId")}
         label={t("vatType")}
         disabled={isLoading}
       />
-      {/* <Select
-        {...register("packageTypeId")}
-        label="Package Type (Lookup)"
-        options={packageTypeLookups.map((p) => ({
-          value: String(p.oid),
-          label: p.valueNameEn || p.valueNameAr || "",
-        }))}
-        disabled={isLoading}
-      /> */}
-      <Select
-        {...register("dosageFormId")}
-        label={t("dosageForm")}
-        options={dosageForms.map((d) => ({
-          value: String(d.oid),
-          label: d.valueNameEn || d.valueNameAr || "",
-        }))}
-        disabled={isLoading}
+      <Controller
+        name="packageTypeId"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            label="Package Type (Lookup)"
+            options={packageTypeLookups.map((p) => ({
+              value: String(p.oid),
+              label: p.valueNameEn || p.valueNameAr || "",
+            }))}
+            disabled={isLoading}
+          />
+        )}
+      />
+      <Controller
+        name="dosageFormId"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            label={t("dosageForm")}
+            options={dosageForms.map((d) => ({
+              value: String(d.oid),
+              label: d.valueNameEn || d.valueNameAr || "",
+            }))}
+            disabled={isLoading}
+          />
+        )}
       />
       <Input
         {...register("productGroupId")}

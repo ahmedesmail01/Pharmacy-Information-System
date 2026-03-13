@@ -49,6 +49,7 @@ export default function ProductForm({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(getProductSchema(t)),
@@ -168,6 +169,7 @@ export default function ProductForm({
             errors={errors}
             isLoading={isLoading}
             productTypes={productTypes}
+            control={control}
           />
         )}
 
@@ -176,6 +178,7 @@ export default function ProductForm({
             register={register}
             isLoading={isLoading}
             packageTypeLookups={packageTypeLookups}
+            control={control}
           />
         )}
 
@@ -187,6 +190,7 @@ export default function ProductForm({
             packageTypeLookups={packageTypeLookups}
             dosageForms={dosageForms}
             vatTypes={vatTypes}
+            control={control}
           />
         )}
 

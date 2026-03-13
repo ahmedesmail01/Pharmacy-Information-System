@@ -1,4 +1,4 @@
-import { UseFormRegister } from "react-hook-form";
+import { UseFormRegister, Control, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
@@ -10,12 +10,14 @@ interface StrengthPackagingTabProps {
   register: UseFormRegister<ProductFormValues>;
   isLoading?: boolean;
   packageTypeLookups: AppLookupDetailDto[];
+  control: Control<ProductFormValues>;
 }
 
 export default function StrengthPackagingTab({
   register,
   isLoading,
   packageTypeLookups,
+  control,
 }: StrengthPackagingTabProps) {
   const { t } = useTranslation("products");
 
@@ -37,14 +39,20 @@ export default function StrengthPackagingTab({
           disabled={isLoading}
         />
       </div>
-      <Select
-        {...register("packageType")}
-        label={t("packageType")}
-        options={packageTypeLookups.map((p) => ({
-          value: p.valueNameEn || p.valueNameAr || "",
-          label: p.valueNameEn || p.valueNameAr || "",
-        }))}
-        disabled={isLoading}
+      <Controller
+        name="packageType"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            label={t("packageType")}
+            options={packageTypeLookups.map((p) => ({
+              value: p.valueNameEn || p.valueNameAr || "",
+              label: p.valueNameEn || p.valueNameAr || "",
+            }))}
+            disabled={isLoading}
+          />
+        )}
       />
       <Input
         {...register("packageSize")}

@@ -1,4 +1,9 @@
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import {
+  UseFormRegister,
+  FieldErrors,
+  Control,
+  Controller,
+} from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
@@ -11,6 +16,7 @@ interface BasicInfoTabProps {
   errors: FieldErrors<ProductFormValues>;
   isLoading?: boolean;
   productTypes: AppLookupDetailDto[];
+  control: Control<ProductFormValues>;
 }
 
 export default function BasicInfoTab({
@@ -18,6 +24,7 @@ export default function BasicInfoTab({
   errors,
   isLoading,
   productTypes,
+  control,
 }: BasicInfoTabProps) {
   const { t } = useTranslation("products");
   const tc = useTranslation("common").t;
@@ -55,14 +62,20 @@ export default function BasicInfoTab({
         placeholder="اسم الدواء بالعربية"
         disabled={isLoading}
       />
-      <Select
-        {...register("productTypeId")}
-        label={t("productType")}
-        options={productTypes.map((pt) => ({
-          value: String(pt.oid),
-          label: pt.valueNameEn || pt.valueNameAr || "",
-        }))}
-        disabled={isLoading}
+      <Controller
+        name="productTypeId"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            label={t("productType")}
+            options={productTypes.map((pt) => ({
+              value: String(pt.oid),
+              label: pt.valueNameEn || pt.valueNameAr || "",
+            }))}
+            disabled={isLoading}
+          />
+        )}
       />
       <Input
         {...register("price")}
@@ -72,14 +85,20 @@ export default function BasicInfoTab({
         step="0.01"
         disabled={isLoading}
       />
-      <Select
-        {...register("status")}
-        label={tc("status")}
-        options={[
-          { value: "1", label: tc("active") },
-          { value: "0", label: tc("inactive") },
-        ]}
-        disabled={isLoading}
+      <Controller
+        name="status"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            label={tc("status")}
+            options={[
+              { value: "1", label: tc("active") },
+              { value: "0", label: tc("inactive") },
+            ]}
+            disabled={isLoading}
+          />
+        )}
       />
     </div>
   );
