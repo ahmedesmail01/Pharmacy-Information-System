@@ -41,5 +41,19 @@
   "regulatory": "التنظيمية",
   "stockLevels": "مستويات المخزون",
   "createProduct": "إنشاء منتج",
-  "updateProduct": "تحديث المنتج"
+  "updateProduct": "تحديث المنتج",
+  "productUnits": "وحدات المنتج",
+  "manageUnitsDescription": "تعريف وحدات التعبئة المختلفة ومعاملات التحويل الخاصة بها",
+  "addUnit": "إضافة وحدة",
+  "editUnit": "تعديل الوحدة",
+  "unitSavedSuccessfully": "تم حفظ وحدة المنتج بنجاح",
+  "unitDeletedSuccessfully": "تم حذف وحدة المنتج بنجاح",
+  "packageTypeRequired": "نوع العبوة مطلوب",
+  "minConversionFactorOne": "يجب أن يكون معامل التحويل 1 على الأقل",
+  "minPriceZero": "لا يمكن أن يكون السعر سالباً",
+  "deleteUnit": "حذف الوحدة",
+  "deleteUnitConfirm": "هل أنت متأكد أنك تريد حذف وحدة المنتج هذه؟",
+  "noUnitsFound": "لم يتم تعريف وحدات بعد",
+  "addYourFirstUnit": "اضغط على 'إضافة وحدة' لتعريف وحدة تعبئة لهذا المنتج",
+  "conversionFactor": "معامل التحويل"
 }

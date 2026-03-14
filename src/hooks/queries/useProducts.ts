@@ -1,7 +1,19 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { productService } from "@/api/productService";
-import { FilterOperation } from "@/types";
+import {
+  CreateProductUnitDto,
+  FilterOperation,
+  UpdateProductUnitDto,
+} from "@/types";
 import { queryKeys } from "./queryKeys";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { handleApiError } from "@/utils/handleApiError";
 
 const PAGE_SIZE = 20;
 
@@ -132,5 +144,69 @@ export function useProduct(id: string | undefined) {
     queryFn: () => productService.getById(id!).then((res) => res.data.data!),
     enabled: !!id,
     staleTime: 1000 * 60 * 10, // 10 min
+  });
+}
+
+/**
+ * Fetch product units for a specific product.
+ */
+export function useProductUnits(productId: string | undefined) {
+  return useQuery({
+    queryKey: productId ? queryKeys.products.units(productId) : [],
+    queryFn: () =>
+      productService
+        .getProductUnitsByProductId(productId!)
+        .then((res) => res.data.data ?? []),
+    enabled: !!productId,
+  });
+}
+
+/**
+ * Hook for creating or updating a product unit.
+ */
+export function useUpsertProductUnit(productId: string) {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation("products");
+
+  return useMutation({
+    mutationFn: async (data: CreateProductUnitDto | UpdateProductUnitDto) => {
+      if ("oid" in data && data.oid) {
+        return productService.updateProductUnit(
+          data.oid,
+          data as UpdateProductUnitDto,
+        );
+      }
+      return productService.createProductUnit(data as CreateProductUnitDto);
+    },
+    onSuccess: () => {
+      toast.success(t("unitSavedSuccessfully"));
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.products.units(productId),
+      });
+    },
+    onError: (err) => {
+      handleApiError(err);
+    },
+  });
+}
+
+/**
+ * Hook for deleting a product unit.
+ */
+export function useDeleteProductUnit(productId: string) {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation("products");
+
+  return useMutation({
+    mutationFn: (id: string) => productService.deleteProductUnit(id),
+    onSuccess: () => {
+      toast.success(t("unitDeletedSuccessfully"));
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.products.units(productId),
+      });
+    },
+    onError: (err) => {
+      handleApiError(err);
+    },
   });
 }

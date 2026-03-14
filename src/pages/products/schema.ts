@@ -33,4 +33,17 @@ export const getProductSchema = (t: TFunction) =>
     status: z.coerce.number().default(1),
   });
 
+export const getProductUnitSchema = (t: TFunction) =>
+  z.object({
+    oid: z.string().optional(),
+    productId: z.string().min(1),
+    packageTypeId: z.string().min(1, t("packageTypeRequired")),
+    conversionFactor: z.coerce.number().min(1, t("minConversionFactorOne")),
+    price: z.coerce.number().min(0, t("minPriceZero")),
+    barcode: z.string().optional().nullable(),
+  });
+
 export type ProductFormValues = z.infer<ReturnType<typeof getProductSchema>>;
+export type ProductUnitFormValues = z.infer<
+  ReturnType<typeof getProductUnitSchema>
+>;

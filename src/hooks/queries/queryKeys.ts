@@ -18,6 +18,8 @@ export const queryKeys = {
       ["products", "paginated", page, search, dosageFormId] as const,
     /** Single product detail */
     detail: (id: string) => ["products", "detail", id] as const,
+    /** Product units for a specific product */
+    units: (productId: string) => ["products", "units", productId] as const,
   },
 
   branches: {

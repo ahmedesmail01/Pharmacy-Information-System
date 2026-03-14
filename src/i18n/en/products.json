@@ -41,5 +41,19 @@
   "regulatory": "Regulatory",
   "stockLevels": "Stock Levels",
   "createProduct": "Create Product",
-  "updateProduct": "Update Product"
+  "updateProduct": "Update Product",
+  "productUnits": "Product Units",
+  "manageUnitsDescription": "Define different packaging units and their conversion factors",
+  "addUnit": "Add Unit",
+  "editUnit": "Edit Unit",
+  "unitSavedSuccessfully": "Product unit saved successfully",
+  "unitDeletedSuccessfully": "Product unit deleted successfully",
+  "packageTypeRequired": "Package type is required",
+  "minConversionFactorOne": "Conversion factor must be at least 1",
+  "minPriceZero": "Price cannot be negative",
+  "deleteUnit": "Delete Unit",
+  "deleteUnitConfirm": "Are you sure you want to delete this product unit?",
+  "noUnitsFound": "No units defined",
+  "addYourFirstUnit": "Click 'Add Unit' to define a packaging unit for this product",
+  "conversionFactor": "Conversion Factor"
 }

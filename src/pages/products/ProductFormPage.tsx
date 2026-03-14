@@ -4,13 +4,17 @@ import toast from "react-hot-toast";
 import PageHeader from "@/components/shared/PageHeader";
 import ProductForm from "./ProductForm";
 import { productService } from "@/api/productService";
-import { useProduct } from "@/hooks/queries/useProducts";
+import { useProduct, useProductUnits } from "@/hooks/queries/useProducts";
 import { queryKeys } from "@/hooks/queries/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { handleApiError } from "@/utils/handleApiError";
-import { CreateProductDto } from "@/types";
+import { CreateProductDto, ProductUnitDto } from "@/types";
 import Spinner from "@/components/ui/Spinner";
 import { useState } from "react";
+import ProductUnitTable from "./components/ProductUnitTable";
+import ProductUnitForm from "./components/ProductUnitForm";
+import { Layers, Plus } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 export default function ProductFormPage() {
   const { id } = useParams();
@@ -20,7 +24,14 @@ export default function ProductFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch product if ID is provided
-  const { data: initialData, isLoading } = useProduct(id);
+  const { data: initialData, isLoading: isProductLoading } = useProduct(id);
+
+  // Fetch product units
+  const { data: units = [], isLoading: isUnitsLoading } = useProductUnits(id);
+
+  // Management state for units
+  const [isAddingUnit, setIsAddingUnit] = useState(false);
+  const [editingUnit, setEditingUnit] = useState<ProductUnitDto | null>(null);
 
   const handleSubmit = async (formData: CreateProductDto) => {
     // Ensure nulls for linkage fields
@@ -55,7 +66,7 @@ export default function ProductFormPage() {
     }
   };
 
-  if (id && isLoading) {
+  if (id && isProductLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
         <Spinner size="lg" />
@@ -77,6 +88,58 @@ export default function ProductFormPage() {
           isLoading={isSubmitting}
         />
       </div>
+
+      {id && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
+          <div className="p-6 border-b border-gray-50 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <Layers className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {t("productUnits")}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  {t("manageUnitsDescription")}
+                </p>
+              </div>
+            </div>
+
+            {!isAddingUnit && !editingUnit && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsAddingUnit(true)}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                {t("addUnit")}
+              </Button>
+            )}
+          </div>
+
+          <div className="p-6 space-y-6">
+            {(isAddingUnit || editingUnit) && (
+              <ProductUnitForm
+                productId={id}
+                initialData={editingUnit}
+                onCancel={() => {
+                  setIsAddingUnit(false);
+                  setEditingUnit(null);
+                }}
+              />
+            )}
+
+            <ProductUnitTable
+              productId={id}
+              units={units}
+              isLoading={isUnitsLoading}
+              onEdit={setEditingUnit}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
