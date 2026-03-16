@@ -811,3 +811,78 @@ export interface RsdOperationLogItemDto {
 export interface RsdOperationLogDetailDto extends RsdOperationLogDto {
   details: RsdOperationLogItemDto[];
 }
+
+// ─── Return Invoice ────────────────────────────────────────────────────────
+
+export interface ReturnInvoiceItemDto {
+  oid: string;
+  returnInvoiceId: string;
+  originalInvoiceItemId: string;
+  productId: string;
+  productName: string | null;
+  productGTIN: string | null;
+  quantity: number;
+  unitPrice: number;
+  discountPercent: number;
+  discountAmount: number;
+  totalPrice: number;
+  batchNumber: string | null;
+  expiryDate: string | null;
+  notes: string | null;
+}
+
+export interface ReturnInvoiceDto {
+  oid: string;
+  returnNumber: string | null;
+  originalInvoiceId: string;
+  originalInvoiceNumber: string | null;
+  branchId: string;
+  branchName: string | null;
+  customerName: string | null;
+  customerPhone: string | null;
+  subTotal: number;
+  discountPercent: number;
+  discountAmount: number;
+  taxAmount: number;
+  totalAmount: number;
+  refundAmount: number;
+  returnDate: string;
+  paymentMethodId: string;
+  paymentMethodName: string | null;
+  invoiceStatusId: string;
+  invoiceStatusName: string | null;
+  cashierId: string;
+  cashierName: string | null;
+  returnReasonId: string;
+  returnReasonName: string | null;
+  notes: string | null;
+  status: number;
+  createdAt: string;
+  items: ReturnInvoiceItemDto[];
+  itemCount: number;
+}
+
+export interface CreateReturnInvoiceItemDto {
+  originalInvoiceItemId: string;
+  productId: string;
+  quantity: number;
+  unitPrice: number;
+  discountPercent: number;
+  batchNumber: string | null;
+  expiryDate: string | null;
+  notes: string | null;
+}
+
+export interface CreateReturnInvoiceDto {
+  originalInvoiceId: string;
+  branchId: string;
+  customerName: string | null;
+  customerPhone: string | null;
+  discountPercent: number;
+  returnDate: string;
+  paymentMethodId: string;
+  cashierId: string;
+  returnReasonId: string;
+  notes: string | null;
+  items: CreateReturnInvoiceItemDto[];
+}
