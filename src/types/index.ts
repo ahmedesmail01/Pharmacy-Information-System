@@ -882,7 +882,80 @@ export interface CreateReturnInvoiceDto {
   returnDate: string;
   paymentMethodId: string;
   cashierId: string;
-  returnReasonId: string;
   notes: string | null;
   items: CreateReturnInvoiceItemDto[];
+}
+
+// ─── Stock Transaction Return ──────────────────────────────────────────────────
+
+export interface StockTransactionReturnDetailDto {
+  oid: string;
+  stockTransactionReturnId: string;
+  productId: string;
+  productName: string | null;
+  productGTIN: string | null;
+  quantity: number;
+  gtin: string | null;
+  batchNumber: string | null;
+  expiryDate: string | null;
+  serialNumber: string | null;
+  unitCost: number;
+  totalCost: number;
+  lineNumber: number;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface StockTransactionReturnDto {
+  oid: string;
+  transactionTypeId: string;
+  transactionTypeName: string | null;
+  fromBranchId: string;
+  fromBranchName: string | null;
+  toBranchId: string;
+  toBranchName: string | null;
+  referenceNumber: string | null;
+  notificationId: string | null;
+  transactionDate: string;
+  totalValue: number;
+  supplierId: string | null;
+  supplierName: string | null;
+  notes: string | null;
+  returnInvoiceId: string | null;
+  returnInvoiceNumber: string | null;
+  originalTransactionId: string | null;
+  status: string;
+  approvedBy: string | null;
+  approvedDate: string | null;
+  createdAt: string;
+  createdBy: string;
+  details: StockTransactionReturnDetailDto[];
+}
+
+export interface CreateStockTransactionReturnDetailDto {
+  productId: string;
+  quantity: number;
+  gtin: string | null;
+  batchNumber: string | null;
+  expiryDate: string | null;
+  serialNumber: string | null;
+  unitCost: number;
+  totalCost: number;
+  lineNumber: number;
+  notes: string | null;
+}
+
+export interface CreateStockTransactionReturnDto {
+  transactionTypeId: string;
+  fromBranchId: string;
+  toBranchId: string;
+  referenceNumber: string | null;
+  notificationId: string | null;
+  transactionDate: string;
+  supplierId: string | null;
+  notes: string | null;
+  returnInvoiceId: string | null;
+  originalTransactionId: string | null;
+  status: string;
+  details: CreateStockTransactionReturnDetailDto[];
 }
