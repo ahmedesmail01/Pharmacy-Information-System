@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Printer } from "lucide-react";
 import toast from "react-hot-toast";
+import { useReactToPrint } from "react-to-print";
 
 import Button from "@/components/ui/Button";
 import { useLookup } from "@/context/LookupContext";
@@ -14,6 +15,7 @@ import {
   BranchDto,
   StakeholderDto,
   ProductDto,
+  StockTransactionReturnDto,
   FilterOperation,
 } from "@/types";
 import { usePaginatedBranches, usePaginatedSuppliers } from "@/hooks/queries";
@@ -21,6 +23,7 @@ import { usePaginatedBranches, usePaginatedSuppliers } from "@/hooks/queries";
 import TransactionHeader from "./components/TransactionHeader";
 import TransactionGeneralInfo from "./components/TransactionGeneralInfo";
 import TransactionItemsTable from "./components/TransactionItemsTable";
+import PrintableStockReturn from "./components/PrintableStockReturn";
 import PageHeader from "@/components/shared/PageHeader";
 
 export default function StockTransactionReturnDetailPage() {
@@ -29,7 +32,15 @@ export default function StockTransactionReturnDetailPage() {
   const { t, i18n } = useTranslation("stock");
   const { getLookupDetails } = useLookup();
   const [products, setProducts] = useState<ProductDto[]>([]);
+  const [returnData, setReturnData] =
+    useState<StockTransactionReturnDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const printComponentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: printComponentRef,
+    documentTitle: `StockReturn_${returnData?.referenceNumber || id}`,
+  });
 
   const transactionTypes = getLookupDetails("TRANSACTION_TYPE");
 
@@ -83,6 +94,7 @@ export default function StockTransactionReturnDetailPage() {
           const tRes = await stockTransactionReturnService.getById(id);
           if (tRes.data.success && tRes.data.data) {
             const tData = tRes.data.data;
+            setReturnData(tData);
 
             const initialDetails = tData.details.map((d) => ({
               productId: d.productId,
@@ -165,11 +177,19 @@ export default function StockTransactionReturnDetailPage() {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/stock")}
-              className=""
             >
               <ArrowLeft size={20} />
             </Button>
             <TransactionHeader typeCode={typeCode || ""} className="w-full" />
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handlePrint()}
+              className="gap-2 ms-auto"
+            >
+              <Printer size={18} />
+              {t("print", "Print")}
+            </Button>
           </div>
 
           <form className="space-y-6">
@@ -202,6 +222,11 @@ export default function StockTransactionReturnDetailPage() {
           </form>
         </div>
       </FormProvider>
+
+      {/* Hidden printable stock return receipt */}
+      {returnData && (
+        <PrintableStockReturn ref={printComponentRef} returnData={returnData} />
+      )}
     </div>
   );
 }

@@ -1,0 +1,169 @@
+import { forwardRef } from "react";
+import { format } from "date-fns";
+import { StockTransactionReturnDto } from "@/types";
+
+interface PrintableStockReturnProps {
+  returnData: StockTransactionReturnDto;
+}
+
+const PrintableStockReturn = forwardRef<
+  HTMLDivElement,
+  PrintableStockReturnProps
+>(({ returnData }, ref) => {
+  const headerInfo = [
+    {
+      labelEn: "From Branch",
+      labelAr: "من فرع",
+      value: returnData.fromBranchName || "---",
+    },
+    {
+      labelEn: "To Branch",
+      labelAr: "إلى فرع",
+      value: returnData.toBranchName || "---",
+    },
+    {
+      labelEn: "Date",
+      labelAr: "التاريخ",
+      value: returnData.transactionDate
+        ? format(new Date(returnData.transactionDate), "yyyy/MM/dd h:mm:ss a")
+        : "---",
+    },
+    {
+      labelEn: "Supplier",
+      labelAr: "المورد",
+      value: returnData.supplierName || "---",
+    },
+    {
+      labelEn: "Type",
+      labelAr: "النوع",
+      value: returnData.transactionTypeName || "---",
+    },
+    {
+      labelEn: "Status",
+      labelAr: "الحالة",
+      value: returnData.status || "---",
+    },
+  ];
+
+  return (
+    <div
+      ref={ref}
+      className="hidden print:block bg-white text-black p-4 space-y-4 text-xs font-sans w-full"
+      style={{ direction: "ltr" }}
+    >
+      {/* Info Grid */}
+      <div className="grid grid-cols-2 gap-x-8 gap-y-1 mt-4">
+        {headerInfo.map((info, idx) => (
+          <div
+            key={idx}
+            className="flex justify-between items-center border-b border-gray-100 py-0.5"
+          >
+            <div className="flex gap-2">
+              <span className="font-bold w-20">{info.labelEn}</span>
+              <span className="font-medium">{info.value}</span>
+            </div>
+            <span
+              className="font-bold text-right w-16"
+              style={{ direction: "rtl" }}
+            >
+              {info.labelAr}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Title */}
+      <div className="text-center border-y-2 border-black py-1 mt-4">
+        <h1 className="text-xs font-bold uppercase">
+          Stock Return - مرتجع مخزون
+        </h1>
+      </div>
+
+      {/* Order Info */}
+      <div className="text-center space-y-1 py-2">
+        <div className="font-bold">
+          {returnData.referenceNumber || returnData.oid}
+        </div>
+        {returnData.notes && (
+          <div className="text-[10px] text-gray-600">{returnData.notes}</div>
+        )}
+      </div>
+
+      {/* Table Headers */}
+      <div className="grid grid-cols-12 border-b-2 border-black py-1 font-bold text-center mt-4">
+        <div className="col-span-1 flex flex-col items-center">
+          <span style={{ direction: "rtl" }}>#</span>
+        </div>
+        <div className="col-span-2 flex flex-col items-center">
+          <span style={{ direction: "rtl" }}>عدد</span>
+          <span>Qty</span>
+        </div>
+        <div className="col-span-5 flex flex-col items-center">
+          <span style={{ direction: "rtl" }}>المنتجات</span>
+          <span>Products</span>
+        </div>
+        <div className="col-span-2 flex flex-col items-center">
+          <span style={{ direction: "rtl" }}>سعر</span>
+          <span>Price</span>
+        </div>
+        <div className="col-span-2 flex flex-col items-center">
+          <span style={{ direction: "rtl" }}>اجمالي</span>
+          <span>Total</span>
+        </div>
+      </div>
+
+      {/* Table Body */}
+      <div className="divide-y border-b border-black">
+        {returnData.details?.map((item, idx) => (
+          <div
+            key={idx}
+            className="grid grid-cols-12 py-1 text-center items-center"
+          >
+            <div className="col-span-1">{item.lineNumber}</div>
+            <div className="col-span-2">{item.quantity}</div>
+            <div className="col-span-5 text-left px-2">
+              <div className="font-medium">{item.productName}</div>
+              {item.batchNumber && (
+                <div className="text-[9px] text-gray-500">
+                  Batch: {item.batchNumber}
+                </div>
+              )}
+            </div>
+            <div className="col-span-2">{item.unitCost?.toFixed(2)}</div>
+            <div className="col-span-2">{item.totalCost?.toFixed(2)}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Totals Section */}
+      <div className="space-y-1 mt-4">
+        <div className="flex justify-between items-center py-2">
+          <div className="flex gap-4 text-sm">
+            <span className="font-black w-32">Total Value</span>
+            <span className="font-black underline decoration-double">
+              {returnData.totalValue?.toFixed(2)}
+            </span>
+          </div>
+          <span
+            className="font-black text-sm text-right"
+            style={{ direction: "rtl" }}
+          >
+            إجمالي القيمة
+          </span>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div
+        className="text-center pt-4 border-t-2 border-black font-bold text-[10px]"
+        style={{ direction: "rtl" }}
+      >
+        مرتجع مخزون - Stock Return Document
+      </div>
+    </div>
+  );
+});
+
+PrintableStockReturn.displayName = "PrintableStockReturn";
+
+export default PrintableStockReturn;
