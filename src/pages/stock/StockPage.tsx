@@ -6,13 +6,14 @@ import Button from "@/components/ui/Button";
 import PageHeader from "@/components/shared/PageHeader";
 import StockLevels from "./StockLevels";
 import StockTransactions from "./StockTransactions";
+import StockTransactionReturns from "./StockTransactionReturns";
 import StockTabs from "./components/StockTabs";
 import NewTransactionForm from "./components/NewTransactionForm";
 
 export default function StockPage() {
   const { t } = useTranslation("stock");
   const [activeTab, setActiveTab] = useState<
-    "levels" | "transactions" | "new_transaction"
+    "levels" | "transactions" | "new_transaction" | "transaction_returns"
   >("new_transaction");
 
   return (
@@ -35,6 +36,7 @@ export default function StockPage() {
         {activeTab === "levels" && <StockLevels />}
         {activeTab === "transactions" && <StockTransactions />}
         {activeTab === "new_transaction" && <NewTransactionForm />}
+        {activeTab === "transaction_returns" && <StockTransactionReturns />}
       </div>
     </div>
   );

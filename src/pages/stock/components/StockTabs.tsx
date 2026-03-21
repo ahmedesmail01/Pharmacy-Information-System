@@ -2,8 +2,14 @@ import { Package, History, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface StockTabsProps {
-  activeTab: "levels" | "transactions" | "new_transaction";
-  setActiveTab: (tab: "levels" | "transactions" | "new_transaction") => void;
+  activeTab:
+    | "levels"
+    | "transactions"
+    | "new_transaction"
+    | "transaction_returns";
+  setActiveTab: (
+    tab: "levels" | "transactions" | "new_transaction" | "transaction_returns",
+  ) => void;
 }
 
 export default function StockTabs({ activeTab, setActiveTab }: StockTabsProps) {
@@ -43,6 +49,17 @@ export default function StockTabs({ activeTab, setActiveTab }: StockTabsProps) {
       >
         <Package className="h-4 w-4" />
         {t("stock_levels")}
+      </button>
+      <button
+        onClick={() => setActiveTab("transaction_returns")}
+        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+          activeTab === "transaction_returns"
+            ? "bg-white text-blue-600 shadow-sm"
+            : "text-gray-500 hover:text-gray-700"
+        }`}
+      >
+        <History className="h-4 w-4" />
+        {t("transaction_returns", { defaultValue: "Returns" })}
       </button>
     </div>
   );
