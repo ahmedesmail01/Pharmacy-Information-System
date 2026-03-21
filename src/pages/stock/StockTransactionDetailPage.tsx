@@ -46,6 +46,20 @@ export default function StockTransactionDetailPage() {
   const PRODUCTS_PAGE_SIZE = 20;
   const currentSearchRef = useRef<string | undefined>(undefined);
 
+  // Pagination states for branches
+  const [branchesPage, setBranchesPage] = useState(1);
+  const [branchesHasMore, setBranchesHasMore] = useState(true);
+  const [isLoadingMoreBranches, setIsLoadingMoreBranches] = useState(false);
+  const currentBranchSearchRef = useRef<string | undefined>("");
+  const branchSearchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Pagination states for suppliers
+  const [suppliersPage, setSuppliersPage] = useState(1);
+  const [suppliersHasMore, setSuppliersHasMore] = useState(true);
+  const [isLoadingMoreSuppliers, setIsLoadingMoreSuppliers] = useState(false);
+  const currentSupplierSearchRef = useRef<string | undefined>("");
+  const supplierSearchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const transactionTypes = getLookupDetails("TRANSACTION_TYPE");
 
   const schema = z.object({
@@ -154,37 +168,132 @@ export default function StockTransactionDetailPage() {
     fetchProducts(currentSearchRef.current, productsPage + 1, false);
   };
 
+  const DEVICES_PAGESIZE = 10;
+
+  const fetchBranches = async (search = "", page = 1, replace = false) => {
+    try {
+      setIsLoadingMoreBranches(true);
+      const res = await branchService.query({
+        request: {
+          pagination: {
+            getAll: false,
+            pageNumber: page,
+            pageSize: DEVICES_PAGESIZE,
+          },
+          filters: search
+            ? [{ propertyName: "branchName", value: search, operation: 2 }]
+            : [],
+          sort: [{ sortBy: "branchName", sortDirection: "asc" }],
+        },
+      });
+      if (res.data.success && res.data.data) {
+        const fetched = res.data.data.data;
+        const hasNext = res.data.data.hasNextPage;
+        setBranches((prev) => {
+          if (replace) return fetched;
+          const merged = [...prev];
+          fetched.forEach((b) => {
+            if (!merged.find((m) => m.oid === b.oid)) merged.push(b);
+          });
+          return merged;
+        });
+        setBranchesHasMore(hasNext);
+        setBranchesPage(page);
+      }
+    } catch (err) {
+      console.error("Failed to fetch branches", err);
+    } finally {
+      setIsLoadingMoreBranches(false);
+    }
+  };
+
+  const debouncedFetchBranches = (search: string) => {
+    currentBranchSearchRef.current = search || undefined;
+    if (branchSearchTimeoutRef.current)
+      clearTimeout(branchSearchTimeoutRef.current);
+    branchSearchTimeoutRef.current = setTimeout(() => {
+      fetchBranches(currentBranchSearchRef.current, 1, true);
+    }, 300);
+  };
+
+  const handleLoadMoreBranches = () => {
+    if (!branchesHasMore || isLoadingMoreBranches) return;
+    fetchBranches(currentBranchSearchRef.current, branchesPage + 1, false);
+  };
+
+  const fetchSuppliers = async (search = "", page = 1, replace = false) => {
+    try {
+      setIsLoadingMoreSuppliers(true);
+      const filters = [
+        {
+          propertyName: "StakeholderTypeCode",
+          value: "VENDOR",
+          operation: FilterOperation.Equals,
+        },
+      ];
+      if (search) {
+        filters.push({ propertyName: "name", value: search, operation: 2 });
+      }
+
+      const res = await stakeholderService.query({
+        request: {
+          pagination: {
+            getAll: false,
+            pageNumber: page,
+            pageSize: DEVICES_PAGESIZE,
+          },
+          filters,
+          sort: [{ sortBy: "name", sortDirection: "asc" }],
+        },
+      });
+      if (res.data.success && res.data.data) {
+        const fetched = res.data.data.data;
+        const hasNext = res.data.data.hasNextPage;
+        setSuppliers((prev) => {
+          if (replace) return fetched;
+          const merged = [...prev];
+          fetched.forEach((s) => {
+            if (!merged.find((m) => m.oid === s.oid)) merged.push(s);
+          });
+          return merged;
+        });
+        setSuppliersHasMore(hasNext);
+        setSuppliersPage(page);
+      }
+    } catch (err) {
+      console.error("Failed to fetch suppliers", err);
+    } finally {
+      setIsLoadingMoreSuppliers(false);
+    }
+  };
+
+  const debouncedFetchSuppliers = (search: string) => {
+    currentSupplierSearchRef.current = search || undefined;
+    if (supplierSearchTimeoutRef.current)
+      clearTimeout(supplierSearchTimeoutRef.current);
+    supplierSearchTimeoutRef.current = setTimeout(() => {
+      fetchSuppliers(currentSupplierSearchRef.current, 1, true);
+    }, 300);
+  };
+
+  const handleLoadMoreSuppliers = () => {
+    if (!suppliersHasMore || isLoadingMoreSuppliers) return;
+    fetchSuppliers(currentSupplierSearchRef.current, suppliersPage + 1, false);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch static data first
-        const [bRes, sRes] = await Promise.all([
-          branchService.query({
-            request: {
-              pagination: { getAll: true, pageNumber: 1, pageSize: 10 },
-              sort: [{ sortBy: "branchName", sortDirection: "asc" }],
-            },
-          }),
-          stakeholderService.query({
-            request: {
-              pagination: { getAll: true, pageNumber: 1, pageSize: 10 },
-              filters: [
-                {
-                  propertyName: "StakeholderTypeCode",
-                  value: "VENDOR", // Upgraded from SUPPLIER
-                  operation: FilterOperation.Equals,
-                },
-              ],
-              sort: [{ sortBy: "name", sortDirection: "asc" }],
-            },
-          }),
-        ]);
-
-        if (bRes.data.success && bRes.data.data)
-          setBranches(bRes.data.data.data);
-        if (sRes.data.success && sRes.data.data)
-          setSuppliers(sRes.data.data.data);
+        // Fetch initial paged data for dependencies
+        try {
+          await Promise.all([
+            fetchBranches(undefined, 1, true),
+            fetchSuppliers(undefined, 1, true),
+          ]);
+        } catch (e) {
+          console.error("Failed to load dependency metadata", e);
+        }
 
         // Fetch transaction data
         if (id) {
@@ -350,6 +459,14 @@ export default function StockTransactionDetailPage() {
               transactionTypeOptions={getTransactionTypeOptions()}
               branchOptions={getBranchOptions()}
               supplierOptions={getSupplierOptions()}
+              debouncedFetchBranches={debouncedFetchBranches}
+              onLoadMoreBranches={handleLoadMoreBranches}
+              branchesHasMore={branchesHasMore}
+              isLoadingMoreBranches={isLoadingMoreBranches}
+              debouncedFetchSuppliers={debouncedFetchSuppliers}
+              onLoadMoreSuppliers={handleLoadMoreSuppliers}
+              suppliersHasMore={suppliersHasMore}
+              isLoadingMoreSuppliers={isLoadingMoreSuppliers}
             />
 
             <TransactionItemsTable

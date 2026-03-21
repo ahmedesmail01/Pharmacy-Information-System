@@ -10,6 +10,14 @@ interface TransactionGeneralInfoProps {
   branchOptions: { value: string; label: string }[];
   supplierOptions: { value: string; label: string }[];
   isViewMode?: boolean;
+  debouncedFetchBranches?: (search: string) => void;
+  onLoadMoreBranches?: () => void;
+  branchesHasMore?: boolean;
+  isLoadingMoreBranches?: boolean;
+  debouncedFetchSuppliers?: (search: string) => void;
+  onLoadMoreSuppliers?: () => void;
+  suppliersHasMore?: boolean;
+  isLoadingMoreSuppliers?: boolean;
 }
 
 export default function TransactionGeneralInfo({
@@ -18,6 +26,14 @@ export default function TransactionGeneralInfo({
   branchOptions,
   supplierOptions,
   isViewMode = false,
+  debouncedFetchBranches,
+  onLoadMoreBranches,
+  branchesHasMore = false,
+  isLoadingMoreBranches = false,
+  debouncedFetchSuppliers,
+  onLoadMoreSuppliers,
+  suppliersHasMore = false,
+  isLoadingMoreSuppliers = false,
 }: TransactionGeneralInfoProps) {
   const { t } = useTranslation("stock");
   const {
@@ -25,8 +41,6 @@ export default function TransactionGeneralInfo({
     watch,
     formState: { errors },
   } = useFormContext();
-
-  // console.log("typeCode", typeCode);
 
   return (
     <Card className="overflow-visible h-fit">
@@ -75,6 +89,10 @@ export default function TransactionGeneralInfo({
             error={(errors.toBranchId as any)?.message}
             disabled={isViewMode}
             {...register("toBranchId")}
+            onSearchChange={debouncedFetchBranches || (() => {})}
+            onLoadMore={onLoadMoreBranches || (() => {})}
+            hasMore={branchesHasMore}
+            isLoadingMore={isLoadingMoreBranches}
           />
         )}
 
@@ -88,6 +106,10 @@ export default function TransactionGeneralInfo({
             error={(errors.fromBranchId as any)?.message}
             disabled={isViewMode}
             {...register("fromBranchId")}
+            onSearchChange={debouncedFetchBranches || (() => {})}
+            onLoadMore={onLoadMoreBranches || (() => {})}
+            hasMore={branchesHasMore}
+            isLoadingMore={isLoadingMoreBranches}
           />
         )}
 
@@ -100,6 +122,10 @@ export default function TransactionGeneralInfo({
             error={(errors.supplierId as any)?.message}
             disabled={isViewMode}
             {...register("supplierId")}
+            onSearchChange={debouncedFetchSuppliers || (() => {})}
+            onLoadMore={onLoadMoreSuppliers || (() => {})}
+            hasMore={suppliersHasMore}
+            isLoadingMore={isLoadingMoreSuppliers}
           />
         )}
       </div>
