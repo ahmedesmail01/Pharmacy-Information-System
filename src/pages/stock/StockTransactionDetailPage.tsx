@@ -4,8 +4,9 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import * as z from "zod";
-import { Save, ArrowLeft, Loader2, Trash2, Undo2 } from "lucide-react";
+import { Save, ArrowLeft, Loader2, Trash2, Undo2, Printer } from "lucide-react";
 import toast from "react-hot-toast";
+import { useReactToPrint } from "react-to-print";
 
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -19,12 +20,14 @@ import {
   StakeholderDto,
   ProductDto,
   CreateStockTransactionDto as UpdateStockTransactionDto,
+  StockTransactionResponseDto,
   FilterOperation,
 } from "@/types";
 
 import TransactionHeader from "./components/TransactionHeader";
 import TransactionGeneralInfo from "./components/TransactionGeneralInfo";
 import TransactionItemsTable from "./components/TransactionItemsTable";
+import PrintableStockTransaction from "./components/PrintableStockTransaction";
 import PageHeader from "@/components/shared/PageHeader";
 
 export default function StockTransactionDetailPage() {
@@ -42,6 +45,14 @@ export default function StockTransactionDetailPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [transactionData, setTransactionData] =
+    useState<StockTransactionResponseDto | null>(null);
+
+  const printComponentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: printComponentRef,
+    documentTitle: `StockTransaction_${transactionData?.referenceNumber || id}`,
+  });
 
   const PRODUCTS_PAGE_SIZE = 20;
   const currentSearchRef = useRef<string | undefined>(undefined);
@@ -300,6 +311,7 @@ export default function StockTransactionDetailPage() {
           const tRes = await stockService.getById(id);
           if (tRes.data.success && tRes.data.data) {
             const tData = tRes.data.data;
+            setTransactionData(tData);
 
             const initialDetails = tData.details.map((d) => ({
               productId: d.productId,
@@ -441,16 +453,29 @@ export default function StockTransactionDetailPage() {
               <ArrowLeft size={20} />
             </Button>
             <TransactionHeader typeCode={typeCode || ""} className="w-full" />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(`/stock/transactions/${id}/return`)}
-              className="whitespace-nowrap px-4 flex items-center gap-2  text-red-600 underline"
-            >
-              <Undo2 size={20} />
-              {t("return_items", "Return Items")}
-            </Button>
+
+            <div className="flex items-center gap-2 ms-auto">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(`/stock/transactions/${id}/return`)}
+                className="whitespace-nowrap px-4 flex items-center gap-2 text-red-600 underline"
+              >
+                <Undo2 size={20} />
+                {t("return_items", "Return Items")}
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={() => handlePrint()}
+                className="whitespace-nowrap flex items-center gap-2 font-bold"
+              >
+                <Printer size={18} />
+                {t("print", "Print")}
+              </Button>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -538,6 +563,14 @@ export default function StockTransactionDetailPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Hidden printable stock transaction receipt */}
+      {transactionData && (
+        <PrintableStockTransaction
+          ref={printComponentRef}
+          transactionData={transactionData}
+        />
+      )}
     </div>
   );
 }
