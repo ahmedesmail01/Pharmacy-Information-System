@@ -44,6 +44,7 @@
   "scanPlaceholder": "Scan or type barcode and press Enter...",
   "searchByName": "Search by Name",
   "nameSearchPlaceholder": "Search product by name...",
+  "gtinSearchPlaceholderAndName": "Search product by GTIN or Name...",
   "batchNumber": "Batch #",
   "serialNumber": "Serial #",
   "expiryDate": "Expiry Date",

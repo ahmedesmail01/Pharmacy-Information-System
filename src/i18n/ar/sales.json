@@ -44,6 +44,7 @@
   "scanPlaceholder": "امسح أو اكتب الباركود واضغط Enter...",
   "searchByName": "البحث بالاسم",
   "nameSearchPlaceholder": "البحث عن المنتج بالاسم...",
+  "gtinSearchPlaceholderAndName": "البحث عن المنتج بالرقم التسلسلي أو الاسم...",
   "batchNumber": "رقم الدفعة",
   "serialNumber": "الرقم التسلسلي",
   "expiryDate": "تاريخ الانتهاء",

@@ -69,7 +69,7 @@ export default function ProductSearch({
             value: p.oid,
             label: `${p.drugName} - ${p.gtin || ""}`,
           }))}
-          searchPlaceholder={t("nameSearchPlaceholder")}
+          searchPlaceholder={t("gtinSearchPlaceholderAndName")}
           onSearchChange={onSearchChange}
           onLoadMore={onLoadMore}
           hasMore={hasMore}

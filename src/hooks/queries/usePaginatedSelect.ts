@@ -52,7 +52,7 @@ export function usePaginatedProducts({
             filters: search.trim()
               ? [
                   {
-                    propertyName: "drugName",
+                    propertyName: /^\d+$/.test(search.trim()) ? "gtin" : "drugName",
                     value: search,
                     operation: FilterOperation.Contains,
                   },
