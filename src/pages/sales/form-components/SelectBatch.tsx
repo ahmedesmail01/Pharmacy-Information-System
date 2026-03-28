@@ -20,7 +20,9 @@ const SelectBatch = ({ gtin, onSelect, placeholder }: Props) => {
     try {
       const res = await stockService.query({
         request: {
-          filters: [{ propertyName: "productGTIN", value: gtin, operation: 2 }],
+          filters: [
+            { propertyName: "Product.GTIN", value: gtin, operation: 2 },
+          ],
           pagination: {
             pageNumber: 1,
             pageSize: 50,
@@ -41,7 +43,7 @@ const SelectBatch = ({ gtin, onSelect, placeholder }: Props) => {
         },
       });
       setBatches(
-        res.data.data.data.filter((b) => b.availableQuantity > 0) || [],
+        res.data.data.data.filter((b) => b.availableQuantity > 0) || []
       );
     } catch (err) {
       console.error("Failed to fetch batches", err);
@@ -80,8 +82,8 @@ const SelectBatch = ({ gtin, onSelect, placeholder }: Props) => {
           isLoading
             ? t("loading")
             : options.length === 0
-              ? t("no_batches")
-              : placeholder || t("select_batch")
+            ? t("no_batches")
+            : placeholder || t("select_batch")
         }
         disabled={isLoading || options.length === 0}
         searchPlaceholder={t("search_batch")}
