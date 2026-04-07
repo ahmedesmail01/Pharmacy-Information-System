@@ -35,19 +35,15 @@ export default function StockTransactions() {
   });
 
   const loadData = useCallback(() => {
-    const filters = [
-      new FilterRequest(
-        "referenceNumber",
-        searchTerm,
-        FilterOperation.Contains,
-      ),
-    ];
-    if (searchTerm) {
-      filters.push({
-        propertyName: "referenceNumber",
-        value: searchTerm,
-        operation: FilterOperation.Contains,
-      });
+    const filters: FilterRequest[] = [];
+    if (searchTerm.length > 3) {
+      filters.push(
+        new FilterRequest(
+          "referenceNumber",
+          searchTerm,
+          FilterOperation.Contains,
+        ),
+      );
     }
     fetch("", filters);
   }, [fetch, searchTerm]);
