@@ -70,6 +70,11 @@ const menuKeys: MenuItem[] = [
         permission: PERMISSIONS.BRANCHES.VIEW,
       },
       {
+        labelKey: "stores",
+        path: "/stores",
+        permission: PERMISSIONS.STORES.VIEW,
+      },
+      {
         labelKey: "systemUsers",
         path: "/users",
         permission: PERMISSIONS.USERS.VIEW,
@@ -351,11 +356,7 @@ export default function Sidebar({
             {depth === 0 && (
               <Icon className={`h-5 w-5 flex-shrink-0 ${iconStyles}`} />
             )}
-            {!isCollapsed && (
-              <span className="flex-1">
-                {t(item.labelKey)}
-              </span>
-            )}
+            {!isCollapsed && <span className="flex-1">{t(item.labelKey)}</span>}
           </Link>
         );
       });

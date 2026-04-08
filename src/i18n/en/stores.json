@@ -1,0 +1,21 @@
+{
+  "title": "Stores",
+  "addStore": "Add Store",
+  "editStore": "Edit Store",
+  "deleteStore": "Delete Store",
+  "deleteConfirm": "Are you sure you want to delete this store?",
+  "storeCode": "Store Code",
+  "storeName": "Store Name",
+  "description": "Description",
+  "address": "Address",
+  "phoneNumber": "Phone Number",
+  "branch": "Branch",
+  "status": "Status",
+  "isActive": "Is Active",
+  "searchPlaceholder": "Search by store name...",
+  "storeCreated": "Store created successfully",
+  "storeUpdated": "Store updated successfully",
+  "storeDeleted": "Store deleted successfully",
+  "branchRequired": "Branch is required",
+  "storeNameRequired": "Store name is required"
+}

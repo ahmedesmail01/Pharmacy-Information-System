@@ -1,0 +1,21 @@
+{
+  "title": "المستودعات",
+  "addStore": "إضافة مستودع",
+  "editStore": "تعديل مستودع",
+  "deleteStore": "حذف مستودع",
+  "deleteConfirm": "هل أنت متأكد من حذف هذا المستودع؟",
+  "storeCode": "كود المستودع",
+  "storeName": "اسم المستودع",
+  "description": "الوصف",
+  "address": "العنوان",
+  "phoneNumber": "رقم الهاتف",
+  "branch": "الفرع",
+  "status": "الحالة",
+  "isActive": "نشط",
+  "searchPlaceholder": "البحث باسم المستودع...",
+  "storeCreated": "تم إنشاء المستودع بنجاح",
+  "storeUpdated": "تم تحديث المستودع بنجاح",
+  "storeDeleted": "تم حذف المستودع بنجاح",
+  "branchRequired": "الفرع مطلوب",
+  "storeNameRequired": "اسم المستودع مطلوب"
+}

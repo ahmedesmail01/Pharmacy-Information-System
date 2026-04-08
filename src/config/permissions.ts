@@ -13,6 +13,12 @@ export const PERMISSIONS = {
     EDIT: "branches.edit",
     DELETE: "branches.delete",
   },
+  STORES: {
+    VIEW: "stores.view",
+    CREATE: "stores.create",
+    EDIT: "stores.edit",
+    DELETE: "stores.delete",
+  },
   PRODUCTS: {
     VIEW: "products.view",
     CREATE: "products.create",

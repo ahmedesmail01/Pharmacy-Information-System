@@ -4,6 +4,8 @@ import {
   StoreDto,
   PagedResult,
   QueryRequest,
+  CreateStoreDto,
+  UpdateStoreDto,
 } from "@/types";
 
 export const storeService = {
@@ -15,4 +17,13 @@ export const storeService = {
 
   getById: (id: string) => 
     api.get<ApiResponse<StoreDto>>(`/api/Store/${id}`),
+
+  create: (data: CreateStoreDto) =>
+    api.post<ApiResponse<StoreDto>>("/api/Store", data),
+
+  update: (id: string, data: UpdateStoreDto) =>
+    api.put<ApiResponse<StoreDto>>(`/api/Store/${id}`, data),
+
+  delete: (id: string) =>
+    api.delete<ApiResponse<string>>(`/api/Store/${id}`),
 };

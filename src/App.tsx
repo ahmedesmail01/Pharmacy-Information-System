@@ -7,6 +7,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import LoginPage from "@/pages/LoginPage";
 import DashboardPage from "@/pages/DashboardPage";
 import BranchesPage from "@/pages/branches/BranchesPage";
+import StoresPage from "@/pages/store/StoresPage";
 import ProductsPage from "@/pages/products/ProductsPage";
 import RolesPage from "@/pages/roles/RolesPage";
 import SalesPage from "@/pages/sales/SalesPage";
@@ -61,6 +62,7 @@ export default function App() {
           >
             <Route index element={<DashboardPage />} />
             <Route path="branches" element={<BranchesPage />} />
+            <Route path="stores" element={<StoresPage />} />
             <Route path="products" element={<ProductsPage />} />
             <Route path="products/new" element={<ProductFormPage />} />
             <Route path="products/edit/:id" element={<ProductFormPage />} />

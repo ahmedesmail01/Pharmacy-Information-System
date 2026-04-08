@@ -260,6 +260,21 @@ export interface StoreDto {
   createdAt: string;
 }
 
+export interface CreateStoreDto {
+  storeCode: string;
+  storeName: string;
+  description?: string;
+  address?: string;
+  phoneNumber?: string;
+  isActive: boolean;
+  branchId: string;
+  status: number;
+}
+
+export interface UpdateStoreDto extends CreateStoreDto {
+  oid: string;
+}
+
 // ─── Product ──────────────────────────────────────────────────────────────────
 
 export interface ProductDto {
