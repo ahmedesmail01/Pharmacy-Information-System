@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
   Plug,
+  Briefcase,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -32,6 +33,7 @@ const menuIcons: Record<string, any> = {
   "/lookups": Settings,
   "/integrations": Plug,
   "/rsd": ShieldCheck,
+  "/management": Briefcase,
 };
 
 // paths → translation keys (sidebar namespace)
@@ -50,17 +52,43 @@ const menuKeys: MenuItem[] = [
     path: "/",
     permission: PERMISSIONS.DASHBOARD.VIEW,
   },
+  // managment should be here
   {
-    labelKey: "branches",
-    icon: "/branches",
-    path: "/branches",
-    permission: PERMISSIONS.BRANCHES.VIEW,
-  },
-  {
-    labelKey: "products",
-    icon: "/products",
-    path: "/products",
-    permission: PERMISSIONS.PRODUCTS.VIEW,
+    labelKey: "management",
+    icon: "/management",
+    path: "/management",
+    children: [
+      {
+        labelKey: "products",
+        path: "/products",
+        permission: PERMISSIONS.PRODUCTS.VIEW,
+      },
+      {
+        labelKey: "branches",
+        path: "/branches",
+        permission: PERMISSIONS.BRANCHES.VIEW,
+      },
+      {
+        labelKey: "systemUsers",
+        path: "/users",
+        permission: PERMISSIONS.USERS.VIEW,
+      },
+      {
+        labelKey: "roles",
+        path: "/roles",
+        permission: PERMISSIONS.ROLES.VIEW,
+      },
+      {
+        labelKey: "stakeholders",
+        path: "/stakeholders",
+        permission: PERMISSIONS.STAKEHOLDERS.VIEW,
+      },
+      {
+        labelKey: "lookups",
+        path: "/lookups",
+        permission: PERMISSIONS.LOOKUPS.VIEW,
+      },
+    ],
   },
   {
     labelKey: "sales",
@@ -132,30 +160,6 @@ const menuKeys: MenuItem[] = [
     ],
   },
   {
-    labelKey: "stakeholders",
-    icon: "/stakeholders",
-    path: "/stakeholders",
-    permission: PERMISSIONS.STAKEHOLDERS.VIEW,
-  },
-  {
-    labelKey: "systemUsers",
-    icon: "/users",
-    path: "/users",
-    permission: PERMISSIONS.USERS.VIEW,
-  },
-  {
-    labelKey: "roles",
-    icon: "/roles",
-    path: "/roles",
-    permission: PERMISSIONS.ROLES.VIEW,
-  },
-  {
-    labelKey: "lookups",
-    icon: "/lookups",
-    path: "/lookups",
-    permission: PERMISSIONS.LOOKUPS.VIEW,
-  },
-  {
     labelKey: "integrations",
     icon: "/integrations",
     path: "/integrations",
@@ -210,9 +214,17 @@ export default function Sidebar({
     }
   }, [location.pathname]);
 
-  const isActive = (path: string) => {
-    if (path === "/") return location.pathname === "/";
-    return location.pathname.startsWith(path);
+  const isActive = (item: MenuItem) => {
+    if (item.path === "/") return location.pathname === "/";
+    if (location.pathname.startsWith(item.path)) return true;
+    if (item.children) {
+      return item.children.some(
+        (child) =>
+          child.path === location.pathname ||
+          (child.path !== "/" && location.pathname.startsWith(child.path)),
+      );
+    }
+    return false;
   };
 
   const isChildActive = (childPath: string) => {
@@ -255,12 +267,10 @@ export default function Sidebar({
       {/* Nav Items */}
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 no-scrollbar">
         {menuKeys
-          .filter(
-            (item) => !item.permission || hasPermission(item.permission),
-          )
+          .filter((item) => !item.permission || hasPermission(item.permission))
           .map((item) => {
             const Icon = menuIcons[item.icon] || Settings;
-            const active = isActive(item.path);
+            const active = isActive(item);
             const hasChildren = item.children && item.children.length > 0;
             const isExpanded = expandedMenu === item.path;
 

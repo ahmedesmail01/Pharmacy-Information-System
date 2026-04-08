@@ -11,7 +11,7 @@
   "transactionHistory": "Transaction History",
   "stockLevels": "Stock Levels",
   "stockReturns": "Returns",
-  "systemUsers": "System Users",
+  "systemUsers": "System User Management",
   "roles": "Roles",
   "lookups": "Lookups",
   "integrations": "Integrations",
@@ -21,5 +21,6 @@
   "rsd": "RSD",
   "rsdLogs": "RSD Logs",
   "rsdOperations": "RSD Operations",
-  "pharmacyIS": "Pharmacy IS"
+  "pharmacyIS": "Pharmacy IS",
+  "management": "Management"
 }
