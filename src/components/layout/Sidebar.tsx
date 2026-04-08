@@ -16,6 +16,7 @@ import {
   ChevronRight as ChevronRightIcon,
   Plug,
   Briefcase,
+  Activity,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -32,17 +33,17 @@ const menuIcons: Record<string, any> = {
   "/roles": ShieldCheck,
   "/lookups": Settings,
   "/integrations": Plug,
-  "/rsd": ShieldCheck,
   "/management": Briefcase,
+  "/operations": Activity,
 };
 
 // paths → translation keys (sidebar namespace)
 interface MenuItem {
   labelKey: string;
-  icon: string;
+  icon?: string;
   path: string;
   permission?: string;
-  children?: { labelKey: string; path: string; permission?: string }[];
+  children?: MenuItem[];
 }
 
 const menuKeys: MenuItem[] = [
@@ -91,53 +92,67 @@ const menuKeys: MenuItem[] = [
     ],
   },
   {
-    labelKey: "sales",
-    icon: "/sales",
-    path: "/sales",
-    permission: PERMISSIONS.SALES.VIEW,
+    labelKey: "operations",
+    icon: "/operations",
+    path: "/operations",
     children: [
       {
-        labelKey: "salesForm",
+        labelKey: "sales",
+        icon: "/sales",
         path: "/sales",
-        permission: PERMISSIONS.SALES.CREATE,
+        permission: PERMISSIONS.SALES.VIEW,
+        children: [
+          {
+            labelKey: "salesForm",
+            icon: "/sales",
+            path: "/sales",
+            permission: PERMISSIONS.SALES.CREATE,
+          },
+          {
+            labelKey: "salesHistory",
+            icon: "/sales",
+            path: "/sales/history",
+            permission: PERMISSIONS.SALES.HISTORY,
+          },
+          {
+            labelKey: "refundHistory",
+            icon: "/sales",
+            path: "/sales/refunds",
+            permission: PERMISSIONS.SALES.REFUND,
+          },
+        ],
       },
       {
-        labelKey: "salesHistory",
-        path: "/sales/history",
-        permission: PERMISSIONS.SALES.HISTORY,
-      },
-      {
-        labelKey: "refundHistory",
-        path: "/sales/refunds",
-        permission: PERMISSIONS.SALES.REFUND,
-      },
-    ],
-  },
-  {
-    labelKey: "stock",
-    icon: "/stock",
-    path: "/stock",
-    permission: PERMISSIONS.STOCK.VIEW,
-    children: [
-      {
-        labelKey: "newTransaction",
+        labelKey: "stock",
+        icon: "/stock",
         path: "/stock",
-        permission: PERMISSIONS.STOCK.CREATE,
-      },
-      {
-        labelKey: "transactionHistory",
-        path: "/stock/history",
-        permission: PERMISSIONS.STOCK.HISTORY,
-      },
-      {
-        labelKey: "stockLevels",
-        path: "/stock/levels",
-        permission: PERMISSIONS.STOCK.LEVELS,
-      },
-      {
-        labelKey: "stockReturns",
-        path: "/stock/returns",
-        permission: PERMISSIONS.STOCK.RETURNS,
+        permission: PERMISSIONS.STOCK.VIEW,
+        children: [
+          {
+            labelKey: "newTransaction",
+            icon: "/stock",
+            path: "/stock",
+            permission: PERMISSIONS.STOCK.CREATE,
+          },
+          {
+            labelKey: "transactionHistory",
+            icon: "/stock",
+            path: "/stock/history",
+            permission: PERMISSIONS.STOCK.HISTORY,
+          },
+          {
+            labelKey: "stockLevels",
+            icon: "/stock",
+            path: "/stock/levels",
+            permission: PERMISSIONS.STOCK.LEVELS,
+          },
+          {
+            labelKey: "stockReturns",
+            icon: "/stock",
+            path: "/stock/returns",
+            permission: PERMISSIONS.STOCK.RETURNS,
+          },
+        ],
       },
     ],
   },
@@ -149,11 +164,13 @@ const menuKeys: MenuItem[] = [
     children: [
       {
         labelKey: "rsdOperations",
+        icon: "/rsd",
         path: "/rsd",
         permission: PERMISSIONS.RSD.OPERATE,
       },
       {
         labelKey: "rsdLogs",
+        icon: "/rsd",
         path: "/rsd/logs",
         permission: PERMISSIONS.RSD.LOGS,
       },
@@ -194,35 +211,69 @@ export default function Sidebar({
   const { t, i18n } = useTranslation("sidebar");
   const dir = i18n.dir();
   const isRtl = dir === "rtl";
-  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const { hasPermission } = usePermissions();
 
-  // Auto-expand parent dropdown when a child route is active
+  const togglePath = (path: string) => {
+    setExpandedPaths((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  };
+
+  // Auto-expand parent dropdowns when a child route is active
   useEffect(() => {
-    for (const item of menuKeys) {
-      if (item.children) {
-        const isChildActive = item.children.some(
-          (child) =>
-            child.path === location.pathname ||
-            (child.path !== "/" && location.pathname.startsWith(child.path)),
-        );
-        if (isChildActive) {
-          setExpandedMenu(item.path);
-          return;
+    const findActivePaths = (
+      items: MenuItem[],
+      targetPath: string,
+      currentStack: string[],
+    ): string[] | null => {
+      for (const item of items) {
+        if (
+          item.path === targetPath ||
+          (item.path !== "/" && targetPath.startsWith(item.path))
+        ) {
+          // If it has children, also check them for a more specific match
+          if (item.children) {
+            const childResult = findActivePaths(item.children, targetPath, [
+              ...currentStack,
+              item.path,
+            ]);
+            if (childResult) return childResult;
+          }
+          return [...currentStack, item.path];
+        }
+        if (item.children) {
+          const childResult = findActivePaths(item.children, targetPath, [
+            ...currentStack,
+            item.path,
+          ]);
+          if (childResult) return childResult;
         }
       }
+      return null;
+    };
+
+    const activePaths = findActivePaths(menuKeys, location.pathname, []);
+    if (activePaths) {
+      setExpandedPaths((prev) => {
+        const next = new Set(prev);
+        activePaths.forEach((path) => next.add(path));
+        return next;
+      });
     }
   }, [location.pathname]);
 
-  const isActive = (item: MenuItem) => {
+  const isActive = (item: MenuItem): boolean => {
     if (item.path === "/") return location.pathname === "/";
     if (location.pathname.startsWith(item.path)) return true;
     if (item.children) {
-      return item.children.some(
-        (child) =>
-          child.path === location.pathname ||
-          (child.path !== "/" && location.pathname.startsWith(child.path)),
-      );
+      return item.children.some((child) => isActive(child));
     }
     return false;
   };
@@ -231,9 +282,88 @@ export default function Sidebar({
     return location.pathname === childPath;
   };
 
+  const renderMenuItems = (items: MenuItem[], depth = 0) => {
+    return items
+      .filter((item) => !item.permission || hasPermission(item.permission))
+      .map((item) => {
+        const Icon = (item.icon && menuIcons[item.icon]) || Settings;
+        const active = isActive(item);
+        const childActive = isChildActive(item.path);
+        const hasChildren = item.children && item.children.length > 0;
+        const isExpanded = expandedPaths.has(item.path);
+
+        const visibleChildren = hasChildren
+          ? item.children!.filter(
+              (child) => !child.permission || hasPermission(child.permission),
+            )
+          : [];
+
+        const itemStyles = childActive
+          ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+          : active
+            ? "bg-blue-500/10 text-blue-400"
+            : "text-gray-400 hover:text-gray-100 hover:bg-white/5";
+
+        const iconStyles = childActive
+          ? "text-white"
+          : active
+            ? "text-blue-400"
+            : "text-gray-400 group-hover:text-gray-200";
+
+        if (hasChildren && visibleChildren.length > 0) {
+          return (
+            <div key={item.path} className="space-y-1">
+              <button
+                onClick={() => togglePath(item.path)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 group ${itemStyles}`}
+              >
+                {depth === 0 && (
+                  <Icon className={`h-5 w-5 flex-shrink-0 ${iconStyles}`} />
+                )}
+                {!isCollapsed && (
+                  <>
+                    <span className="flex-1 text-start">
+                      {t(item.labelKey)}
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                    />
+                  </>
+                )}
+              </button>
+              {!isCollapsed && isExpanded && (
+                <div
+                  className={`relative ${isRtl ? "mr-6 pr-2 border-r" : "ml-6 pl-2 border-l"} border-gray-800/50 mt-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-300`}
+                >
+                  {renderMenuItems(visibleChildren, depth + 1)}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 group ${itemStyles}`}
+          >
+            {depth === 0 && (
+              <Icon className={`h-5 w-5 flex-shrink-0 ${iconStyles}`} />
+            )}
+            {!isCollapsed && (
+              <span className="flex-1">
+                {t(item.labelKey)}
+              </span>
+            )}
+          </Link>
+        );
+      });
+  };
+
   return (
     <aside
-      className={`fixed top-0 ${isRtl ? "right-0" : "left-0"} h-full bg-[#111827] border-gray-100 z-40 transition-all duration-300 flex flex-col shadow-xl shadow-gray-100/50
+      className={`fixed top-0 ${isRtl ? "right-0" : "left-0"} h-full bg-[#111827] border-gray-800 z-40 transition-all duration-300 flex flex-col shadow-2xl
       ${isCollapsed ? "w-20" : "w-64"}
       ${isMobileOpen ? "translate-x-0" : isRtl ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"}
       ${isRtl ? "border-l" : "border-r"}
@@ -266,97 +396,7 @@ export default function Sidebar({
 
       {/* Nav Items */}
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 no-scrollbar">
-        {menuKeys
-          .filter((item) => !item.permission || hasPermission(item.permission))
-          .map((item) => {
-            const Icon = menuIcons[item.icon] || Settings;
-            const active = isActive(item);
-            const hasChildren = item.children && item.children.length > 0;
-            const isExpanded = expandedMenu === item.path;
-
-            // Filter children by permission
-            const visibleChildren = hasChildren
-              ? item.children!.filter(
-                  (child) =>
-                    !child.permission || hasPermission(child.permission),
-                )
-              : [];
-
-            if (hasChildren && visibleChildren.length > 0) {
-              return (
-                <div key={item.path}>
-                  <button
-                    onClick={() =>
-                      setExpandedMenu(isExpanded ? null : item.path)
-                    }
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
-                      active
-                        ? "bg-blue-50 text-blue-700"
-                        : "text-gray-200 hover:bg-gray-50 hover:text-gray-900"
-                    }`}
-                  >
-                    <Icon
-                      className={`h-5 w-5 flex-shrink-0 ${active ? "text-blue-600" : "text-gray-200 group-hover:text-gray-600"}`}
-                    />
-                    {!isCollapsed && (
-                      <>
-                        <span
-                          className={`flex-1 text-start ${active ? "text-blue-600" : "text-gray-200 group-hover:text-gray-600"}`}
-                        >
-                          {t(item.labelKey)}
-                        </span>
-                        <ChevronDown
-                          className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-                        />
-                      </>
-                    )}
-                  </button>
-                  {!isCollapsed && isExpanded && (
-                    <div
-                      className={`${isRtl ? "pr-8" : "pl-8"} mt-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200`}
-                    >
-                      {visibleChildren.map((child) => (
-                        <Link
-                          key={child.path}
-                          to={child.path}
-                          className={`block px-3 py-2 rounded-lg text-sm transition-all ${
-                            isChildActive(child.path)
-                              ? "bg-blue-100 text-blue-700 font-semibold"
-                              : "text-gray-300 font-semibold hover:bg-gray-50 hover:text-gray-900"
-                          }`}
-                        >
-                          {t(child.labelKey)}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            }
-
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
-                  active
-                    ? "bg-blue-50 text-blue-700 shadow-sm shadow-blue-100"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
-              >
-                <Icon
-                  className={`h-5 w-5 flex-shrink-0 ${active ? "text-blue-600" : "text-gray-200 group-hover:text-gray-600"}`}
-                />
-                {!isCollapsed && (
-                  <span
-                    className={`${active ? "text-blue-600" : "text-gray-200 group-hover:text-gray-600"}`}
-                  >
-                    {t(item.labelKey)}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+        {renderMenuItems(menuKeys)}
       </nav>
     </aside>
   );
