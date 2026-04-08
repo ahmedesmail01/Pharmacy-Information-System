@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect, useState } from "react";
@@ -41,6 +41,7 @@ export default function StoreForm({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<StoreFormValues>({
     resolver: zodResolver(storeSchema),
@@ -111,15 +112,21 @@ export default function StoreForm({
         />
       </div>
 
-      <Select
-        {...register("branchId")}
-        label={t("branch") + "*"}
-        options={branches.map((b) => ({
-          value: b.oid,
-          label: b.branchName,
-        }))}
-        error={errors.branchId?.message}
-        disabled={isLoading}
+      <Controller
+        name="branchId"
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            label={t("branch") + "*"}
+            options={branches.map((b) => ({
+              value: b.oid,
+              label: b.branchName,
+            }))}
+            error={errors.branchId?.message}
+            disabled={isLoading}
+          />
+        )}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -130,15 +137,21 @@ export default function StoreForm({
           error={errors.phoneNumber?.message}
           disabled={isLoading}
         />
-        <Select
-          {...register("status")}
-          label={tc("status")}
-          options={[
-            { value: 1, label: tc("active") },
-            { value: 0, label: tc("inactive") },
-          ]}
-          error={errors.status?.message}
-          disabled={isLoading}
+        <Controller
+          name="status"
+          control={control}
+          render={({ field }) => (
+            <Select
+              {...field}
+              label={tc("status")}
+              options={[
+                { value: 1, label: tc("active") },
+                { value: 0, label: tc("inactive") },
+              ]}
+              error={errors.status?.message}
+              disabled={isLoading}
+            />
+          )}
         />
       </div>
 
