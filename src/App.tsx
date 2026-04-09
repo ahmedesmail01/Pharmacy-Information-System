@@ -35,6 +35,7 @@ import StockTransactionReturnPage from "./pages/stock/StockTransactionReturnPage
 import StockTransactionReturnDetailPage from "./pages/stock/StockTransactionReturnDetailPage";
 import PermissionGate from "@/components/shared/PermissionGate";
 import { PERMISSIONS } from "@/config/permissions";
+import InvoiceTemplatePage from "./pages/invoiceBuilder/InvoiceTemplatePage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -103,10 +104,7 @@ export default function App() {
             <Route path="rsd/logs" element={<RsdLogsPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="lookups" element={<LookupsPage />} />
-            <Route
-              path="lookups/:lookupCode"
-              element={<LookupDetailPage />}
-            />
+            <Route path="lookups/:lookupCode" element={<LookupDetailPage />} />
             <Route
               path="integrations/providers"
               element={<IntegrationProvidersPage />}
@@ -115,6 +113,7 @@ export default function App() {
               path="integrations/settings"
               element={<BranchIntegrationsPage />}
             />
+            <Route path="invoice-builder" element={<InvoiceTemplatePage />} />
           </Route>
         </Routes>
       </BrowserRouter>
