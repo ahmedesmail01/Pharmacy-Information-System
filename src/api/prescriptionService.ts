@@ -8,23 +8,23 @@ const DEV_PRESCRIPTION_URL =
 
 export interface PrescriptionMedicineMatching {
   input_type: string;
-  active: string;
-  category: string;
+  active: string | null;
+  category: string | null;
   confidence: string;
-  note: string;
+  note: string | null;
   matches: string[];
 }
 
 export interface PrescriptionMedicine {
   ocr_name: string;
   cleaned_name: string;
-  dose: string;
-  frequency: string;
-  duration: string;
-  route: string;
-  notes: string;
+  dose: string | null;
+  frequency: string | null;
+  duration: string | null;
+  route: string | null;
+  notes: string | null;
   read_confidence: string;
-  corrected_from: string;
+  corrected_from: string | null;
   matching: PrescriptionMedicineMatching;
 }
 
@@ -41,7 +41,11 @@ export interface PrescriptionAnalysisResponse {
   image: string;
   ocr: PrescriptionOCR;
   medicines: PrescriptionMedicine[];
-  summary: Record<string, any>;
+  summary: {
+    total: number;
+    found: number;
+    not_found: number;
+  };
 }
 
 // ─── Service ─────────────────────────────────────────────────────────────────

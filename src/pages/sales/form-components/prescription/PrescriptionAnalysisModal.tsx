@@ -81,18 +81,11 @@ export default function PrescriptionAnalysisModal({
       matchedProducts: [],
       selectedProduct: null,
       isExpanded: true,
-      isLoading: true,
+      isLoading: false, // Don't start loading automatically
       searchTerm: m.cleaned_name || m.ocr_name,
     }));
 
     setSelections(initial);
-
-    initial.forEach((_, idx) => {
-      const name =
-        analysisResult.medicines[idx].cleaned_name ||
-        analysisResult.medicines[idx].ocr_name;
-      searchProducts(name, idx);
-    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analysisResult]);
 
@@ -123,8 +116,8 @@ export default function PrescriptionAnalysisModal({
       prev.map((s, i) => (i === index ? { ...s, searchTerm: value } : s)),
     );
 
-  const handleSearchSubmit = (index: number) => {
-    const term = selections[index]?.searchTerm;
+  const handleSearchSubmit = (index: number, forcedTerm?: string) => {
+    const term = forcedTerm || selections[index]?.searchTerm;
     if (term) searchProducts(term, index);
   };
 

@@ -5,6 +5,7 @@ import {
   Check,
   Search,
   AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 import type { ProductDto } from "@/types";
 import Spinner from "@/components/ui/Spinner";
@@ -18,7 +19,7 @@ interface MedicineTreeNodeProps {
   onSelect: (i: number, p: ProductDto) => void;
   onDeselect: (i: number) => void;
   onSearchChange: (i: number, v: string) => void;
-  onSearchSubmit: (i: number) => void;
+  onSearchSubmit: (i: number, term?: string) => void;
 }
 
 export default function MedicineTreeNode({
@@ -31,7 +32,14 @@ export default function MedicineTreeNode({
   onSearchSubmit,
 }: MedicineTreeNodeProps) {
   const med = sel.medicine;
-  const confidence = parseFloat(med.read_confidence || "0");
+  
+  // Map string confidence to numeric for the badge colors
+  const confidenceMap: Record<string, number> = {
+    high: 0.9,
+    medium: 0.6,
+    low: 0.3,
+  };
+  const confidence = confidenceMap[med.read_confidence?.toLowerCase() || ""] || parseFloat(med.read_confidence || "0") || 0;
 
   return (
     <div
@@ -98,7 +106,7 @@ export default function MedicineTreeNode({
             </span>
           )}
           <span
-            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+            className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${
               confidence >= 0.8
                 ? "bg-emerald-100 text-emerald-700"
                 : confidence >= 0.5
@@ -106,7 +114,7 @@ export default function MedicineTreeNode({
                   : "bg-red-100 text-red-700"
             }`}
           >
-            {(confidence * 100).toFixed(0)}%
+            {med.read_confidence}
           </span>
         </div>
       </button>
@@ -115,6 +123,30 @@ export default function MedicineTreeNode({
       {sel.isExpanded && (
         <div className="px-4 pb-4">
           <div className="ml-6 pl-4 border-l-2 border-gray-200 space-y-2">
+            {/* AI Suggestions */}
+            {med.matching?.matches?.length > 0 && (
+              <div className="mb-3">
+                <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <Sparkles className="h-3 w-3 text-violet-400" />
+                  AI Suggested Matches
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {med.matching.matches.map((match, mIdx) => (
+                    <button
+                      key={mIdx}
+                      onClick={() => {
+                        onSearchChange(index, match);
+                        onSearchSubmit(index, match);
+                      }}
+                      className="px-2.5 py-1 text-[11px] bg-violet-50 text-violet-700 border border-violet-100 rounded-full hover:bg-violet-100 hover:border-violet-200 transition-all font-medium"
+                    >
+                      {match}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* search field */}
             <div className="flex items-center gap-2 mb-2">
               <div className="relative flex-1">
